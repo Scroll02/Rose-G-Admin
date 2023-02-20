@@ -48,11 +48,12 @@ const Sidebar = () => {
           </Link>
 
           <p className="title">USER</p>
-
-          <li>
-            <LogoutRoundedIcon className="icon" />
-            <span>Logout</span>
-          </li>
+          <Link to="/login" style={{ textDecoration: "none" }}>
+            <li>
+              <LogoutRoundedIcon className="icon" />
+              <span>Logout</span>
+            </li>
+          </Link>
         </ul>
       </div>
     </div>

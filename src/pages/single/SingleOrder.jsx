@@ -22,7 +22,7 @@ const SingleOrder = () => {
   const { orderId } = useParams();
   // console.log(orderId);
 
-  //------------------ Rertrieve Food Data  ------------------//
+  //------------------ Retrieve Food Data  ------------------//
   const [userOrderData, setUserOrderData] = useState([]);
 
   const getUserOrderData = async () => {

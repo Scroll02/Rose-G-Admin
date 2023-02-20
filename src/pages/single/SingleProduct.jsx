@@ -24,7 +24,7 @@ const SingleProduct = () => {
 
   const navigate = useNavigate();
 
-  //------------------ Rertrieve Food Data  ------------------//
+  //------------------ Retrieve Food Data  ------------------//
   const [foodData, setFoodData] = useState();
 
   const getFoodData = async () => {
