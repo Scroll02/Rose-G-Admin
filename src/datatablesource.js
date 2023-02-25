@@ -19,7 +19,7 @@ export const userColumns = [
           ) : (
             <img className="cellImg" src={params.row.img} alt="avatar" />
           )}
-          {params.row.fullName}
+          {params.row.firstName}&nbsp;{params.row.lastName}
         </div>
       );
     },
@@ -30,11 +30,11 @@ export const userColumns = [
     width: 200,
   },
 
-  {
-    field: "fullName",
-    headerName: "Full Name",
-    width: 180,
-  },
+  // {
+  //   field: "fullName",
+  //   headerName: "Full Name",
+  //   width: 180,
+  // },
   {
     field: "contactNumber",
     headerName: "Contact Number",

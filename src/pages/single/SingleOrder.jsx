@@ -105,7 +105,8 @@ const SingleOrder = () => {
                 <div className="detailItem">
                   <span className="itemKey">Customer Full Name:</span>
                   <span className="itemValue">
-                    {userOrderData.orderFullName}
+                    {userOrderData.orderFirstName}&nbsp;
+                    {userOrderData.orderLastName}
                   </span>
                 </div>
 

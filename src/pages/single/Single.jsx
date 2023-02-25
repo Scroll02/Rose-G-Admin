@@ -44,6 +44,8 @@ const Single = () => {
 
   //------------------ Handle Change for Input  ------------------//
   const [newFullName, setNewFullName] = useState("");
+  const [newFirstName, setNewFirstName] = useState("");
+  const [newLastName, setNewLastName] = useState("");
   const [newEmail, setNewEmail] = useState("");
   const [newContactNumber, setNewContactNumber] = useState("");
   const [newAddress, setNewAddress] = useState("");
@@ -58,9 +60,21 @@ const Single = () => {
     const docRef = doc(db, "UserData", userId);
 
     if (docRef !== null) {
-      if (newFullName !== "") {
+      if (newFirstName !== "") {
         updateDoc(docRef, {
-          fullName: newFullName,
+          firstName: newFirstName,
+        });
+      }
+
+      if (newLastName !== "") {
+        updateDoc(docRef, {
+          lastName: newLastName,
+        });
+      }
+
+      if (newEmail !== "") {
+        updateDoc(docRef, {
+          email: newEmail,
         });
       }
 
@@ -96,14 +110,37 @@ const Single = () => {
             <div className="item">
               <img src={defaultUserIcon} alt="" className="itemImg" />
               <div className="details">
-                <h1 className="itemTitle">{userData?.fullName}</h1>
+                {/*-------------------- Full Name -------------------- */}
+                <h1 className="itemTitle">
+                  Full Name:&nbsp;{userData?.firstName}&nbsp;
+                  {userData?.lastName}
+                </h1>
+
+                {/*-------------------- First Name -------------------- */}
+                <div className="detailItem">
+                  <span className="itemKey">First Name:</span>
+                  <span className="itemValue">{userData?.firstName}</span>
+                </div>
                 <input
                   type="text"
                   // defaultValue={userData?.contactNumber}
-                  placeholder="New Full Name"
-                  onChange={(e) => setNewFullName(e.target.value)}
+                  placeholder="New First Name"
+                  onChange={(e) => setNewFirstName(e.target.value)}
                 />
 
+                {/*-------------------- Last Name -------------------- */}
+                <div className="detailItem">
+                  <span className="itemKey">Last Name:</span>
+                  <span className="itemValue">{userData?.lastName}</span>
+                </div>
+                <input
+                  type="text"
+                  // defaultValue={userData?.contactNumber}
+                  placeholder="New Last Name"
+                  onChange={(e) => setNewLastName(e.target.value)}
+                />
+
+                {/*-------------------- Email -------------------- */}
                 <div className="detailItem">
                   <span className="itemKey">Email:</span>
                   <span className="itemValue">{userData?.email}</span>
@@ -114,6 +151,8 @@ const Single = () => {
                   placeholder="New Email Address"
                   onChange={(e) => setNewEmail(e.target.value)}
                 />
+
+                {/*-------------------- Contact Number -------------------- */}
                 <div className="detailItem">
                   <span className="itemKey">Contact Number:</span>
                   <span className="itemValue">{userData?.contactNumber}</span>
@@ -126,6 +165,8 @@ const Single = () => {
                   // onChange={(e) => setNewContactNumber(e.target.value)}
                   onChange={handleChange}
                 />
+
+                {/*-------------------- Address -------------------- */}
                 <div className="detailItem">
                   <span className="itemKey">Address:</span>
                   <span className="itemValue">{userData?.address}</span>
