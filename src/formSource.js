@@ -43,12 +43,12 @@ export const productInputs = [
     type: "text",
     placeholder: "Description",
   },
-  {
-    id: "categoryTitle",
-    label: "Category",
-    type: "text",
-    placeholder: "Type of food",
-  },
+  // {
+  //   id: "categoryTitle",
+  //   label: "Category",
+  //   type: "text",
+  //   placeholder: "Type of food",
+  // },
   {
     id: "price",
     label: "Price",
@@ -74,5 +74,20 @@ export const productInputs = [
     label: "Add-on Price",
     type: "text",
     placeholder: "10",
+  },
+];
+
+export const foodCategoryInputs = [
+  {
+    id: "categoryName",
+    label: "Category Name",
+    type: "text",
+    placeholder: "Category Name",
+  },
+  {
+    id: "bagSlug",
+    label: "Bag Slug",
+    type: "text",
+    placeholder: "Bag Slug",
   },
 ];

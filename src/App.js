@@ -5,13 +5,17 @@ import Single from "./pages/single/Single";
 import New from "./pages/new/New"; //*ADDING NEW USER
 import NewProduct from "./pages/new/NewProduct"; //*ADDING NEW PRODUCTS
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { productInputs, userInputs } from "./formSource";
+import { productInputs, userInputs, foodCategoryInputs } from "./formSource";
 import ProductList from "./pages/list/ProductList"; //*PRODUCT LIST
 import OrderList from "./pages/list/OrderList";
 import { AuthContext } from "./context/AuthContext";
 import { useContext, useState } from "react";
 import SingleProduct from "./pages/single/SingleProduct";
 import SingleOrder from "./pages/single/SingleOrder";
+
+import FoodCategoriesList from "./pages/list/FoodCategoriesList"; //FOOD CATEGORIES LIST
+import NewFoodCategory from "./pages/new/NewFoodCategory"; //ADDING NEW FOOD CATEGORY
+import SingleFoodCategory from "./pages/single/SingleFoodCategory";
 
 function App() {
   const { currentUser } = useContext(AuthContext);
@@ -25,6 +29,9 @@ function App() {
     <div className="App">
       <BrowserRouter>
         <Routes>
+          {/*------------------ Login Route  ------------------*/}
+          <Route path="login" element={<Login />} />
+
           {/*------------------ Home Route  ------------------*/}
           <Route path="/">
             <Route
@@ -36,9 +43,6 @@ function App() {
               }
             />
 
-            {/*------------------ Login Route  ------------------*/}
-            <Route path="login" element={<Login />} />
-
             {/*------------------ Users Route  ------------------*/}
             <Route path="users">
               <Route
@@ -49,7 +53,7 @@ function App() {
                   </RequireAuth>
                 }
               />
-              {/*------------------ Users Route (Single)  ------------------*/}
+              {/* Users Route (Single) */}
               <Route
                 path=":userId"
                 element={
@@ -59,7 +63,7 @@ function App() {
                 }
               />
 
-              {/*------------------ Add New User Route  ------------------*/}
+              {/* Add New User Route */}
               <Route
                 path="new"
                 element={
@@ -81,7 +85,7 @@ function App() {
                 }
               />
 
-              {/*------------------ Product Route (Single) ------------------*/}
+              {/* Product Route (Single) */}
               <Route
                 path=":productId"
                 element={
@@ -91,7 +95,18 @@ function App() {
                 }
               />
 
-              {/*------------------ Add New Product/Food Route  ------------------*/}
+              {/* Food Categories Route */}
+              <Route
+                path="foodCategories"
+                index
+                element={
+                  <RequireAuth>
+                    <FoodCategoriesList />
+                  </RequireAuth>
+                }
+              />
+
+              {/* Add New Product/Food Route */}
               <Route
                 path="new"
                 element={
@@ -100,6 +115,29 @@ function App() {
                       inputs={productInputs}
                       title="Add New Product"
                     />
+                  </RequireAuth>
+                }
+              />
+
+              {/* New Food Category Route */}
+              <Route
+                path="newCategory"
+                element={
+                  <RequireAuth>
+                    <NewFoodCategory
+                      inputs={foodCategoryInputs}
+                      title="Add New Category"
+                    />
+                  </RequireAuth>
+                }
+              />
+
+              {/* Product Category Route (Single - "Edit") */}
+              <Route
+                path="foodCategories/:categoryId"
+                element={
+                  <RequireAuth>
+                    <SingleFoodCategory />
                   </RequireAuth>
                 }
               />
@@ -116,7 +154,7 @@ function App() {
                 }
               />
 
-              {/*------------------ Order Route (Single) ------------------*/}
+              {/* Order Route (Single) */}
               <Route
                 path=":orderId"
                 element={
@@ -126,7 +164,7 @@ function App() {
                 }
               />
 
-              {/*------------------ Add New Product/Food Route  ------------------*/}
+              {/* Add New Product/Food Route */}
               <Route
                 path="new"
                 element={

@@ -208,44 +208,18 @@ export const foodColumns = [
   },
 ];
 
-export const foodRows = [
+/*------------------ Food Categories Column ------------------*/
+export const foodCategoryColumns = [
+  { field: "foodCategoryId", headerName: "Category ID", width: 160 },
   {
-    id: 1,
-    foodname: "Palabok",
-    foodImg:
-      "https://images.pexels.com/photos/1820770/pexels-photo-1820770.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=500",
-    fooddescription: "Masarap",
-    foodprice: 300,
-    foodcategory: "Pasta",
-    addonname: "Egg",
-    addonprice: 30,
-    stock: 10,
+    field: "categoryName",
+    headerName: "Category Name",
+    width: 230,
   },
-
   {
-    id: 2,
-    foodname: "Palabok",
-    foodImg:
-      "https://images.pexels.com/photos/1820770/pexels-photo-1820770.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=500",
-    fooddescription: "Masarap",
-    foodprice: 300,
-    foodcategory: "Pasta",
-    addonname: "Egg",
-    addonprice: 30,
-    stock: 10,
-  },
-
-  {
-    id: 3,
-    foodname: "Palabok",
-    foodImg:
-      "https://images.pexels.com/photos/1820770/pexels-photo-1820770.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=500",
-    fooddescription: "Masarap",
-    foodprice: 300,
-    foodcategory: "Pasta",
-    addonname: "Egg",
-    addonprice: 30,
-    stock: 10,
+    field: "bagSlug",
+    headerName: "Bag Slug",
+    width: 230,
   },
 ];
 

@@ -3,12 +3,12 @@ import "./new.scss";
 import Sidebar from "../../components/sidebar/Sidebar";
 import DriveFolderUploadOutlinedIcon from "@mui/icons-material/DriveFolderUploadOutlined";
 import { useState, useEffect } from "react";
-import { updateDoc, addDoc, collection, doc } from "firebase/firestore";
+import { addDoc, collection, onSnapshot } from "firebase/firestore";
 import { db, storage } from "../../firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { useNavigate } from "react-router-dom";
 
-const New = ({ inputs, title, id, setFoodId }) => {
+const New = ({ inputs, title }) => {
   const [file, setFile] = useState("");
   const [data, setData] = useState({});
   const [per, setPerc] = useState(null);
@@ -64,11 +64,12 @@ const New = ({ inputs, title, id, setFoodId }) => {
   };
 
   //------------------ Add New Food Function ------------------//
+
   const handleAdd = async (e) => {
     e.preventDefault();
 
     try {
-      const res = await addDoc(collection(db, "FoodData"), {
+      await addDoc(collection(db, "FoodData"), {
         ...data,
         foodId: new Date().getTime().toString(),
       });
@@ -78,6 +79,29 @@ const New = ({ inputs, title, id, setFoodId }) => {
     }
     alert("Product is added");
   };
+
+  //------------------ Display Food Categories Data ------------------//
+  const [categoriesData, setCategoriesData] = useState([]);
+  useEffect(() => {
+    //LISTEN (REALTIME)
+    const unsub = onSnapshot(
+      collection(db, "FoodCategories"),
+      (snapShot) => {
+        let list = [];
+        snapShot.docs.forEach((doc) => {
+          list.push({ id: doc.id, ...doc.data() });
+        });
+        setCategoriesData(list);
+      },
+      (error) => {
+        console.log(error);
+      }
+    );
+    return () => {
+      unsub();
+    };
+  }, []);
+  // console.log(categoriesData);
 
   return (
     <div className="new">
@@ -124,6 +148,23 @@ const New = ({ inputs, title, id, setFoodId }) => {
                   />
                 </div>
               ))}
+
+              {/* Drop down list for food categories */}
+              <div className="formInput">
+                <label>Category</label>
+                <select>
+                  {categoriesData.map((item) => {
+                    return (
+                      <option
+                        key={item.foodCategoryId}
+                        value={item.categoryName}
+                      >
+                        {item.categoryName}
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
             </form>
             <button disabled={per !== null && per < 100} onClick={handleAdd}>
               Add Product
