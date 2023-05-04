@@ -1,21 +1,20 @@
-import Home from "./pages/home/Home";
-import Login from "./pages/login/Login";
-import List from "./pages/list/List"; //*USER LIST
-import Single from "./pages/single/Single";
-import New from "./pages/new/New"; //*ADDING NEW USER
-import NewProduct from "./pages/new/NewProduct"; //*ADDING NEW PRODUCTS
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { productInputs, userInputs, foodCategoryInputs } from "./formSource";
-import ProductList from "./pages/list/ProductList"; //*PRODUCT LIST
-import OrderList from "./pages/list/OrderList";
+import { productInputs, userInputs, productCategoryInputs } from "./formSource";
 import { AuthContext } from "./context/AuthContext";
 import { useContext, useState } from "react";
-import SingleProduct from "./pages/single/SingleProduct";
-import SingleOrder from "./pages/single/SingleOrder";
-
-import FoodCategoriesList from "./pages/list/FoodCategoriesList"; //FOOD CATEGORIES LIST
-import NewFoodCategory from "./pages/new/NewFoodCategory"; //ADDING NEW FOOD CATEGORY
-import SingleFoodCategory from "./pages/single/SingleFoodCategory";
+import Home from "./pages/home/Home";
+import Login from "./pages/login/Login";
+import UserList from "./pages/list/UserList"; //USER LIST
+import ProductList from "./pages/list/ProductList"; //PRODUCT LIST
+import OrderList from "./pages/list/OrderList"; //ORDER LIST
+import ProductCategoriesList from "./pages/list/ProductCategoriesList"; //PRODUCT CATEGORIES LIST
+import NewUser from "./pages/new/NewUser"; //ADDING NEW USER
+import NewProduct from "./pages/new/NewProduct"; //ADDING NEW PRODUCTS
+import NewProductCategory from "./pages/new/NewProductCategory"; //ADDING NEW FOOD CATEGORY
+import SingleUser from "./pages/single/SingleUser"; //SINGLE USER
+import SingleProduct from "./pages/single/SingleProduct"; //SINGLE PRODUCT
+import SingleOrder from "./pages/single/SingleOrder"; //SINGLE ORDER
+import SingleProductCategory from "./pages/single/SingleProductCategory"; //SINGLE PRODUCT CATEGORY
 
 function App() {
   const { currentUser } = useContext(AuthContext);
@@ -49,7 +48,7 @@ function App() {
                 index
                 element={
                   <RequireAuth>
-                    <List />
+                    <UserList />
                   </RequireAuth>
                 }
               />
@@ -58,7 +57,7 @@ function App() {
                 path=":userId"
                 element={
                   <RequireAuth>
-                    <Single />
+                    <SingleUser />
                   </RequireAuth>
                 }
               />
@@ -68,7 +67,7 @@ function App() {
                 path="new"
                 element={
                   <RequireAuth>
-                    <New inputs={userInputs} title="Add New User" />
+                    <NewUser inputs={userInputs} title="Add New User" />
                   </RequireAuth>
                 }
               />
@@ -95,20 +94,20 @@ function App() {
                 }
               />
 
-              {/* Food Categories Route */}
+              {/* Product Categories Route */}
               <Route
-                path="foodCategories"
+                path="productCategories"
                 index
                 element={
                   <RequireAuth>
-                    <FoodCategoriesList />
+                    <ProductCategoriesList />
                   </RequireAuth>
                 }
               />
 
-              {/* Add New Product/Food Route */}
+              {/* Add New Product Route */}
               <Route
-                path="new"
+                path="newProduct"
                 element={
                   <RequireAuth>
                     <NewProduct
@@ -124,8 +123,8 @@ function App() {
                 path="newCategory"
                 element={
                   <RequireAuth>
-                    <NewFoodCategory
-                      inputs={foodCategoryInputs}
+                    <NewProductCategory
+                      inputs={productCategoryInputs}
                       title="Add New Category"
                     />
                   </RequireAuth>
@@ -134,10 +133,10 @@ function App() {
 
               {/* Product Category Route (Single - "Edit") */}
               <Route
-                path="foodCategories/:categoryId"
+                path="productCategories/:categoryId"
                 element={
                   <RequireAuth>
-                    <SingleFoodCategory />
+                    <SingleProductCategory />
                   </RequireAuth>
                 }
               />
@@ -160,19 +159,6 @@ function App() {
                 element={
                   <RequireAuth>
                     <SingleOrder />
-                  </RequireAuth>
-                }
-              />
-
-              {/* Add New Product/Food Route */}
-              <Route
-                path="new"
-                element={
-                  <RequireAuth>
-                    <NewProduct
-                      inputs={productInputs}
-                      title="Add New Product"
-                    />
                   </RequireAuth>
                 }
               />

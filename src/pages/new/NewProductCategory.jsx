@@ -4,10 +4,9 @@ import Sidebar from "../../components/sidebar/Sidebar";
 import { useState } from "react";
 import { addDoc, collection } from "firebase/firestore";
 import { db } from "../../firebase";
-
 import { useNavigate } from "react-router-dom";
 
-const NewFoodCategory = ({ inputs, title }) => {
+const NewProductCategory = ({ inputs, title }) => {
   const [data, setData] = useState([]);
   const navigate = useNavigate();
 
@@ -23,9 +22,9 @@ const NewFoodCategory = ({ inputs, title }) => {
     e.preventDefault();
 
     try {
-      const res = await addDoc(collection(db, "FoodCategories"), {
+      await addDoc(collection(db, "ProductCategories"), {
         ...data,
-        foodCategoryId: new Date().getTime().toString(),
+        productCategoryId: new Date().getTime().toString(),
       });
       navigate(-1);
     } catch (err) {
@@ -64,4 +63,4 @@ const NewFoodCategory = ({ inputs, title }) => {
   );
 };
 
-export default NewFoodCategory;
+export default NewProductCategory;

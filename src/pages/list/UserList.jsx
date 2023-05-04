@@ -1,18 +1,18 @@
 import Sidebar from "../../components/sidebar/Sidebar";
 import "./list.scss";
 import Navbar from "../../components/navbar/Navbar";
-import OrderTable from "../../components/datatable/OrderTable";
+import UserTable from "../../components/datatable/UserTable";
 
-const OrderList = () => {
+const UserList = () => {
   return (
     <div className="list">
       <Sidebar />
       <div className="listContainer">
         <Navbar />
-        <OrderTable />
+        <UserTable />
       </div>
     </div>
   );
 };
 
-export default OrderList;
+export default UserList;

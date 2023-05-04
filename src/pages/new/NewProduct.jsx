@@ -8,52 +8,12 @@ import { db, storage } from "../../firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { useNavigate } from "react-router-dom";
 
-const New = ({ inputs, title }) => {
+const NewFood = ({ inputs, title }) => {
   const [file, setFile] = useState("");
   const [data, setData] = useState({});
   const [per, setPerc] = useState(null);
 
   const navigate = useNavigate();
-
-  //------------------ Upload Image Function ------------------//
-  useEffect(() => {
-    const uploadFile = () => {
-      const name = new Date().getTime() + file.name;
-      console.log(name);
-      const storageRef = ref(storage, file.name);
-
-      const uploadTask = uploadBytesResumable(storageRef, file);
-      uploadTask.on(
-        "state_changed",
-        (snapshot) => {
-          const progress =
-            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          console.log("Upload is " + progress + "% done");
-          setPerc(progress);
-          switch (snapshot.state) {
-            case "paused":
-              console.log("Upload is paused");
-              break;
-            case "running":
-              console.log("Upload is running");
-              break;
-            default:
-              break;
-          }
-        },
-        (error) => {
-          console.log(error);
-        },
-        () => {
-          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-            setData((prev) => ({ ...prev, img: downloadURL }));
-          });
-        }
-      );
-    };
-    file && uploadFile();
-  }, [file]);
-
   console.log(data);
 
   //------------------ Handle Input For Fields ------------------//
@@ -63,29 +23,12 @@ const New = ({ inputs, title }) => {
     setData({ ...data, [id]: value });
   };
 
-  //------------------ Add New Food Function ------------------//
-
-  const handleAdd = async (e) => {
-    e.preventDefault();
-
-    try {
-      await addDoc(collection(db, "FoodData"), {
-        ...data,
-        foodId: new Date().getTime().toString(),
-      });
-      navigate(-1);
-    } catch (err) {
-      console.log(err);
-    }
-    alert("Product is added");
-  };
-
-  //------------------ Display Food Categories Data ------------------//
+  //------------------ Retrieve Food Categories Data ------------------//
   const [categoriesData, setCategoriesData] = useState([]);
   useEffect(() => {
     //LISTEN (REALTIME)
     const unsub = onSnapshot(
-      collection(db, "FoodCategories"),
+      collection(db, "ProductCategories"),
       (snapShot) => {
         let list = [];
         snapShot.docs.forEach((doc) => {
@@ -102,6 +45,38 @@ const New = ({ inputs, title }) => {
     };
   }, []);
   // console.log(categoriesData);
+
+  //------------------ Add New Food Function ------------------//
+  const [selectedCategory, setSelectedCategory] = useState("");
+
+  const handleAdd = async (e) => {
+    e.preventDefault();
+
+    const storageRef = ref(
+      storage,
+      `food_images/${new Date().getTime()}_${file.name}`
+    ); // replace 'images' with your storage path
+
+    try {
+      // Upload image to storage
+      const uploadTask = uploadBytesResumable(storageRef, file);
+      const snapshot = await uploadTask;
+      const downloadURL = await getDownloadURL(snapshot.ref);
+
+      // Add document to Firestore with image download URL
+      await addDoc(collection(db, "FoodData"), {
+        ...data,
+        img: downloadURL,
+        foodId: new Date().getTime().toString(),
+        categoryTitle: selectedCategory,
+      });
+
+      navigate(-1);
+      alert("Product is added");
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   return (
     <div className="new">
@@ -149,14 +124,20 @@ const New = ({ inputs, title }) => {
                 </div>
               ))}
 
-              {/* Drop down list for food categories */}
+              {/* Drop down list for product categories */}
               <div className="formInput">
                 <label>Category</label>
-                <select>
+                <select
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                >
+                  <option value="" disabled>
+                    ---Select a category---
+                  </option>
                   {categoriesData.map((item) => {
                     return (
                       <option
-                        key={item.foodCategoryId}
+                        key={item.productCategoryId}
                         value={item.categoryName}
                       >
                         {item.categoryName}
@@ -176,4 +157,4 @@ const New = ({ inputs, title }) => {
   );
 };
 
-export default New;
+export default NewFood;

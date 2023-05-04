@@ -9,17 +9,17 @@ import { useParams } from "react-router-dom";
 import { db } from "../../firebase";
 import { useNavigate } from "react-router-dom";
 
-const SingleFoodCategory = () => {
+const SingleProductCategory = () => {
   const { categoryId } = useParams();
   console.log(categoryId);
 
   const navigate = useNavigate();
 
-  //------------------ Retrieve Food Data  ------------------//
+  //------------------ Retrieve Product Categories Data  ------------------//
   const [categoryData, setCategoryData] = useState();
 
   const getCategoryData = async () => {
-    const docRef = doc(db, "FoodCategories", categoryId);
+    const docRef = doc(db, "ProductCategories", categoryId);
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
@@ -38,11 +38,11 @@ const SingleFoodCategory = () => {
 
   //------------------ Handle Change for Input  ------------------//
   const [newCategoryName, setNewCategoryName] = useState("");
-  const [newBagSlug, setNewBagSlug] = useState("");
+  const [newSlug, setNewSlug] = useState("");
 
   //------------------ Update Food Data Function  ------------------//
   const handleUpdate = async () => {
-    const docRef = doc(db, "FoodCategories", categoryId);
+    const docRef = doc(db, "ProductCategories", categoryId);
 
     if (docRef !== null) {
       if (newCategoryName !== "") {
@@ -51,9 +51,9 @@ const SingleFoodCategory = () => {
         });
       }
 
-      if (newBagSlug !== "") {
+      if (newSlug !== "") {
         updateDoc(docRef, {
-          bagSlug: newBagSlug,
+          bagSlug: newSlug,
         });
       }
 
@@ -90,13 +90,13 @@ const SingleFoodCategory = () => {
                 {/*------------------ Food Description ------------------*/}
                 <div className="detailItem">
                   <span className="itemKey">Bag Slug:</span>
-                  <span className="itemValue">{categoryData?.bagSlug}</span>
+                  <span className="itemValue">{categoryData?.slug}</span>
                 </div>
                 <input
                   type="text"
                   // defaultValue={userData?.contactNumber}
                   placeholder="New Bag Slug"
-                  onChange={(e) => setNewBagSlug(e.target.value)}
+                  onChange={(e) => setNewSlug(e.target.value)}
                 />
               </div>
             </div>
@@ -114,4 +114,4 @@ const SingleFoodCategory = () => {
   );
 };
 
-export default SingleFoodCategory;
+export default SingleProductCategory;

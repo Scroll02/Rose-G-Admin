@@ -83,10 +83,10 @@ const OrderTable = () => {
       <DataGrid
         className="datagrid"
         rows={data}
-        columns={orderColumns.concat(actionColumn)}
+        columns={actionColumn.concat(orderColumns)}
         pageSize={9}
         rowsPerPageOptions={[9]}
-        checkboxSelection
+        // checkboxSelection
       />
     </div>
   );

@@ -3,28 +3,21 @@ import Sidebar from "../../components/sidebar/Sidebar";
 import Navbar from "../../components/navbar/Navbar";
 import Chart from "../../components/chart/Chart";
 import List from "../../components/table/Table";
-
+import DriveFolderUploadOutlinedIcon from "@mui/icons-material/DriveFolderUploadOutlined";
 import { useState, useEffect } from "react";
-import {
-  doc,
-  collection,
-  setDoc,
-  addDoc,
-  getDoc,
-  serverTimestamp,
-  updateDoc,
-} from "firebase/firestore";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { Link, useParams } from "react-router-dom";
 import { db, auth, storage } from "../../firebase";
 import { useNavigate } from "react-router-dom";
 
 const SingleProduct = () => {
   const { productId } = useParams();
-  console.log(productId);
+  // console.log(productId);
 
   const navigate = useNavigate();
 
-  //------------------ Retrieve Food Data  ------------------//
+  //------------------ Retrieve Product Data  ------------------//
   const [foodData, setFoodData] = useState();
 
   const getFoodData = async () => {
@@ -46,6 +39,7 @@ const SingleProduct = () => {
   console.log(foodData);
 
   //------------------ Handle Change for Input  ------------------//
+  const [newImageFile, setNewImageFile] = useState("");
   const [newFoodName, setNewFoodName] = useState("");
   const [newDescription, setNewDescription] = useState("");
   const [newCategory, setNewCategory] = useState("");
@@ -67,52 +61,104 @@ const SingleProduct = () => {
     setNewAddOnPrice(numberOnly);
   };
 
-  //------------------ Update Food Data Function  ------------------//
+  //------------------ Update Product Data Function  ------------------//
+  // const handleUpdate = async () => {
+  //   const docRef = doc(db, "FoodData", productId);
+
+  //   if (docRef !== null) {
+  //     if (newFoodName !== "") {
+  //       updateDoc(docRef, {
+  //         foodName: newFoodName,
+  //       });
+  //     }
+
+  //     if (newDescription !== "") {
+  //       updateDoc(docRef, {
+  //         description: newDescription,
+  //       });
+  //     }
+
+  //     if (newCategory !== "") {
+  //       updateDoc(docRef, {
+  //         categoryTitle: newCategory,
+  //       });
+  //     }
+
+  //     if (newPrice !== "") {
+  //       updateDoc(docRef, {
+  //         price: newPrice,
+  //       });
+  //     }
+
+  //     if (newStock !== "") {
+  //       updateDoc(docRef, {
+  //         stock: newStock,
+  //       });
+  //     }
+
+  //     if (newAddOnName !== "") {
+  //       updateDoc(docRef, {
+  //         addOn: newAddOnName,
+  //       });
+  //     }
+
+  //     if (newAddOnPrice !== "") {
+  //       updateDoc(docRef, {
+  //         addOnPrice: newAddOnPrice,
+  //       });
+  //     }
+
+  //     alert("Food data is updated");
+  //     navigate(-1);
+  //   } else {
+  //     alert("No food data");
+  //   }
+  // };
   const handleUpdate = async () => {
     const docRef = doc(db, "FoodData", productId);
 
     if (docRef !== null) {
+      const updates = {};
+
       if (newFoodName !== "") {
-        updateDoc(docRef, {
-          foodName: newFoodName,
-        });
+        updates.foodName = newFoodName;
       }
 
       if (newDescription !== "") {
-        updateDoc(docRef, {
-          description: newDescription,
-        });
+        updates.description = newDescription;
       }
 
       if (newCategory !== "") {
-        updateDoc(docRef, {
-          categoryTitle: newCategory,
-        });
+        updates.categoryTitle = newCategory;
       }
 
       if (newPrice !== "") {
-        updateDoc(docRef, {
-          price: newPrice,
-        });
+        updates.price = newPrice;
       }
 
       if (newStock !== "") {
-        updateDoc(docRef, {
-          stock: newStock,
-        });
+        updates.stock = newStock;
       }
 
       if (newAddOnName !== "") {
-        updateDoc(docRef, {
-          addOn: newAddOnName,
-        });
+        updates.addOn = newAddOnName;
       }
 
       if (newAddOnPrice !== "") {
-        updateDoc(docRef, {
-          addOnPrice: newAddOnPrice,
-        });
+        updates.addOnPrice = newAddOnPrice;
       }
+
+      if (newImageFile !== "") {
+        const storageRef = ref(
+          storage,
+          `food_images/${new Date().getTime()}_${newImageFile.name}`
+        );
+        await uploadBytes(storageRef, newImageFile);
+        const downloadURL = await getDownloadURL(storageRef);
+        updates.imageUrl = downloadURL;
+      }
+
+      await updateDoc(docRef, updates);
 
       alert("Food data is updated");
       navigate(-1);
@@ -131,7 +177,7 @@ const SingleProduct = () => {
             <div className="editButton" onClick={handleUpdate}>
               Save
             </div>
-            <h1 className="title">Food Information</h1>
+            <h1 className="title">Product Information</h1>
             <div className="item">
               {/*------------------ Food Image ------------------*/}
               <img src={foodData?.img} alt="" className="itemImg" />
@@ -144,6 +190,23 @@ const SingleProduct = () => {
                   placeholder="New Food Name"
                   onChange={(e) => setNewFoodName(e.target.value)}
                 />
+
+                {/*------------------ New Product Image ------------------*/}
+                <div className="detailItem">
+                  <label
+                    htmlFor="file"
+                    style={{ display: "flex", alignItems: "center" }}
+                  >
+                    New Image:
+                    <DriveFolderUploadOutlinedIcon className="icon" />
+                  </label>
+                  <input
+                    type="file"
+                    id="file"
+                    onChange={(e) => setNewImageFile(e.target.files[0])}
+                    style={{ display: "none" }}
+                  />
+                </div>
 
                 {/*------------------ Food Description ------------------*/}
                 <div className="detailItem">
@@ -195,33 +258,6 @@ const SingleProduct = () => {
                   placeholder="New Stock"
                   // onChange={(e) => setNewStock(e.target.value)}
                   onChange={handleChangeNewStock}
-                />
-
-                {/*------------------ Food Add-on Name ------------------*/}
-                <div className="detailItem">
-                  <span className="itemKey">Add-on Name:</span>
-                  <span className="itemValue">{foodData?.addOn}</span>
-                </div>
-                <input
-                  type="text"
-                  // defaultValue={userData?.contactNumber}
-                  placeholder="New Add-on Name"
-                  onChange={(e) => setNewAddOnName(e.target.value)}
-                />
-
-                {/*------------------ Food Add-on Price ------------------*/}
-                <div className="detailItem">
-                  <span className="itemKey">Add-on Price:</span>
-                  <span className="itemValue">
-                    ₱{parseFloat(foodData?.addOnPrice).toFixed(2)}
-                  </span>
-                </div>
-                <input
-                  type="text"
-                  value={newAddOnPrice}
-                  placeholder="New Add-on Price"
-                  // onChange={(e) => setNewAddOnPrice(e.target.value)}
-                  onChange={handleChangeNewAddOnPrice}
                 />
               </div>
             </div>

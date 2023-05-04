@@ -1,18 +1,19 @@
-import React from "react";
-import { foodCategoryColumns, foodRows } from "../../datatablesource";
+import "./datatable.scss";
+import { DataGrid } from "@mui/x-data-grid";
+import { userColumns, userRows } from "../../datatablesource";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { DataGrid } from "@mui/x-data-grid";
 import { collection, deleteDoc, doc, onSnapshot } from "firebase/firestore";
 import { db } from "../../firebase";
 
-const FoodCategoriesTable = () => {
+const UserTable = () => {
   const [data, setData] = useState([]);
-  //------------------ Display Food Categories Data ------------------//
+
+  //------------------ Display Users Data ------------------//
   useEffect(() => {
     //LISTEN (REALTIME)
     const unsub = onSnapshot(
-      collection(db, "FoodCategories"),
+      collection(db, "UserData"),
       (snapShot) => {
         let list = [];
         snapShot.docs.forEach((doc) => {
@@ -30,12 +31,11 @@ const FoodCategoriesTable = () => {
   }, []);
   console.log(data);
 
-  //------------------ Delete Food Data  ------------------//
+  //------------------ Delete Users Data  ------------------//
   const handleDelete = async (id) => {
     try {
-      await deleteDoc(doc(db, "FoodCategories", id));
+      await deleteDoc(doc(db, "UserData", id));
       setData(data.filter((item) => item.id !== id));
-      alert("Selected food category is deleted");
     } catch (err) {
       console.log(err);
     }
@@ -50,7 +50,7 @@ const FoodCategoriesTable = () => {
         return (
           <div className="cellAction">
             <Link
-              to={`/products/foodCategories/${params.row.id}`}
+              to={`/users/${params.row.id}`}
               style={{ textDecoration: "none" }}
             >
               <div className="viewButton">Edit</div>
@@ -69,23 +69,21 @@ const FoodCategoriesTable = () => {
   return (
     <div className="datatable">
       <div className="datatableTitle">
-        List of Food Categories
-        <div className="datatableButtons">
-          <Link to="/products/newCategory" className="link">
-            Add New Category
-          </Link>
-        </div>
+        List of Users
+        <Link to="/users/new" className="link">
+          Add New User
+        </Link>
       </div>
       <DataGrid
         className="datagrid"
         rows={data}
-        columns={foodCategoryColumns.concat(actionColumn)}
+        columns={actionColumn.concat(userColumns)}
         pageSize={9}
         rowsPerPageOptions={[9]}
-        checkboxSelection
+        // checkboxSelection
       />
     </div>
   );
 };
 
-export default FoodCategoriesTable;
+export default UserTable;

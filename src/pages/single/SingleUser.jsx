@@ -6,23 +6,19 @@ import List from "../../components/table/Table";
 
 import defaultUserIcon from "../../images/defaultUserIcon.png";
 import { useState, useEffect } from "react";
-import {
-  doc,
-  setDoc,
-  addDoc,
-  getDoc,
-  serverTimestamp,
-  updateDoc,
-} from "firebase/firestore";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { Link, useParams } from "react-router-dom";
 import { db, auth, storage } from "../../firebase";
+import { useNavigate } from "react-router-dom";
 
 const Single = () => {
   //------------------ Retrieve User ID  ------------------//
   const { userId } = useParams();
   // console.log(userId);
 
-  //------------------ Rertrieve Users Data  ------------------//
+  const navigate = useNavigate();
+
+  //------------------ Retrieve Users Data  ------------------//
   const [userData, setUserData] = useState();
 
   const getUserData = async () => {
@@ -43,7 +39,6 @@ const Single = () => {
   }, []);
 
   //------------------ Handle Change for Input  ------------------//
-  const [newFullName, setNewFullName] = useState("");
   const [newFirstName, setNewFirstName] = useState("");
   const [newLastName, setNewLastName] = useState("");
   const [newEmail, setNewEmail] = useState("");
@@ -91,6 +86,7 @@ const Single = () => {
       }
 
       alert("User data is updated");
+      navigate(-1);
     } else {
       alert("No user data");
     }

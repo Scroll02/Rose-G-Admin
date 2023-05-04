@@ -1,10 +1,16 @@
 import React from "react";
-import { foodColumns } from "../../datatablesource";
+import { productColumns } from "../../datatablesource";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { DataGrid } from "@mui/x-data-grid";
-import { collection, deleteDoc, doc, onSnapshot } from "firebase/firestore";
-import { getStorage } from "firebase/storage";
+import {
+  collection,
+  deleteDoc,
+  doc,
+  onSnapshot,
+  getDoc,
+} from "firebase/firestore";
+import { getStorage, ref, deleteObject } from "firebase/storage";
 import { db } from "../../firebase";
 
 const ProductTable = () => {
@@ -33,22 +39,19 @@ const ProductTable = () => {
   console.log(data);
 
   //------------------ Delete Food Data  ------------------//
-
   const handleDelete = async (id) => {
     const storage = getStorage();
     try {
-      await deleteDoc(doc(db, "FoodData", id));
+      const docRef = doc(db, "FoodData", id);
+      const docSnap = await getDoc(docRef);
+      const { img } = docSnap.data();
+
+      const imageRef = ref(storage, img);
+      await deleteObject(imageRef);
+
+      await deleteDoc(docRef);
       setData(data.filter((item) => item.id !== id));
       alert("Food Data is deleted");
-      // Deleting the image from storage
-      // const foodRef = ref(storage, "tapa_topview.png");
-      // deleteObject(foodRef)
-      //   .then(() => {
-      //     alert("deleted");
-      //   })
-      //   .catch((error) => {
-      //     alert("something went wrong");
-      //   });
     } catch (err) {
       console.log(err);
     }
@@ -83,23 +86,23 @@ const ProductTable = () => {
   return (
     <div className="datatable">
       <div className="datatableTitle">
-        List of Foods
+        List of Products
         <div className="datatableButtons">
-          <Link to="/products/foodCategories" className="link">
+          <Link to="/products/productCategories" className="link">
             Show Product Categories
           </Link>
-          <Link to="/products/new" className="link">
-            Add New Food
+          <Link to="/products/newProduct" className="link">
+            Add New Product
           </Link>
         </div>
       </div>
       <DataGrid
         className="datagrid"
         rows={data}
-        columns={foodColumns.concat(actionColumn)}
+        columns={actionColumn.concat(productColumns)}
         pageSize={9}
         rowsPerPageOptions={[9]}
-        checkboxSelection
+        // checkboxSelection
       />
     </div>
   );
