@@ -7,9 +7,11 @@ import { addDoc, collection, onSnapshot } from "firebase/firestore";
 import { db, storage } from "../../firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { useNavigate } from "react-router-dom";
+import { showSuccessToast } from "../../components/toast/Toast";
 
 const NewFood = ({ inputs, title }) => {
-  const [file, setFile] = useState("");
+  const [productImgFile, setProductImgFile] = useState("");
+  const [productImgFileName, setProductImgFileName] = useState("");
   const [data, setData] = useState({});
   const [per, setPerc] = useState(null);
 
@@ -23,7 +25,7 @@ const NewFood = ({ inputs, title }) => {
     setData({ ...data, [id]: value });
   };
 
-  //------------------ Retrieve Food Categories Data ------------------//
+  //------------------ Retrieve Product Categories Data ------------------//
   const [categoriesData, setCategoriesData] = useState([]);
   useEffect(() => {
     //LISTEN (REALTIME)
@@ -48,18 +50,17 @@ const NewFood = ({ inputs, title }) => {
 
   //------------------ Add New Food Function ------------------//
   const [selectedCategory, setSelectedCategory] = useState("");
-
   const handleAdd = async (e) => {
     e.preventDefault();
 
     const storageRef = ref(
       storage,
-      `food_images/${new Date().getTime()}_${file.name}`
+      `food_images/${new Date().getTime()}_${productImgFile.name}`
     ); // replace 'images' with your storage path
 
     try {
       // Upload image to storage
-      const uploadTask = uploadBytesResumable(storageRef, file);
+      const uploadTask = uploadBytesResumable(storageRef, productImgFile);
       const snapshot = await uploadTask;
       const downloadURL = await getDownloadURL(snapshot.ref);
 
@@ -72,7 +73,7 @@ const NewFood = ({ inputs, title }) => {
       });
 
       navigate(-1);
-      alert("Product is added");
+      showSuccessToast("Product is added", 1000);
     } catch (err) {
       console.log(err);
     }
@@ -90,8 +91,8 @@ const NewFood = ({ inputs, title }) => {
           <div className="left">
             <img
               src={
-                file
-                  ? URL.createObjectURL(file)
+                productImgFile
+                  ? URL.createObjectURL(productImgFile)
                   : "https://icon-library.com/images/no-image-icon/no-image-icon-0.jpg"
               }
               alt=""
@@ -101,13 +102,17 @@ const NewFood = ({ inputs, title }) => {
             <form>
               <div className="formInput">
                 <label htmlFor="file">
-                  Image
+                  Image:
                   <DriveFolderUploadOutlinedIcon className="icon" />
+                  {productImgFileName}
                 </label>
                 <input
                   type="file"
                   id="file"
-                  onChange={(e) => setFile(e.target.files[0])}
+                  onChange={(e) => {
+                    setProductImgFile(e.target.files[0]);
+                    setProductImgFileName(e.target.files[0].name);
+                  }}
                   style={{ display: "none" }}
                 />
               </div>

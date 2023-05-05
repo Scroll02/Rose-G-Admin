@@ -58,15 +58,36 @@ export const userColumns = [
     },
   },
 
+  // {
+  //   field: "isVerified",
+  //   headerName: "Email Verified",
+  //   width: 150,
+  //   renderCell: (params) => {
+  //     return params.row.isVerified ? (
+  //       <div className={`cellWithIsVerified ${params.row.status}`}>
+  //         Verified
+  //       </div>
+  //     ) : (
+  //       <div className={`cellWithIsVerified ${params.row.status}`}>
+  //         Not Verified
+  //       </div>
+  //     );
+  //   },
+  // },
+
   {
-    field: "isVerified",
+    field: "emailVerified",
     headerName: "Email Verified",
     width: 150,
     renderCell: (params) => {
-      return params.row.isVerified ? (
-        <div className="cellWithImg">Verified</div>
-      ) : (
-        <div className="cellWithImg">Not Verified</div>
+      return (
+        <div
+          className={`cellWithEmailVerified ${
+            params.row.emailVerified == "Verified" ? "verified" : "notVerified"
+          }`}
+        >
+          {params.row.emailVerified == "Verified" ? "Verified" : "Not Verified"}
+        </div>
       );
     },
   },
@@ -144,6 +165,18 @@ export const productCategoryColumns = [
     field: "categoryName",
     headerName: "Category Name",
     width: 230,
+    renderCell: (params) => {
+      return (
+        <div className="cellWithImg">
+          <img
+            className="cellImg"
+            src={params.row.categoryImg}
+            alt="product-category-image"
+          />
+          {params.row.categoryName}
+        </div>
+      );
+    },
   },
   {
     field: "slug",

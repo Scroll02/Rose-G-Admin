@@ -5,11 +5,23 @@ import Chart from "../../components/chart/Chart";
 import List from "../../components/table/Table";
 import DriveFolderUploadOutlinedIcon from "@mui/icons-material/DriveFolderUploadOutlined";
 import { useState, useEffect } from "react";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import {
+  doc,
+  getDoc,
+  updateDoc,
+  onSnapshot,
+  collection,
+} from "firebase/firestore";
+import {
+  ref,
+  uploadBytes,
+  getDownloadURL,
+  deleteObject,
+} from "firebase/storage";
 import { Link, useParams } from "react-router-dom";
 import { db, auth, storage } from "../../firebase";
 import { useNavigate } from "react-router-dom";
+import { showSuccessToast, showInfoToast } from "../../components/toast/Toast"; //SUCCESS & INFO TOAST
 
 const SingleProduct = () => {
   const { productId } = useParams();
@@ -18,15 +30,15 @@ const SingleProduct = () => {
   const navigate = useNavigate();
 
   //------------------ Retrieve Product Data  ------------------//
-  const [foodData, setFoodData] = useState();
+  const [productData, setProductData] = useState();
 
-  const getFoodData = async () => {
+  const getProductData = async () => {
     const docRef = doc(db, "FoodData", productId);
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
       console.log("Document data: ", docSnap.data());
-      setFoodData(docSnap.data());
+      setProductData(docSnap.data());
     } else {
       // doc.data() will be undefined in this case
       console.log("No such document!");
@@ -34,20 +46,17 @@ const SingleProduct = () => {
   };
 
   useEffect(() => {
-    getFoodData();
+    getProductData();
   }, []);
-  console.log(foodData);
+  // console.log(productData);
 
   //------------------ Handle Change for Input  ------------------//
   const [newImageFile, setNewImageFile] = useState("");
+  const [newImageFileName, setNewImageFileName] = useState("");
   const [newFoodName, setNewFoodName] = useState("");
   const [newDescription, setNewDescription] = useState("");
-  const [newCategory, setNewCategory] = useState("");
   const [newPrice, setNewPrice] = useState("");
   const [newStock, setNewStock] = useState("");
-  const [newAddOnName, setNewAddOnName] = useState("");
-  const [newAddOnPrice, setNewAddOnPrice] = useState("");
-  // console.log(newFoodName);
   const handleChangeNewPrice = (e) => {
     const numberOnly = e.target.value.replace(/^[A-Za-z ]+$/g, "");
     setNewPrice(numberOnly);
@@ -56,114 +65,96 @@ const SingleProduct = () => {
     const numberOnly = e.target.value.replace(/^[A-Za-z ]+$/g, "");
     setNewStock(numberOnly);
   };
-  const handleChangeNewAddOnPrice = (e) => {
-    const numberOnly = e.target.value.replace(/^[A-Za-z ]+$/g, "");
-    setNewAddOnPrice(numberOnly);
-  };
+
+  //------------------ Retrieve Food Categories Data ------------------//
+  const [categoriesData, setCategoriesData] = useState([]);
+  useEffect(() => {
+    //LISTEN (REALTIME)
+    const unsub = onSnapshot(
+      collection(db, "ProductCategories"),
+      (snapShot) => {
+        let list = [];
+        snapShot.docs.forEach((doc) => {
+          list.push({ id: doc.id, ...doc.data() });
+        });
+        setCategoriesData(list);
+      },
+      (error) => {
+        console.log(error);
+      }
+    );
+    return () => {
+      unsub();
+    };
+  }, []);
+  // console.log(categoriesData);
 
   //------------------ Update Product Data Function  ------------------//
-  // const handleUpdate = async () => {
-  //   const docRef = doc(db, "FoodData", productId);
-
-  //   if (docRef !== null) {
-  //     if (newFoodName !== "") {
-  //       updateDoc(docRef, {
-  //         foodName: newFoodName,
-  //       });
-  //     }
-
-  //     if (newDescription !== "") {
-  //       updateDoc(docRef, {
-  //         description: newDescription,
-  //       });
-  //     }
-
-  //     if (newCategory !== "") {
-  //       updateDoc(docRef, {
-  //         categoryTitle: newCategory,
-  //       });
-  //     }
-
-  //     if (newPrice !== "") {
-  //       updateDoc(docRef, {
-  //         price: newPrice,
-  //       });
-  //     }
-
-  //     if (newStock !== "") {
-  //       updateDoc(docRef, {
-  //         stock: newStock,
-  //       });
-  //     }
-
-  //     if (newAddOnName !== "") {
-  //       updateDoc(docRef, {
-  //         addOn: newAddOnName,
-  //       });
-  //     }
-
-  //     if (newAddOnPrice !== "") {
-  //       updateDoc(docRef, {
-  //         addOnPrice: newAddOnPrice,
-  //       });
-  //     }
-
-  //     alert("Food data is updated");
-  //     navigate(-1);
-  //   } else {
-  //     alert("No food data");
-  //   }
-  // };
+  const [newSelectedCategory, setNewSelectedCategory] = useState("");
   const handleUpdate = async () => {
     const docRef = doc(db, "FoodData", productId);
 
     if (docRef !== null) {
       const updates = {};
+      let isUpdated = false; // add a flag variable
 
       if (newFoodName !== "") {
         updates.foodName = newFoodName;
+        isUpdated = true;
       }
 
       if (newDescription !== "") {
         updates.description = newDescription;
+        isUpdated = true;
       }
 
-      if (newCategory !== "") {
-        updates.categoryTitle = newCategory;
+      if (newSelectedCategory !== "") {
+        updates.categoryTitle = newSelectedCategory;
+        isUpdated = true;
       }
 
       if (newPrice !== "") {
         updates.price = newPrice;
+        isUpdated = true;
       }
 
       if (newStock !== "") {
         updates.stock = newStock;
-      }
-
-      if (newAddOnName !== "") {
-        updates.addOn = newAddOnName;
-      }
-
-      if (newAddOnPrice !== "") {
-        updates.addOnPrice = newAddOnPrice;
+        isUpdated = true;
       }
 
       if (newImageFile !== "") {
+        // Get the URL of the old image from Firestore
+        const docSnapshot = await getDoc(docRef);
+        const oldImageUrl = docSnapshot.data().img;
+
         const storageRef = ref(
           storage,
           `food_images/${new Date().getTime()}_${newImageFile.name}`
         );
         await uploadBytes(storageRef, newImageFile);
         const downloadURL = await getDownloadURL(storageRef);
-        updates.imageUrl = downloadURL;
+        updates.img = downloadURL;
+
+        // Delete the old image from storage
+        if (oldImageUrl) {
+          const oldImageRef = ref(storage, oldImageUrl);
+          await deleteObject(oldImageRef);
+        }
+        isUpdated = true;
       }
 
-      await updateDoc(docRef, updates);
-
-      alert("Food data is updated");
-      navigate(-1);
+      if (isUpdated) {
+        // check the flag variable to display the success message
+        await updateDoc(docRef, updates);
+        showSuccessToast("Product data is updated", 1000);
+        navigate(-1);
+      } else {
+        showInfoToast("No changes were made.");
+        navigate(-1);
+      }
     } else {
-      alert("No food data");
+      showInfoToast("No food data");
     }
   };
 
@@ -177,16 +168,16 @@ const SingleProduct = () => {
             <div className="editButton" onClick={handleUpdate}>
               Save
             </div>
+
             <h1 className="title">Product Information</h1>
             <div className="item">
               {/*------------------ Food Image ------------------*/}
-              <img src={foodData?.img} alt="" className="itemImg" />
+              <img src={productData?.img} alt="" className="itemImg" />
               <div className="details">
                 {/*------------------ Food Name ------------------*/}
-                <h1 className="itemTitle">{foodData?.foodName}</h1>
+                <h1 className="itemTitle">{productData?.foodName}</h1>
                 <input
                   type="text"
-                  // defaultValue={userData?.contactNumber}
                   placeholder="New Food Name"
                   onChange={(e) => setNewFoodName(e.target.value)}
                 />
@@ -199,11 +190,15 @@ const SingleProduct = () => {
                   >
                     New Image:
                     <DriveFolderUploadOutlinedIcon className="icon" />
+                    {newImageFileName}
                   </label>
                   <input
                     type="file"
                     id="file"
-                    onChange={(e) => setNewImageFile(e.target.files[0])}
+                    onChange={(e) => {
+                      setNewImageFile(e.target.files[0]);
+                      setNewImageFileName(e.target.files[0].name);
+                    }}
                     style={{ display: "none" }}
                   />
                 </div>
@@ -211,11 +206,10 @@ const SingleProduct = () => {
                 {/*------------------ Food Description ------------------*/}
                 <div className="detailItem">
                   <span className="itemKey">Description:</span>
-                  <span className="itemValue">{foodData?.description}</span>
+                  <span className="itemValue">{productData?.description}</span>
                 </div>
                 <input
                   type="text"
-                  // defaultValue={userData?.contactNumber}
                   placeholder="New Description"
                   onChange={(e) => setNewDescription(e.target.value)}
                 />
@@ -223,40 +217,57 @@ const SingleProduct = () => {
                 {/*------------------ Food Category ------------------*/}
                 <div className="detailItem">
                   <span className="itemKey">Category:</span>
-                  <span className="itemValue">{foodData?.categoryTitle}</span>
+                  <span className="itemValue">
+                    {productData?.categoryTitle}
+                  </span>
                 </div>
-                <input
+                {/* <input
                   type="text"
-                  // defaultValue={userData?.contactNumber}
                   placeholder="New Category"
                   onChange={(e) => setNewCategory(e.target.value)}
-                />
+                /> */}
+                <select
+                  value={newSelectedCategory}
+                  onChange={(e) => setNewSelectedCategory(e.target.value)}
+                >
+                  <option value="" disabled>
+                    ---Select a category---
+                  </option>
+                  {categoriesData.map((item) => {
+                    return (
+                      <option
+                        key={item.productCategoryId}
+                        value={item.categoryName}
+                      >
+                        {item.categoryName}
+                      </option>
+                    );
+                  })}
+                </select>
 
                 {/*------------------ Food Price ------------------*/}
                 <div className="detailItem">
                   <span className="itemKey">Price:</span>
                   <span className="itemValue">
-                    ₱{parseFloat(foodData?.price).toFixed(2)}
+                    ₱{parseFloat(productData?.price).toFixed(2)}
                   </span>
                 </div>
                 <input
                   type="text"
                   value={newPrice}
                   placeholder="New Price"
-                  // onChange={(e) => setNewPrice(e.target.value)}
                   onChange={handleChangeNewPrice}
                 />
 
                 {/*------------------ Food Stock ------------------*/}
                 <div className="detailItem">
                   <span className="itemKey">Stock:</span>
-                  <span className="itemValue">{foodData?.stock}</span>
+                  <span className="itemValue">{productData?.stock}</span>
                 </div>
                 <input
                   type="text"
                   value={newStock}
                   placeholder="New Stock"
-                  // onChange={(e) => setNewStock(e.target.value)}
                   onChange={handleChangeNewStock}
                 />
               </div>

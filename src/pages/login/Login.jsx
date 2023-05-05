@@ -4,6 +4,7 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../firebase";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
+import { showSuccessToast } from "../../components/toast/Toast";
 
 const Login = () => {
   const [error, setError] = useState(false);
@@ -22,7 +23,8 @@ const Login = () => {
         // Signed in
         const user = userCredential.user;
         dispatch({ type: "LOGIN", payload: user });
-        navigate("/");
+        showSuccessToast("You've successfully login", 1000);
+        navigate("/home");
       })
       .catch((error) => {
         setError(true);

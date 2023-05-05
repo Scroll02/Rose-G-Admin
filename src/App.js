@@ -16,6 +16,9 @@ import SingleProduct from "./pages/single/SingleProduct"; //SINGLE PRODUCT
 import SingleOrder from "./pages/single/SingleOrder"; //SINGLE ORDER
 import SingleProductCategory from "./pages/single/SingleProductCategory"; //SINGLE PRODUCT CATEGORY
 
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 function App() {
   const { currentUser } = useContext(AuthContext);
 
@@ -24,23 +27,44 @@ function App() {
   };
 
   console.log(currentUser);
+
+  const autoCloseTime = 1000;
   return (
     <div className="App">
+      <ToastContainer
+        position="top-center"
+        autoClose={autoCloseTime}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
+
       <BrowserRouter>
         <Routes>
           {/*------------------ Login Route  ------------------*/}
-          <Route path="login" element={<Login />} />
+          {/* <Route path="login" element={<Login />} /> */}
 
-          {/*------------------ Home Route  ------------------*/}
+          {/*------------------ Root Route (Login)  ------------------*/}
           <Route path="/">
-            <Route
-              index
-              element={
-                <RequireAuth>
-                  <Home />
-                </RequireAuth>
-              }
-            />
+            {/* Login Route */}
+            <Route index element={<Login />} />
+
+            {/*------------------ Home Route  ------------------*/}
+            <Route path="home">
+              <Route
+                index
+                element={
+                  <RequireAuth>
+                    <Home />
+                  </RequireAuth>
+                }
+              />
+            </Route>
 
             {/*------------------ Users Route  ------------------*/}
             <Route path="users">

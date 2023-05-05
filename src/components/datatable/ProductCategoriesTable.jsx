@@ -3,8 +3,16 @@ import { productCategoryColumns } from "../../datatablesource";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { DataGrid } from "@mui/x-data-grid";
-import { collection, deleteDoc, doc, onSnapshot } from "firebase/firestore";
+import {
+  collection,
+  deleteDoc,
+  doc,
+  onSnapshot,
+  getDoc,
+} from "firebase/firestore";
+import { getStorage, ref, deleteObject } from "firebase/storage";
 import { db } from "../../firebase";
+import { showErrorToast } from "../toast/Toast";
 
 const ProductCategoriesTable = () => {
   const [data, setData] = useState([]);
@@ -30,12 +38,27 @@ const ProductCategoriesTable = () => {
   }, []);
   console.log(data);
 
-  //------------------ Delete Food Data  ------------------//
+  //------------------ Delete Product Category Data  ------------------//
   const handleDelete = async (id) => {
+    const storage = getStorage();
+    // try {
+    //   await deleteDoc(doc(db, "ProductCategories", id));
+    //   setData(data.filter((item) => item.id !== id));
+    //   showErrorToast("Selected food category is deleted", 1000);
+    // } catch (err) {
+    //   console.log(err);
+    // }
     try {
-      await deleteDoc(doc(db, "ProductCategories", id));
+      const docRef = doc(db, "ProductCategories", id);
+      const docSnap = await getDoc(docRef);
+      const { categoryImg } = docSnap.data();
+
+      const imageRef = ref(storage, categoryImg);
+      await deleteObject(imageRef);
+
+      await deleteDoc(docRef);
       setData(data.filter((item) => item.id !== id));
-      alert("Selected food category is deleted");
+      showErrorToast("Product category data is deleted", 1000);
     } catch (err) {
       console.log(err);
     }

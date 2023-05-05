@@ -3,13 +3,13 @@ import Sidebar from "../../components/sidebar/Sidebar";
 import Navbar from "../../components/navbar/Navbar";
 import Chart from "../../components/chart/Chart";
 import List from "../../components/table/Table";
-
 import defaultUserIcon from "../../images/defaultUserIcon.png";
 import { useState, useEffect } from "react";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { db, auth, storage } from "../../firebase";
 import { useNavigate } from "react-router-dom";
+import { showSuccessToast, showInfoToast } from "../../components/toast/Toast";
 
 const Single = () => {
   //------------------ Retrieve User ID  ------------------//
@@ -55,40 +55,37 @@ const Single = () => {
     const docRef = doc(db, "UserData", userId);
 
     if (docRef !== null) {
+      const updates = {};
+
       if (newFirstName !== "") {
-        updateDoc(docRef, {
-          firstName: newFirstName,
-        });
+        updates.firstName = newFirstName;
       }
 
       if (newLastName !== "") {
-        updateDoc(docRef, {
-          lastName: newLastName,
-        });
+        updates.lastName = newLastName;
       }
 
       if (newEmail !== "") {
-        updateDoc(docRef, {
-          email: newEmail,
-        });
+        updates.email = newEmail;
       }
 
       if (newContactNumber !== "") {
-        updateDoc(docRef, {
-          contactNumber: newContactNumber,
-        });
+        updates.contactNumber = newContactNumber;
       }
 
       if (newAddress !== "") {
-        updateDoc(docRef, {
-          address: newAddress,
-        });
+        updates.address = newAddress;
       }
 
-      alert("User data is updated");
-      navigate(-1);
+      if (Object.keys(updates).length > 0) {
+        await updateDoc(docRef, updates);
+        showSuccessToast("User data is updated", 1000);
+        navigate(-1);
+      } else {
+        showInfoToast("No changes made");
+      }
     } else {
-      alert("No user data");
+      showInfoToast("No user data");
     }
   };
 

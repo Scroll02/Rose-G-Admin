@@ -61,7 +61,6 @@ const NewUser = ({ inputs, title }) => {
   const handleInput = (e) => {
     const id = e.target.id;
     const value = e.target.value;
-
     setData({ ...data, [id]: value });
   };
 
@@ -77,17 +76,16 @@ const NewUser = ({ inputs, title }) => {
       await addDoc(collection(db, "UserData"), {
         ...data,
         uid: res.user.uid,
-        timeStamp: serverTimestamp(),
+        createdAt: serverTimestamp(),
+        emailVerified: res.user.emailVerified ? "Verified" : "Not Verified",
       });
       navigate(-1);
+      alert("New user is created");
     } catch (err) {
       console.log(err);
     }
-    await addDoc(collection(db, "UserData"), {
-      ...data,
-    });
-    alert("New user is created");
   };
+
   return (
     <div className="new">
       <Sidebar />

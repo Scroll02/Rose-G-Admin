@@ -12,6 +12,7 @@ import {
 } from "firebase/firestore";
 import { getStorage, ref, deleteObject } from "firebase/storage";
 import { db } from "../../firebase";
+import { showErrorToast } from "../toast/Toast";
 
 const ProductTable = () => {
   const [data, setData] = useState([]);
@@ -51,7 +52,8 @@ const ProductTable = () => {
 
       await deleteDoc(docRef);
       setData(data.filter((item) => item.id !== id));
-      alert("Food Data is deleted");
+      // alert("Food Data is deleted");
+      showErrorToast("Product data is deleted", 1000);
     } catch (err) {
       console.log(err);
     }

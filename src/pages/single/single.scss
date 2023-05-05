@@ -46,10 +46,11 @@
             }
 
             .detailItem {
-              margin: 10px 0;
+              margin: 15px 0;
               font-size: 14px;
 
-              .itemKey {
+              .itemKey,
+              label {
                 font-weight: bold;
                 color: gray;
                 margin-right: 5px;

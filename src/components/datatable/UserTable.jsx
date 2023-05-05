@@ -4,12 +4,13 @@ import { userColumns, userRows } from "../../datatablesource";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { collection, deleteDoc, doc, onSnapshot } from "firebase/firestore";
-import { db } from "../../firebase";
+import { db, auth } from "../../firebase";
+import { showErrorToast } from "../toast/Toast";
 
 const UserTable = () => {
   const [data, setData] = useState([]);
 
-  //------------------ Display Users Data ------------------//
+  //------------------ Retrieve Users Data ------------------//
   useEffect(() => {
     //LISTEN (REALTIME)
     const unsub = onSnapshot(
@@ -31,15 +32,38 @@ const UserTable = () => {
   }, []);
   console.log(data);
 
-  //------------------ Delete Users Data  ------------------//
+  //------------------ Delete User Data  ------------------//
   const handleDelete = async (id) => {
     try {
       await deleteDoc(doc(db, "UserData", id));
       setData(data.filter((item) => item.id !== id));
+      showErrorToast("User data is deleted", 1000);
     } catch (err) {
       console.log(err);
     }
   };
+
+  // This delete function, deletes data from firestore database and authentication
+  // const handleDelete = async (id, email) => {
+  //   try {
+  //     const user = auth.currentUser;
+
+  //     if (user && user.email === email) {
+  //       // Delete the user's authentication identifier
+  //       await auth.deleteUser(user);
+
+  //       // Delete the user's data in Firestore
+  //       await deleteDoc(doc(db, "UserData", id));
+
+  //       setData(data.filter((item) => item.id !== id));
+  //       showErrorToast("User data is deleted", 1000);
+  //     } else {
+  //       showErrorToast("You are not authorized to delete this user", 1000);
+  //     }
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+  // };
 
   const actionColumn = [
     {
@@ -66,6 +90,7 @@ const UserTable = () => {
       },
     },
   ];
+
   return (
     <div className="datatable">
       <div className="datatableTitle">

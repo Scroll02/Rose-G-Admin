@@ -3,11 +3,19 @@ import Sidebar from "../../components/sidebar/Sidebar";
 import Navbar from "../../components/navbar/Navbar";
 import Chart from "../../components/chart/Chart";
 import List from "../../components/table/Table";
+import DriveFolderUploadOutlinedIcon from "@mui/icons-material/DriveFolderUploadOutlined";
 import { useState, useEffect } from "react";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
+import {
+  ref,
+  uploadBytes,
+  getDownloadURL,
+  deleteObject,
+} from "firebase/storage";
 import { useParams } from "react-router-dom";
-import { db } from "../../firebase";
+import { db, storage } from "../../firebase";
 import { useNavigate } from "react-router-dom";
+import { showSuccessToast, showInfoToast } from "../../components/toast/Toast";
 
 const SingleProductCategory = () => {
   const { categoryId } = useParams();
@@ -37,6 +45,8 @@ const SingleProductCategory = () => {
   console.log(categoryData);
 
   //------------------ Handle Change for Input  ------------------//
+  const [newCategoryImg, setNewCategoryImg] = useState("");
+  const [newCategoryImgName, setNewCategoryImgName] = useState("");
   const [newCategoryName, setNewCategoryName] = useState("");
   const [newSlug, setNewSlug] = useState("");
 
@@ -45,22 +55,53 @@ const SingleProductCategory = () => {
     const docRef = doc(db, "ProductCategories", categoryId);
 
     if (docRef !== null) {
+      const updates = {};
+      let isUpdated = false; // add a flag variable
+
       if (newCategoryName !== "") {
-        updateDoc(docRef, {
-          categoryName: newCategoryName,
-        });
+        updates.categoryName = newCategoryName;
+        isUpdated = true;
       }
 
       if (newSlug !== "") {
-        updateDoc(docRef, {
-          bagSlug: newSlug,
-        });
+        updates.slug = newSlug;
+        isUpdated = true;
       }
 
-      alert("Category data is updated");
-      navigate(-1);
+      if (newCategoryImg !== "") {
+        // Get the URL of the old image from Firestore
+        const docSnapshot = await getDoc(docRef);
+        const oldImageUrl = docSnapshot.data().categoryImg;
+
+        const storageRef = ref(
+          storage,
+          `productCategory_images/${new Date().getTime()}_${
+            newCategoryImg.name
+          }`
+        );
+        await uploadBytes(storageRef, newCategoryImg);
+        const downloadURL = await getDownloadURL(storageRef);
+        updates.categoryImg = downloadURL;
+
+        // Delete the old image from storage
+        if (oldImageUrl) {
+          const oldImageRef = ref(storage, oldImageUrl);
+          await deleteObject(oldImageRef);
+        }
+        isUpdated = true;
+      }
+
+      if (isUpdated) {
+        // check the flag variable to display the success message
+        await updateDoc(docRef, updates);
+        showSuccessToast("Category data is updated", 1000);
+        navigate(-1);
+      } else {
+        showInfoToast("No changes were made.");
+        navigate(-1);
+      }
     } else {
-      alert("No category data");
+      alert("No product category data");
     }
   };
   return (
@@ -75,8 +116,9 @@ const SingleProductCategory = () => {
             </div>
             <h1 className="title">Food Category Information</h1>
             <div className="item">
+              <img src={categoryData?.categoryImg} alt="" className="itemImg" />
               <div className="details">
-                {/*------------------ Food Name ------------------*/}
+                {/*------------------ Category Name ------------------*/}
                 <h1 className="itemTitle">
                   Category Name:&nbsp;{categoryData?.categoryName}
                 </h1>
@@ -87,9 +129,31 @@ const SingleProductCategory = () => {
                   onChange={(e) => setNewCategoryName(e.target.value)}
                 />
 
-                {/*------------------ Food Description ------------------*/}
+                {/*------------------ New Product Image ------------------*/}
                 <div className="detailItem">
-                  <span className="itemKey">Bag Slug:</span>
+                  <label
+                    htmlFor="file"
+                    style={{ display: "flex", alignItems: "center" }}
+                  >
+                    New Image:
+                    <DriveFolderUploadOutlinedIcon className="icon" />
+                    {newCategoryImgName}
+                  </label>
+
+                  <input
+                    type="file"
+                    id="file"
+                    onChange={(e) => {
+                      setNewCategoryImg(e.target.files[0]);
+                      setNewCategoryImgName(e.target.files[0].name);
+                    }}
+                    style={{ display: "none" }}
+                  />
+                </div>
+
+                {/*------------------ Category Slug ------------------*/}
+                <div className="detailItem">
+                  <span className="itemKey">Slug:</span>
                   <span className="itemValue">{categoryData?.slug}</span>
                 </div>
                 <input
