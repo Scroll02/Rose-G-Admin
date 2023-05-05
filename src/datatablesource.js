@@ -97,14 +97,14 @@ export const userColumns = [
 export const productColumns = [
   { field: "id", headerName: "ID", width: 100 },
   {
-    field: "foodName",
-    headerName: "Food Name",
+    field: "productName",
+    headerName: "Product Name",
     width: 230,
     renderCell: (params) => {
       return (
         <div className="cellWithImg">
           <img className="cellImg" src={params.row.img} alt="avatar" />
-          {params.row.foodName}
+          {params.row.productName}
         </div>
       );
     },
@@ -125,31 +125,10 @@ export const productColumns = [
   },
 
   {
-    field: "categoryTitle",
+    field: "categoryName",
     headerName: "Category",
     width: 150,
   },
-
-  // {
-  //   field: "addOn",
-  //   headerName: "Add-on Name",
-  //   width: 180,
-  // },
-
-  // {
-  //   field: "addOnPrice",
-  //   headerName: "Add-on Price",
-  //   width: 100,
-  //   renderCell: (params) => {
-  //     return (
-  //       <div>
-  //         {params.row.addOnPrice != " " && (
-  //           <div>₱{parseFloat(params.row.addOnPrice).toFixed(2)}</div>
-  //         )}
-  //       </div>
-  //     );
-  //   },
-  // },
 
   {
     field: "stock",

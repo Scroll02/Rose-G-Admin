@@ -21,7 +21,7 @@ const ProductTable = () => {
   useEffect(() => {
     //LISTEN (REALTIME)
     const unsub = onSnapshot(
-      collection(db, "FoodData"),
+      collection(db, "ProductData"),
       (snapShot) => {
         let list = [];
         snapShot.docs.forEach((doc) => {
@@ -43,7 +43,7 @@ const ProductTable = () => {
   const handleDelete = async (id) => {
     const storage = getStorage();
     try {
-      const docRef = doc(db, "FoodData", id);
+      const docRef = doc(db, "ProductData", id);
       const docSnap = await getDoc(docRef);
       const { img } = docSnap.data();
 

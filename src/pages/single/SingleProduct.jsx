@@ -18,8 +18,8 @@ import {
   getDownloadURL,
   deleteObject,
 } from "firebase/storage";
-import { Link, useParams } from "react-router-dom";
-import { db, auth, storage } from "../../firebase";
+import { useParams } from "react-router-dom";
+import { db, storage } from "../../firebase";
 import { useNavigate } from "react-router-dom";
 import { showSuccessToast, showInfoToast } from "../../components/toast/Toast"; //SUCCESS & INFO TOAST
 
@@ -33,7 +33,7 @@ const SingleProduct = () => {
   const [productData, setProductData] = useState();
 
   const getProductData = async () => {
-    const docRef = doc(db, "FoodData", productId);
+    const docRef = doc(db, "ProductData", productId);
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
@@ -53,7 +53,7 @@ const SingleProduct = () => {
   //------------------ Handle Change for Input  ------------------//
   const [newImageFile, setNewImageFile] = useState("");
   const [newImageFileName, setNewImageFileName] = useState("");
-  const [newFoodName, setNewFoodName] = useState("");
+  const [newProductName, setNewProductName] = useState("");
   const [newDescription, setNewDescription] = useState("");
   const [newPrice, setNewPrice] = useState("");
   const [newStock, setNewStock] = useState("");
@@ -66,7 +66,7 @@ const SingleProduct = () => {
     setNewStock(numberOnly);
   };
 
-  //------------------ Retrieve Food Categories Data ------------------//
+  //------------------ Retrieve Product Categories Data ------------------//
   const [categoriesData, setCategoriesData] = useState([]);
   useEffect(() => {
     //LISTEN (REALTIME)
@@ -92,14 +92,14 @@ const SingleProduct = () => {
   //------------------ Update Product Data Function  ------------------//
   const [newSelectedCategory, setNewSelectedCategory] = useState("");
   const handleUpdate = async () => {
-    const docRef = doc(db, "FoodData", productId);
+    const docRef = doc(db, "ProductData", productId);
 
     if (docRef !== null) {
       const updates = {};
       let isUpdated = false; // add a flag variable
 
-      if (newFoodName !== "") {
-        updates.foodName = newFoodName;
+      if (newProductName !== "") {
+        updates.productName = newProductName;
         isUpdated = true;
       }
 
@@ -109,7 +109,7 @@ const SingleProduct = () => {
       }
 
       if (newSelectedCategory !== "") {
-        updates.categoryTitle = newSelectedCategory;
+        updates.categoryName = newSelectedCategory;
         isUpdated = true;
       }
 
@@ -130,7 +130,7 @@ const SingleProduct = () => {
 
         const storageRef = ref(
           storage,
-          `food_images/${new Date().getTime()}_${newImageFile.name}`
+          `product_images/${new Date().getTime()}_${newImageFile.name}`
         );
         await uploadBytes(storageRef, newImageFile);
         const downloadURL = await getDownloadURL(storageRef);
@@ -154,7 +154,7 @@ const SingleProduct = () => {
         navigate(-1);
       }
     } else {
-      showInfoToast("No food data");
+      showInfoToast("No product data");
     }
   };
 
@@ -175,11 +175,11 @@ const SingleProduct = () => {
               <img src={productData?.img} alt="" className="itemImg" />
               <div className="details">
                 {/*------------------ Food Name ------------------*/}
-                <h1 className="itemTitle">{productData?.foodName}</h1>
+                <h1 className="itemTitle">{productData?.productName}</h1>
                 <input
                   type="text"
                   placeholder="New Food Name"
-                  onChange={(e) => setNewFoodName(e.target.value)}
+                  onChange={(e) => setNewProductName(e.target.value)}
                 />
 
                 {/*------------------ New Product Image ------------------*/}
@@ -214,18 +214,14 @@ const SingleProduct = () => {
                   onChange={(e) => setNewDescription(e.target.value)}
                 />
 
-                {/*------------------ Food Category ------------------*/}
+                {/*------------------ Product Category ------------------*/}
                 <div className="detailItem">
                   <span className="itemKey">Category:</span>
                   <span className="itemValue">
-                    {productData?.categoryTitle}
+                    {productData?.categoryProduct}
                   </span>
                 </div>
-                {/* <input
-                  type="text"
-                  placeholder="New Category"
-                  onChange={(e) => setNewCategory(e.target.value)}
-                /> */}
+
                 <select
                   value={newSelectedCategory}
                   onChange={(e) => setNewSelectedCategory(e.target.value)}

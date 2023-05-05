@@ -38,10 +38,10 @@ export const userInputs = [
 
 export const productInputs = [
   {
-    id: "foodName",
-    label: "Food Name",
+    id: "productName",
+    label: "Product Name",
     type: "text",
-    placeholder: "Food Name",
+    placeholder: "Product Name",
   },
   {
     id: "description",

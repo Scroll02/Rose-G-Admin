@@ -55,7 +55,7 @@ const NewFood = ({ inputs, title }) => {
 
     const storageRef = ref(
       storage,
-      `food_images/${new Date().getTime()}_${productImgFile.name}`
+      `product_images/${new Date().getTime()}_${productImgFile.name}`
     ); // replace 'images' with your storage path
 
     try {
@@ -65,11 +65,11 @@ const NewFood = ({ inputs, title }) => {
       const downloadURL = await getDownloadURL(snapshot.ref);
 
       // Add document to Firestore with image download URL
-      await addDoc(collection(db, "FoodData"), {
+      await addDoc(collection(db, "ProductData"), {
         ...data,
         img: downloadURL,
-        foodId: new Date().getTime().toString(),
-        categoryTitle: selectedCategory,
+        productId: new Date().getTime().toString(),
+        categoryName: selectedCategory,
       });
 
       navigate(-1);
