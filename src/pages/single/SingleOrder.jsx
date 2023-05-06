@@ -18,6 +18,9 @@ import { Link, useParams } from "react-router-dom";
 import { db, auth, storage } from "../../firebase";
 import moment from "moment";
 
+// Toast
+import { showSuccessToast, showErrorToast } from "../../components/toast/Toast";
+
 const SingleOrder = () => {
   const { orderId } = useParams();
   // console.log(orderId);
@@ -52,10 +55,10 @@ const SingleOrder = () => {
     };
     setDoc(docRef, data)
       .then(() => {
-        alert("Document successfully updated!");
+        showSuccessToast("Order Status is updated!");
       })
       .catch((error) => {
-        alert("Error writing document: ", error);
+        showErrorToast("Error writing document: ", error);
       });
     getUserOrderData();
   };
@@ -70,10 +73,10 @@ const SingleOrder = () => {
     };
     setDoc(docRef, data)
       .then(() => {
-        alert("Document successfully written!");
+        showSuccessToast("Delivery Rider is assigned!");
       })
       .catch((error) => {
-        alert("Error writing document: ", error);
+        showErrorToast("Error writing document: ", error);
       });
     getUserOrderData();
   };
@@ -302,42 +305,18 @@ const SingleOrder = () => {
                         style={{
                           display: "flex",
                           flexDirection: "row",
-                          justifyContent: "space-around",
+                          justifyContent: "space-between",
+                          alignItems: "center",
                           marginTop: 10,
                         }}
                       >
-                        <span>{item.foodQty}x&nbsp;</span>
-                        <span>{item.data?.foodName}</span>
-                        <span>₱{parseFloat(item.data?.price).toFixed(2)}</span>
+                        <span>{item.productQty}x&nbsp;</span>
+                        <span>{item.productName}</span>
+                        <span>₱{parseFloat(item.price).toFixed(2)}</span>
                         <span>
-                          ₱
-                          {parseFloat(item.foodQty * item.data?.price).toFixed(
-                            2
-                          )}
+                          ₱{parseFloat(item.productQty * item.price).toFixed(2)}
                         </span>
                       </div>
-                      {item.addOnQty != 0 && (
-                        <div
-                          style={{
-                            display: "flex",
-                            flexDirection: "row",
-                            justifyContent: "space-around",
-                            marginTop: 10,
-                          }}
-                        >
-                          <span className="itemKey">{item.addOnQty}x </span>
-                          <span className="itemValue">{item.data?.addOn}</span>
-                          <span className="itemValue">
-                            ₱{parseFloat(item.data?.addOnPrice).toFixed(2)}
-                          </span>
-                          <span className="itemValue">
-                            ₱
-                            {parseFloat(
-                              item.addOnQty * item.data?.addOnPrice
-                            ).toFixed(2)}
-                          </span>
-                        </div>
-                      )}
                     </div>
                   );
                 })}

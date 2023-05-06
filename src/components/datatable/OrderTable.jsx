@@ -11,6 +11,7 @@ import {
   onSnapshot,
 } from "firebase/firestore";
 import { db } from "../../firebase";
+import { showErrorToast } from "../toast/Toast";
 
 const OrderTable = () => {
   const [data, setData] = useState([]);
@@ -42,6 +43,7 @@ const OrderTable = () => {
     try {
       await deleteDoc(doc(db, "UserOrders", id));
       setData(data.filter((item) => item.id !== id));
+      showErrorToast("Order is deleted", 1000);
     } catch (err) {
       console.log(err);
     }

@@ -9,6 +9,21 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { useNavigate } from "react-router-dom";
 
+const userRoles = [
+  {
+    userRoleId: 1,
+    userRoleName: "Super Admin",
+  },
+  {
+    userRoleId: 2,
+    userRoleName: "Admin",
+  },
+  {
+    userRoleId: 3,
+    userRoleName: "User",
+  },
+];
+
 const NewUser = ({ inputs, title }) => {
   const [file, setFile] = useState("");
   const [data, setData] = useState({});
@@ -65,6 +80,7 @@ const NewUser = ({ inputs, title }) => {
   };
 
   //------------------ Add New User Function ------------------//
+  const [selectedUserRole, setSelectedUserRole] = useState("");
   const handleAdd = async (e) => {
     e.preventDefault();
     try {
@@ -78,6 +94,7 @@ const NewUser = ({ inputs, title }) => {
         uid: res.user.uid,
         createdAt: serverTimestamp(),
         emailVerified: res.user.emailVerified ? "Verified" : "Not Verified",
+        role: selectedUserRole,
       });
       navigate(-1);
       alert("New user is created");
@@ -118,6 +135,25 @@ const NewUser = ({ inputs, title }) => {
                   onChange={(e) => setFile(e.target.files[0])}
                   style={{ display: "none" }}
                 />
+
+                {/* User Type Input Field */}
+                <label>User Type</label>
+
+                <select
+                  value={selectedUserRole}
+                  onChange={(e) => setSelectedUserRole(e.target.value)}
+                >
+                  <option value="" disabled>
+                    ---Select user type---
+                  </option>
+                  {userRoles.map((item) => {
+                    return (
+                      <option key={item.userRoleId} value={item.userRoleName}>
+                        {item.userRoleName}
+                      </option>
+                    );
+                  })}
+                </select>
               </div>
 
               {inputs.map((input) => (

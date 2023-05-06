@@ -25,6 +25,18 @@ function App() {
   const RequireAuth = ({ children }) => {
     return currentUser ? children : <Navigate to="/login" />;
   };
+  // const RequireAuth = ({ children }) => {
+  //   if (!currentUser) {
+  //     return <Navigate to="/login" />;
+  //   } else if (
+  //     currentUser.userType === "Super Admin" ||
+  //     currentUser.userType === "Admin"
+  //   ) {
+  //     return children;
+  //   } else {
+  //     return <Navigate to="/home" />;
+  //   }
+  // };
 
   console.log(currentUser);
 
