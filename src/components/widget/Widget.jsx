@@ -39,7 +39,7 @@ const Widget = ({ type }) => {
       data = {
         title: "PRODUCT",
         isMoney: false,
-        query: "FoodData",
+        query: "ProductData",
         link: (
           <a href="/products" style={{ textDecoration: "none" }}>
             View all products
