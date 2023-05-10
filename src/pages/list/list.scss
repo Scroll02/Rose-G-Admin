@@ -1,8 +1,9 @@
 .list {
-    display: flex;
-    width: 100%;
-    .listContainer {
-      flex: 6;
-    }
+  display: flex;
+  width: 100%;
+
+  .listContainer {
+    flex: 6;
+    border-width: 2ch;
   }
-  
+}

@@ -21,7 +21,7 @@
       border: none;
       background-color: #bcc99b;
       color: white;
-      font-weight: bold;
+      font-weight: bolder;
       cursor: pointer;
     }
 
@@ -29,6 +29,13 @@
       font-size: 15px;
       color: red;
       margin-top: 10px;
+    }
+
+    .itemImg {
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      object-fit: cover;
     }
   }
 }

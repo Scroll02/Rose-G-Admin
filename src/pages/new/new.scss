@@ -12,6 +12,7 @@
       padding: 10px;
       margin: 20px;
       display: flex;
+      background-color: #fae9bd;
 
       h1 {
         color: lightgray;
@@ -34,6 +35,9 @@
         flex: 2;
 
         form {
+          color: #751c1a;
+          font-weight: bold;
+          font-style: italic;
           // display: flex;
           // flex-wrap: wrap;
           // gap: 30px;
@@ -41,6 +45,7 @@
           .formInput {
             width: 40%;
             margin-bottom: 20px;
+            font-size: large;
 
             label {
               display: flex;
@@ -60,6 +65,7 @@
               border: none;
               border-bottom: 1px solid gray;
               margin-bottom: 20px;
+              font-size: large;
             }
             select {
               width: 100%;
