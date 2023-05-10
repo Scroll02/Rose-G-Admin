@@ -5,6 +5,7 @@ import { auth } from "../../firebase";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import { showSuccessToast } from "../../components/toast/Toast";
+import adminlogo from "../../images/adminlogo.png";
 import { db } from "../../firebase";
 import { doc, getDoc } from "firebase/firestore";
 
@@ -65,6 +66,7 @@ const Login = () => {
   return (
     <div className="login">
       <form onSubmit={handleLogin}>
+        <img src={adminlogo} alt="" className="itemImg" />
         <input
           type="email"
           placeholder="email"

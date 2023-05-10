@@ -1,3 +1,4 @@
+import "./datatable.scss";
 import React from "react";
 import { productColumns } from "../../datatablesource";
 import { Link } from "react-router-dom";
