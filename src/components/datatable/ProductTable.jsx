@@ -4,6 +4,11 @@ import { productColumns } from "../../datatablesource";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { DataGrid } from "@mui/x-data-grid";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
+import ConfirmationModal from "../modal/ConfirmationModal";
+
+// Firebase
 import {
   collection,
   deleteDoc,
@@ -13,7 +18,9 @@ import {
 } from "firebase/firestore";
 import { getStorage, ref, deleteObject } from "firebase/storage";
 import { db } from "../../firebase";
-import { showErrorToast } from "../toast/Toast";
+
+// Toast
+import { showErrorToast, showSuccessToast } from "../toast/Toast";
 
 const ProductTable = () => {
   const [data, setData] = useState([]);
@@ -38,53 +45,63 @@ const ProductTable = () => {
       unsub();
     };
   }, []);
-  console.log(data);
+  // console.log(data);
 
   //------------------ Delete Food Data  ------------------//
-  const handleDelete = async (id) => {
+  const [selectedProductId, setSelectedProductId] = useState(null);
+  const handleDelete = async () => {
     const storage = getStorage();
     try {
-      const docRef = doc(db, "ProductData", id);
+      const docRef = doc(db, "ProductData", selectedProductId);
       const docSnap = await getDoc(docRef);
-      const { img } = docSnap.data();
+      const imageUrl = docSnap.data().img;
 
-      const imageRef = ref(storage, img);
+      const imageRef = ref(storage, imageUrl);
       await deleteObject(imageRef);
 
       await deleteDoc(docRef);
-      setData(data.filter((item) => item.id !== id));
-      // alert("Food Data is deleted");
-      showErrorToast("Product data is deleted", 1000);
+      setData(data.filter((item) => item.id !== selectedProductId));
+      showSuccessToast("Product data is deleted", 2000);
     } catch (err) {
       console.log(err);
+      showErrorToast("Error deleting product", 2000);
     }
   };
 
-  const actionColumn = [
-    {
-      field: "action",
-      headerName: "Action",
-      width: 200,
-      renderCell: (params) => {
-        return (
-          <div className="cellAction">
-            <Link
-              to={`/products/${params.row.id}`}
-              style={{ textDecoration: "none" }}
-            >
-              <div className="viewButton">Edit</div>
-            </Link>
-            <div
-              className="deleteButton"
-              onClick={() => handleDelete(params.row.id)}
-            >
-              Delete
-            </div>
-          </div>
-        );
-      },
-    },
-  ];
+  // Modal
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+  const closeConfirmationModal = () => {
+    setShowConfirmationModal(false);
+  };
+
+  // const actionColumn = [
+  //   {
+  //     field: "action",
+  //     headerName: "Action",
+  //     width: 200,
+  //     renderCell: (params) => {
+  //       return (
+  //         <div className="cellAction">
+  //           <Link
+  //             to={`/products/${params.row.id}`}
+  //             style={{ textDecoration: "none" }}
+  //           >
+  //             <div className="viewButton">
+  //               <EditIcon />
+  //               <span>Edit</span>
+  //             </div>
+  //           </Link>
+  //           <div
+  //             className="deleteButton"
+  //             onClick={() => handleDelete(params.row.id)}
+  //           >
+  //             <DeleteForeverIcon />
+  //           </div>
+  //         </div>
+  //       );
+  //     },
+  //   },
+  // ];
 
   return (
     <div className="datatable">
@@ -102,11 +119,47 @@ const ProductTable = () => {
       <DataGrid
         className="datagrid"
         rows={data}
-        columns={actionColumn.concat(productColumns)}
-        pageSize={9}
-        rowsPerPageOptions={[9]}
+        columns={productColumns.concat([
+          {
+            field: "action",
+            headerName: "Action",
+            width: 200,
+            renderCell: (params) => {
+              return (
+                <div className="cellAction">
+                  <Link
+                    to={`/products/${params.row.id}`}
+                    style={{ textDecoration: "none" }}
+                  >
+                    <div className="viewButton">
+                      <EditIcon />
+                      <span>Edit</span>
+                    </div>
+                  </Link>
+                  <div
+                    className="deleteButton"
+                    onClick={() => {
+                      setSelectedProductId(params.row.id);
+                      setShowConfirmationModal(true);
+                    }}
+                  >
+                    <DeleteForeverIcon />
+                  </div>
+                </div>
+              );
+            },
+          },
+        ])}
+        pageSize={10}
+        rowsPerPageOptions={[10]}
         // checkboxSelection
       />
+      {showConfirmationModal && (
+        <ConfirmationModal
+          handleDelete={handleDelete}
+          closeConfirmationModal={closeConfirmationModal}
+        />
+      )}
     </div>
   );
 };

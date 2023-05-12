@@ -2,15 +2,23 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { productInputs, userInputs, productCategoryInputs } from "./formSource";
 import { AuthContext } from "./context/AuthContext";
 import { useContext, useState } from "react";
+import "./App.css";
 import Home from "./pages/home/Home";
 import Login from "./pages/login/Login";
+
+// LIST
 import UserList from "./pages/list/UserList"; //USER LIST
 import ProductList from "./pages/list/ProductList"; //PRODUCT LIST
 import OrderList from "./pages/list/OrderList"; //ORDER LIST
 import ProductCategoriesList from "./pages/list/ProductCategoriesList"; //PRODUCT CATEGORIES LIST
+import NotificationList from "./pages/list/NotificationList";
+
+// ADDING NEW
 import NewUser from "./pages/new/NewUser"; //ADDING NEW USER
 import NewProduct from "./pages/new/NewProduct"; //ADDING NEW PRODUCTS
 import NewProductCategory from "./pages/new/NewProductCategory"; //ADDING NEW FOOD CATEGORY
+
+// SINGLE
 import SingleUser from "./pages/single/SingleUser"; //SINGLE USER
 import SingleProduct from "./pages/single/SingleProduct"; //SINGLE PRODUCT
 import SingleOrder from "./pages/single/SingleOrder"; //SINGLE ORDER
@@ -38,7 +46,7 @@ function App() {
   //   }
   // };
 
-  console.log(currentUser);
+  // console.log(currentUser);
 
   const autoCloseTime = 1000;
   return (
@@ -195,6 +203,18 @@ function App() {
                 element={
                   <RequireAuth>
                     <SingleOrder />
+                  </RequireAuth>
+                }
+              />
+            </Route>
+
+            {/*------------------ Notifcation Route  ------------------*/}
+            <Route path="notification">
+              <Route
+                index
+                element={
+                  <RequireAuth>
+                    <NotificationList />
                   </RequireAuth>
                 }
               />

@@ -1,10 +1,11 @@
 .navbar {
-  height: 50px;
-  border-bottom: 0.5px solid rgb(231, 228, 228);
+  height: 55px;
+  // border-bottom: 0.5px solid rgb(231, 228, 228);
+  border-bottom: 3px solid var(--background-color2);
   display: flex;
   align-items: center;
   font-size: 14px;
-  background-color: #751c1a;
+  background-color: var(--background-color1);
 
   .wrapper {
     width: 100%;
@@ -18,15 +19,17 @@
       align-items: center;
       border: 0.5px solid lightgray;
       padding: 3px;
-      background-color: white;
+      background-color: var(--text-color1);
 
       input {
         border: none;
         outline: none;
         background-color: transparent;
-
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text-color2);
         &::placeholder {
-          font-size: 12px;
+          font-size: 1rem;
         }
       }
     }
@@ -34,7 +37,7 @@
   .items {
     display: flex;
     align-items: center;
-    color: white;
+    color: var(--text-color1);
 
     .item {
       display: flex;
@@ -43,26 +46,32 @@
       position: relative;
 
       .icon {
-        font-size: 20px;
+        font-size: 30px;
       }
 
       .avatar {
         width: 30px;
         height: 30px;
         border-radius: 50%;
+        margin-right: 10px;
+      }
+
+      span {
+        font-size: 1rem;
+        font-weight: 500;
       }
 
       .counter {
         width: 15px;
         height: 15px;
-        background-color: rgb(10, 145, 73);
+        background-color: var(--background-color2);
         border-radius: 50%;
-        color: white;
+        color: var(--text-color2);
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 10px;
-        font-weight: bold;
+        font-size: 11px;
+        font-weight: 600;
         position: absolute;
         top: -5px;
         right: -5px;

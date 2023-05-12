@@ -2,12 +2,21 @@ import Navbar from "../../components/navbar/Navbar";
 import "./new.scss";
 import Sidebar from "../../components/sidebar/Sidebar";
 import DriveFolderUploadOutlinedIcon from "@mui/icons-material/DriveFolderUploadOutlined";
+import { useNavigate } from "react-router-dom";
+import { showSuccessToast, showErrorToast } from "../../components/toast/Toast";
 import { useState, useEffect } from "react";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+
+// Firebase
+import {
+  addDoc,
+  collection,
+  serverTimestamp,
+  doc,
+  setDoc,
+} from "firebase/firestore";
 import { db, auth, storage } from "../../firebase";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { useNavigate } from "react-router-dom";
 
 const userRoles = [
   {
@@ -81,6 +90,7 @@ const NewUser = ({ inputs, title }) => {
 
   //------------------ Add New User Function ------------------//
   const [selectedUserRole, setSelectedUserRole] = useState("");
+
   const handleAdd = async (e) => {
     e.preventDefault();
     try {
@@ -89,17 +99,18 @@ const NewUser = ({ inputs, title }) => {
         data.email,
         data.password
       );
-      await addDoc(collection(db, "UserData"), {
+      const newDocRef = doc(collection(db, "UserData"), res.user.uid);
+      await setDoc(newDocRef, {
         ...data,
-        uid: res.user.uid,
         createdAt: serverTimestamp(),
         emailVerified: res.user.emailVerified ? "Verified" : "Not Verified",
         role: selectedUserRole,
+        uid: res.user.uid,
       });
       navigate(-1);
-      alert("New user is created");
+      showSuccessToast("New user is created", 1000);
     } catch (err) {
-      console.log(err);
+      showErrorToast("Failed to create user", 1000);
     }
   };
 

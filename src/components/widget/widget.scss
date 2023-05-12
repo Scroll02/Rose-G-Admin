@@ -24,17 +24,21 @@
 
   .counter {
     font-size: 28px;
-    font-weight: 300px;
+    font-weight: 500;
   }
 
-  .link {
+  .link a {
     width: max-content;
     font-size: 17px;
     border-bottom: 1px solid gray;
+    color: var(--text-color2);
+
+    &:hover {
+      font-weight: 600;
+      color: var(--background-color1);
+    }
   }
-  &:hover {
-    color: #ffc500;
-  }
+
   .percentage {
     display: flex;
     align-items: center;
@@ -49,7 +53,7 @@
   }
 
   .icon {
-    font-size: 18px;
+    font-size: 30px;
     padding: 5px;
     border-radius: 10px;
     align-self: flex-end;

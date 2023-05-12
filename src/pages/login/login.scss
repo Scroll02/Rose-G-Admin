@@ -1,41 +1,94 @@
-.login {
+.loginBody {
   height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
+  text-align: center;
+  background: rgb(113, 25, 23);
+  background: linear-gradient(
+    160deg,
+    rgba(113, 25, 23, 1) 50%,
+    rgba(253, 187, 45, 1) 100%
+  );
 
-  form {
+  .loginContainer {
     display: flex;
     flex-direction: column;
     align-items: center;
-
-    input {
-      width: 200px;
-      height: 30px;
-      margin: 10px;
-    }
-
-    button {
-      width: 200px;
-      height: 30px;
-      border: none;
-      background-color: #bcc99b;
-      color: white;
-      font-weight: bolder;
-      cursor: pointer;
-    }
-
-    span {
-      font-size: 15px;
-      color: red;
-      margin-top: 10px;
-    }
-
-    .itemImg {
-      width: 200px;
-      height: 200px;
+    justify-content: center;
+    img {
+      width: 20%;
+      height: auto;
       border-radius: 50%;
       object-fit: cover;
+    }
+
+    h2 {
+      color: var(--text-color1);
+      margin: 20px 0;
+      max-width: 30%;
+      word-wrap: break-word;
+    }
+
+    .loginForm {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      .loginFormGroup {
+        .loginInputContainer {
+          position: relative;
+
+          .loginFormInput {
+            padding: 0.3rem 2.5rem 0.3rem 1rem;
+            margin: 15px 0;
+            border-radius: 0.5rem;
+            font-size: 1.3rem;
+            font-weight: 600;
+            box-sizing: border-box;
+            transition: border-color 0.2s ease-in-out;
+            border: 2px solid var(--text-color1);
+            box-shadow: 3px 3px var(--background-color2);
+            color: var(--text-color2);
+          }
+          .loginFormInput:focus {
+            outline: none;
+            border-color: var(--background-color2);
+          }
+
+          .loginInputIcon {
+            position: absolute;
+            right: 0.5rem;
+            top: 55%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            z-index: 1;
+          }
+
+          .visibilityIcon {
+            color: var(--text-color2);
+          }
+        }
+      }
+
+      button {
+        width: 200px;
+        height: 50px;
+        border-radius: 5px;
+        border: none;
+        background-color: var(--background-color2);
+        color: var(--text-color2);
+        font-weight: 600;
+        font-size: 1rem;
+        margin: 15px 0;
+        cursor: pointer;
+      }
+
+      span {
+        font-size: 15px;
+        color: red;
+        margin-top: 10px;
+      }
     }
   }
 }

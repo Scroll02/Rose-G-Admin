@@ -2,11 +2,17 @@ import defaultUserIcon from "./images/defaultUserIcon.png";
 import moment from "moment";
 /*------------------ User Column ------------------*/
 export const userColumns = [
-  { field: "uid", headerName: "ID", width: 150 },
   {
-    field: "user",
-    headerName: "User",
+    field: "uid",
+    headerName: "User ID",
+    width: 120,
+    headerClassName: "headerName",
+  },
+  {
+    field: "fullName",
+    headerName: "Full Name",
     width: 230,
+    headerClassName: "headerName",
     renderCell: (params) => {
       return (
         <div className="cellWithImg">
@@ -28,27 +34,26 @@ export const userColumns = [
     field: "email",
     headerName: "Email",
     width: 200,
+    headerClassName: "headerName",
   },
 
-  // {
-  //   field: "fullName",
-  //   headerName: "Full Name",
-  //   width: 180,
-  // },
   {
     field: "contactNumber",
     headerName: "Contact Number",
-    width: 150,
+    width: 160,
+    headerClassName: "headerName",
   },
   {
     field: "address",
     headerName: "Address",
     width: 250,
+    headerClassName: "headerName",
   },
   {
     field: "status",
     headerName: "Status",
     width: 160,
+    headerClassName: "headerName",
     renderCell: (params) => {
       return (
         <div className={`cellWithStatus ${params.row.status}`}>
@@ -78,6 +83,7 @@ export const userColumns = [
   {
     field: "emailVerified",
     headerName: "Email Verified",
+    headerClassName: "headerName",
     width: 150,
     renderCell: (params) => {
       return (
@@ -95,7 +101,7 @@ export const userColumns = [
 
 /*------------------ Product Column ------------------*/
 export const productColumns = [
-  { field: "id", headerName: "ID", width: 100 },
+  { field: "id", headerName: "Product ID", width: 120 },
   {
     field: "productName",
     headerName: "Product Name",
@@ -118,9 +124,16 @@ export const productColumns = [
   {
     field: "price",
     headerName: "Price",
-    width: 100,
+    width: 120,
     renderCell: (params) => {
-      return <div>₱{parseFloat(params.row.price).toFixed(2)}</div>;
+      return (
+        <div>
+          ₱
+          {parseFloat(params.row.price)
+            .toFixed(2)
+            .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+        </div>
+      );
     },
   },
 
@@ -168,6 +181,31 @@ export const productCategoryColumns = [
 export const orderColumns = [
   { field: "orderId", headerName: "Order ID", width: 160 },
   {
+    field: "customer",
+    headerName: "Customer",
+    width: 200,
+    renderCell: (params) => {
+      return (
+        <div className="cellWithImg">
+          {params.row.img == null ? (
+            <img
+              className="cellImg"
+              src={defaultUserIcon}
+              alt="Default User Icon"
+            />
+          ) : (
+            <img className="cellImg" src={params.row.img} alt="avatar" />
+          )}
+          <div className="customerName">
+            <span>
+              {params.row.orderFirstName}&nbsp;{params.row.orderLastName}
+            </span>
+          </div>
+        </div>
+      );
+    },
+  },
+  {
     field: "orderPayment",
     headerName: "Order Payment",
     width: 180,
@@ -177,7 +215,14 @@ export const orderColumns = [
     headerName: "Order Total Cost",
     width: 150,
     renderCell: (params) => {
-      return <div>₱{parseFloat(params.row.orderTotalCost).toFixed(2)}</div>;
+      return (
+        <div>
+          ₱
+          {parseFloat(params.row.orderTotalCost)
+            .toFixed(2)
+            .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+        </div>
+      );
     },
   },
 
@@ -198,11 +243,18 @@ export const orderColumns = [
     field: "orderStatus",
     headerName: "Order Status",
     width: 150,
+    renderCell: (params) => {
+      return (
+        <div className={`cellOrderStatus ${params.row.orderStatus}`}>
+          {params.row.orderStatus}
+        </div>
+      );
+    },
   },
 
   {
-    field: "deliveryRiderInfo",
-    headerName: "Delivery Rider Information",
-    width: 250,
+    field: "deliveryRider",
+    headerName: "Delivery Rider",
+    width: 180,
   },
 ];

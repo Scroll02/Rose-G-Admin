@@ -1,10 +1,16 @@
 import "./datatable.scss";
 import { DataGrid } from "@mui/x-data-grid";
-import { userColumns, userRows } from "../../datatablesource";
+import { userColumns } from "../../datatablesource";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
+
+// Firebase
 import { collection, deleteDoc, doc, onSnapshot } from "firebase/firestore";
 import { db, auth } from "../../firebase";
+
+// Toast
 import { showErrorToast } from "../toast/Toast";
 
 const UserTable = () => {
@@ -69,7 +75,8 @@ const UserTable = () => {
     {
       field: "action",
       headerName: "Action",
-      width: 200,
+      width: 150,
+      headerClassName: "headerName",
       renderCell: (params) => {
         return (
           <div className="cellAction">
@@ -77,13 +84,16 @@ const UserTable = () => {
               to={`/users/${params.row.id}`}
               style={{ textDecoration: "none" }}
             >
-              <div className="viewButton">Edit</div>
+              <div className="viewButton">
+                <VisibilityIcon />
+                <span>View</span>
+              </div>
             </Link>
             <div
               className="deleteButton"
               onClick={() => handleDelete(params.row.id)}
             >
-              Delete
+              <DeleteForeverIcon />
             </div>
           </div>
         );
@@ -102,9 +112,9 @@ const UserTable = () => {
       <DataGrid
         className="datagrid"
         rows={data}
-        columns={actionColumn.concat(userColumns)}
-        pageSize={9}
-        rowsPerPageOptions={[9]}
+        columns={userColumns.concat(actionColumn)}
+        pageSize={10}
+        rowsPerPageOptions={[10]}
         // checkboxSelection
       />
     </div>

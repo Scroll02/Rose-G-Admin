@@ -1,0 +1,85 @@
+.confirmationModalWrapper {
+  position: fixed;
+  background: rgba(0, 0, 0, 0.6);
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+
+  .confirmationModalContainer {
+    position: relative;
+    background-color: white;
+    border-radius: 20px;
+    max-width: 400px;
+    padding: 20px 10px;
+
+    .confirmationModalCloseBtn {
+      position: absolute;
+      top: 0;
+      right: 0;
+      padding: 5px;
+      margin: 10px;
+
+      button {
+        display: flex;
+        background: var(--background-color2);
+        border: none;
+        border-radius: 50%;
+        padding: 3px 6px;
+        cursor: pointer;
+      }
+    }
+
+    .confirmationModalHeader {
+      font-size: 2rem;
+      padding: 10px 0;
+      border-bottom: 2px solid black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .confirmationModalContent {
+      display: flex;
+      flex-direction: column;
+
+      p {
+        text-align: center;
+        margin: 15px;
+        font-size: 1.4rem;
+      }
+
+      .deleteForeverIcon {
+        align-self: center;
+        margin: 10px 0;
+        width: 20%;
+        height: auto;
+        color: red;
+      }
+
+      .confirmationModalActions {
+        display: flex;
+        justify-content: space-around;
+
+        button {
+          width: 40%;
+          font-weight: 600;
+          background: var(--text-color1);
+          border: 1px solid grey;
+          border-radius: 5px;
+          padding: 5px 10px;
+          font-size: 1rem;
+          cursor: pointer;
+        }
+        button:nth-of-type(1) {
+          background: var(--background-color2);
+        }
+      }
+    }
+  }
+}
