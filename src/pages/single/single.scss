@@ -1,6 +1,7 @@
 .single {
   display: flex;
   width: 100%;
+
   .singleContainer {
     flex: 6;
 
@@ -16,17 +17,23 @@
         padding: 20px;
         position: relative;
         background-color: #fdf8e9;
+        border-radius: 0.5rem;
 
         .editButton {
           position: absolute;
           top: 0;
           right: 0;
-          padding: 5px;
-          font-size: 12px;
-          color: #7451f8;
-          background-color: #7551f818;
+          padding: 10px;
+          font-size: 1rem;
+          color: var(--text-color1);
+          background-color: var(--background-color1);
+          box-shadow: 2px 2px 2px var(--background-color2);
           cursor: pointer;
           border-radius: 0px 0px 0px 5px;
+
+          &:hover {
+            transform: scale(1.1);
+          }
         }
 
         .item {
@@ -43,31 +50,55 @@
           .details {
             .itemTitle {
               margin-bottom: 10px;
-              color: #555;
+              color: var(--text-color2);
             }
 
             .detailItem {
               margin: 15px 0;
-              font-size: 17px;
+              font-size: 1rem;
 
               .itemKey,
               label {
                 font-weight: bold;
                 font-size: medium;
-                color: black;
+                color: var(--text-color2);
+                font-size: 1rem;
                 margin-right: 5px;
               }
 
               .itemValue {
-                font-weight: 300;
+                font-weight: 600;
               }
             }
           }
 
           input {
+            border: 2px solid var(--text-color1);
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-color2);
+            padding: 5px 10px;
+            width: 80%;
+            border-radius: 0.5rem;
+            outline: none;
+            box-shadow: 4px 4px 2px var(--background-color1);
             margin-bottom: 10px;
+
+            &:hover,
+            &:focus {
+              outline: none;
+              border: 2px solid var(--background-color1);
+            }
           }
           select {
+            border: 2px solid var(--text-color1);
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-color2);
+            padding: 5px 10px;
+            border-radius: 0.5rem;
+            outline: none;
+            box-shadow: 4px 4px 2px var(--background-color1);
             margin-bottom: 10px;
           }
         }

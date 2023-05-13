@@ -102,19 +102,39 @@ export const userColumns = [
 /*------------------ Product Column ------------------*/
 export const productColumns = [
   { field: "id", headerName: "Product ID", width: 120 },
+  // {
+  //   field: "productName",
+  //   headerName: "Product Name",
+  //   width: 230,
+  //   renderCell: (params) => {
+  //     return (
+  //       <div className="cellWithImg">
+  //         <img className="cellImg" src={params.row.img} alt="avatar" />
+  //         {params.row.productName}
+  //       </div>
+  //     );
+  //   },
+  // },
   {
     field: "productName",
     headerName: "Product Name",
     width: 230,
     renderCell: (params) => {
+      const criticalStock = params.row.criticalStock;
+      const stock = params.row.stock;
+      const textColor = stock <= criticalStock ? "red" : "inherit";
+      const fontWeight = stock <= criticalStock ? 700 : "inherit";
       return (
         <div className="cellWithImg">
           <img className="cellImg" src={params.row.img} alt="avatar" />
-          {params.row.productName}
+          <div style={{ color: textColor, fontWeight: fontWeight }}>
+            {params.row.productName}
+          </div>
         </div>
       );
     },
   },
+
   {
     field: "description",
     headerName: "Food Description",
@@ -143,10 +163,28 @@ export const productColumns = [
     width: 150,
   },
 
+  // {
+  //   field: "stock",
+  //   headerName: "Stock",
+  //   width: 100,
+  // },
   {
     field: "stock",
     headerName: "Stock",
     width: 100,
+    renderCell: ({ row: { stock, criticalStock } }) => {
+      const textColor = stock <= criticalStock ? "red" : "inherit";
+      return (
+        <div
+          style={{
+            color: textColor,
+            fontWeight: stock <= criticalStock ? 700 : "normal",
+          }}
+        >
+          {stock}
+        </div>
+      );
+    },
   },
 ];
 

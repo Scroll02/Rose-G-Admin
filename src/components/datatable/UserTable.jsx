@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
+import AddIcon from "@mui/icons-material/Add";
 
 // Firebase
 import { collection, deleteDoc, doc, onSnapshot } from "firebase/firestore";
@@ -105,9 +106,12 @@ const UserTable = () => {
     <div className="datatable">
       <div className="datatableTitle">
         List of Users
-        <Link to="/users/new" className="link">
-          Add New User
-        </Link>
+        <div className="datatableButtons">
+          <Link to="/users/new" className="link">
+            <AddIcon />
+            New User
+          </Link>
+        </div>
       </div>
       <DataGrid
         className="datagrid"

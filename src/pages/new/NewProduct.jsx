@@ -50,6 +50,7 @@ const NewFood = ({ inputs, title }) => {
 
   //------------------ Add New Food Function ------------------//
   const [selectedCategory, setSelectedCategory] = useState("");
+
   const handleAdd = async (e) => {
     e.preventDefault();
 
@@ -64,12 +65,16 @@ const NewFood = ({ inputs, title }) => {
       const snapshot = await uploadTask;
       const downloadURL = await getDownloadURL(snapshot.ref);
 
-      // Add document to Firestore with image download URL
+      // Calculate critical stock level
+      const criticalStock = Math.floor(data.stock * 0.2);
+
+      // Add document to Firestore with image download URL and critical stock level
       await addDoc(collection(db, "ProductData"), {
         ...data,
         img: downloadURL,
         productId: new Date().getTime().toString(),
         categoryName: selectedCategory,
+        criticalStock: criticalStock,
       });
 
       navigate(-1);

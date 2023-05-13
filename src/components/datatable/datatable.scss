@@ -1,5 +1,6 @@
 .datatable {
-  height: 675px;
+  // height: 71.5%;
+  height: 671px;
   padding: 20px;
 
   .datatableTitle {
@@ -12,28 +13,54 @@
     align-items: center;
     justify-content: space-between;
 
-    .link {
-      text-decoration: none;
-      color: green;
-      font-size: 16px;
-      font-weight: 600;
-      border: 1px solid green;
-      padding: 5px;
-      border-radius: 5px;
-      cursor: pointer;
-      margin: 0 20px;
+    .datatableButtons {
+      display: flex;
+
+      .link {
+        text-decoration: none;
+        color: var(--background-color1);
+        border: 2px solid var(--background-color1);
+        box-shadow: 2px 2px 2px var(--background-color2);
+        font-size: 16px;
+        font-weight: 600;
+        padding: 5px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin: 0 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 5px;
+
+        &:hover {
+          background-color: var(--background-color1);
+          color: var(--text-color1);
+        }
+      }
     }
 
     select {
-      text-decoration: none;
-      color: green;
+      outline: none;
       font-size: 16px;
       font-weight: 600;
-      border: 1px solid green;
+      color: var(--background-color1);
+      border: 2px solid var(--background-color1);
+      box-shadow: 2px 2px 2px var(--background-color2);
       padding: 5px;
       border-radius: 5px;
       cursor: pointer;
       margin: 0 20px;
+
+      option {
+        font-weight: 600;
+        background-color: var(--background-color1);
+        color: var(--text-color1);
+      }
+
+      &:hover {
+        color: var(--text-color1);
+        background-color: var(--background-color1);
+      }
     }
   }
   .datagrid {

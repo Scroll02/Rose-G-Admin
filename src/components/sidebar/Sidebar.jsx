@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useState, useEffect } from "react";
 import "./sidebar.scss";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import Person2RoundedIcon from "@mui/icons-material/Person2Rounded";
@@ -6,15 +6,108 @@ import FoodBankRoundedIcon from "@mui/icons-material/FoodBankRounded";
 import BorderColorRoundedIcon from "@mui/icons-material/BorderColorRounded";
 import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, NavLink } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
+import PriorityHighIcon from "@mui/icons-material/PriorityHigh";
+
+// Firebase
+import { onSnapshot, collection } from "firebase/firestore";
 import { signOut } from "firebase/auth";
-import { auth } from "../../firebase";
+import { auth, db } from "../../firebase";
+
+// Toast
 import { showSuccessToast } from "../toast/Toast";
 
 const Sidebar = () => {
   const { dispatch } = useContext(AuthContext);
   const navigate = useNavigate();
+
+  //------------------ User Orders Data ------------------//
+  const [orderCount, setOrderCount] = useState(0);
+  const [orderData, setOrderData] = useState([]);
+
+  // Retrieve User Orders Data
+  useEffect(() => {
+    const unsubscribe = onSnapshot(
+      collection(db, "UserOrders"),
+      (snapshot) => {
+        const orders = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setOrderData(orders);
+      },
+      (error) => console.log(error)
+    );
+    return unsubscribe;
+  }, []);
+
+  // Filtered by orders today's date and order status is pending
+  const filterOrdersByDate = (orders) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return orders.filter((order) => {
+      if (!order.orderDate) return false;
+      const orderDate = new Date(order.orderDate.seconds * 1000);
+      orderDate.setHours(0, 0, 0, 0);
+      return (
+        orderDate.getTime() === today.getTime() &&
+        order.orderStatus === "Pending"
+      );
+    });
+  };
+
+  // Get the order count for today
+  useEffect(() => {
+    const filteredData = filterOrdersByDate(orderData);
+    const count = filteredData.length;
+    setOrderCount(count);
+    // If order status is changed to anything other than Pending, minus 1 the order count
+    const unsub = onSnapshot(collection(db, "UserOrders"), (snapShot) => {
+      snapShot.docs.forEach((doc) => {
+        const order = doc.data();
+        if (
+          order.orderStatus !== "Pending" &&
+          order.orderDate &&
+          filterOrdersByDate([order]).length > 0
+        ) {
+          setOrderCount((prevCount) => prevCount - 1);
+        }
+      });
+    });
+    return () => {
+      unsub();
+    };
+  }, [orderData]);
+
+  //------------------ Products Data ------------------//
+  const [productData, setProductData] = useState([]);
+
+  // Retrieve Product Data
+  useEffect(() => {
+    const unsubscribe = onSnapshot(
+      collection(db, "ProductData"),
+      (snapshot) => {
+        setProductData(
+          snapshot.docs.map((doc) => {
+            const data = { id: doc.id, ...doc.data() };
+            if (data.stock <= data.criticalStock) {
+              data.isCritical = true;
+            } else {
+              data.isCritical = false;
+            }
+            return data;
+          })
+        );
+      },
+      (error) => {
+        console.error(error);
+      }
+    );
+    return unsubscribe;
+  }, []);
+
+  // Logout function
   const handleLogout = () => {
     signOut(auth)
       .then(() => {
@@ -39,52 +132,83 @@ const Sidebar = () => {
         <ul>
           <p className="title">MAIN</p>
           {/* Dashboard */}
-          <Link to="/home" style={{ textDecoration: "none" }}>
-            <li>
+          <li>
+            <NavLink
+              to="/home"
+              className={(navClass) => (navClass.isActive ? "activeLink" : "")}
+              style={{ textDecoration: "none" }}
+            >
               <DashboardIcon className="icon" />
               <span>Dashboard</span>
-            </li>
-          </Link>
+            </NavLink>
+          </li>
 
           <p className="title">LISTS</p>
           {/* Users */}
-          <Link to="/users" style={{ textDecoration: "none" }}>
-            <li>
+          <li>
+            <NavLink
+              to="/users"
+              style={{ textDecoration: "none" }}
+              className={(navClass) => (navClass.isActive ? "activeLink" : "")}
+            >
               <Person2RoundedIcon className="icon" />
               <span>Users</span>
-            </li>
-          </Link>
+            </NavLink>
+          </li>
 
           {/* Products */}
-          <Link to="/products" style={{ textDecoration: "none" }}>
-            <li>
+          <li>
+            <NavLink
+              to="/products"
+              style={{ textDecoration: "none" }}
+              className={(navClass) => (navClass.isActive ? "activeLink" : "")}
+            >
               <FoodBankRoundedIcon className="icon" />
               <span>Products</span>
-            </li>
-          </Link>
+              {/* <div className="PriorityHighIcon">
+                <PriorityHighIcon />
+              </div> */}
+              {productData.some((product) => product.isCritical) && (
+                <PriorityHighIcon className="PriorityHighIcon" />
+              )}
+            </NavLink>
+          </li>
 
           {/* Orders */}
-          <Link to="/orders" style={{ textDecoration: "none" }}>
-            <li>
+          <li>
+            <NavLink
+              to="/orders"
+              style={{ textDecoration: "none" }}
+              className={(navClass) => (navClass.isActive ? "activeLink" : "")}
+            >
               <BorderColorRoundedIcon className="icon" />
               <span>Orders</span>
-            </li>
-          </Link>
+              {orderCount !== null && orderCount >= 1 ? (
+                <span className="linkCounter">{orderCount}</span>
+              ) : null}
+            </NavLink>
+          </li>
 
           <p className="title">USEFUL</p>
           {/* Notifications */}
-          <Link to="/notification" style={{ textDecoration: "none" }}>
-            <li>
+          <li>
+            <NavLink
+              to="/notification"
+              style={{ textDecoration: "none" }}
+              className={(navClass) => (navClass.isActive ? "activeLink" : "")}
+            >
               <NotificationsNoneIcon className="icon" />
               <span>Notifications</span>
-            </li>
-          </Link>
+            </NavLink>
+          </li>
 
           <p className="title">USER</p>
           {/* Logout */}
           <li onClick={handleLogout}>
-            <LogoutRoundedIcon className="icon" />
-            <span>Logout</span>
+            <NavLink style={{ textDecoration: "none" }}>
+              <LogoutRoundedIcon className="icon" />
+              <span>Logout</span>
+            </NavLink>
           </li>
         </ul>
       </div>

@@ -3,10 +3,12 @@ import React from "react";
 import { productColumns } from "../../datatablesource";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import ConfirmationModal from "../modal/ConfirmationModal";
+import AddIcon from "@mui/icons-material/Add";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 
 // Firebase
 import {
@@ -25,29 +27,35 @@ import { showErrorToast, showSuccessToast } from "../toast/Toast";
 const ProductTable = () => {
   const [data, setData] = useState([]);
 
-  //------------------ Display Food Data ------------------//
+  //------------------ Retrieve Product Data ------------------//
+  // Once stock is below or less than criticalStock that product will displayed first on the table
   useEffect(() => {
-    //LISTEN (REALTIME)
-    const unsub = onSnapshot(
+    const unsubscribe = onSnapshot(
       collection(db, "ProductData"),
-      (snapShot) => {
-        let list = [];
-        snapShot.docs.forEach((doc) => {
-          list.push({ id: doc.id, ...doc.data() });
+      (snapshot) => {
+        const newData = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        newData.sort((a, b) => {
+          if (a.stock <= a.criticalStock && b.stock > b.criticalStock) {
+            return -1; // a should be sorted before b
+          } else if (a.stock > a.criticalStock && b.stock <= b.criticalStock) {
+            return 1; // a should be sorted after b
+          } else {
+            return 0; // the order doesn't matter
+          }
         });
-        setData(list);
+        setData(newData);
       },
       (error) => {
-        console.log(error);
+        console.error(error);
       }
     );
-    return () => {
-      unsub();
-    };
+    return unsubscribe;
   }, []);
-  // console.log(data);
 
-  //------------------ Delete Food Data  ------------------//
+  // Delete Product Data
   const [selectedProductId, setSelectedProductId] = useState(null);
   const handleDelete = async () => {
     const storage = getStorage();
@@ -109,16 +117,19 @@ const ProductTable = () => {
         List of Products
         <div className="datatableButtons">
           <Link to="/products/productCategories" className="link">
-            Show Product Categories
+            <VisibilityIcon />
+            Product Categories
           </Link>
           <Link to="/products/newProduct" className="link">
-            Add New Product
+            <AddIcon />
+            New Product
           </Link>
         </div>
       </div>
       <DataGrid
         className="datagrid"
         rows={data}
+        slots={{ toolbar: GridToolbar }}
         columns={productColumns.concat([
           {
             field: "action",

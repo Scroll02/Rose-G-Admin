@@ -29,20 +29,23 @@ const Home = () => {
           <Widget type="orderCancelled" />
         </div>
 
-        {/* <div className="listContainer">
+        <div className="listContainer">
           <div className="listTitle">Latest Orders</div>
           <LatestTransaction />
-        </div> */}
+        </div>
+
+        {/* Charts */}
         <div className="charts">
           <Featured />
           <Chart title="Last 6 Months (Revenue)" aspect={2 / 1} />
         </div>
-        <div>
-          <OrderTable datatableTitle={"Latest Orders"} />
-        </div>
 
-        {/* 
-        <div className="listContainer">
+        {/* Latest Orders Table */}
+        {/* <div className="listContainer">
+          <OrderTable datatableTitle={"Latest Orders"} />
+        </div> */}
+
+        {/* <div className="listContainer">
           <div className="listTitle">Latest Transaction</div>
           <Table />
         </div> */}

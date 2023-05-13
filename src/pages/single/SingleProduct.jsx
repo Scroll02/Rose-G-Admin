@@ -96,7 +96,8 @@ const SingleProduct = () => {
 
     if (docRef !== null) {
       const updates = {};
-      let isUpdated = false; // add a flag variable
+      let isUpdated = false;
+      let newCriticalStock = 0; // add a variable for new criticalStock
 
       if (newProductName !== "") {
         updates.productName = newProductName;
@@ -120,11 +121,12 @@ const SingleProduct = () => {
 
       if (newStock !== "") {
         updates.stock = newStock;
+        newCriticalStock = Math.round(newStock * 0.2); // calculate new criticalStock value
+        updates.criticalStock = newCriticalStock; // update the criticalStock field in updates object
         isUpdated = true;
       }
 
       if (newImageFile !== "") {
-        // Get the URL of the old image from Firestore
         const docSnapshot = await getDoc(docRef);
         const oldImageUrl = docSnapshot.data().img;
 
@@ -136,7 +138,6 @@ const SingleProduct = () => {
         const downloadURL = await getDownloadURL(storageRef);
         updates.img = downloadURL;
 
-        // Delete the old image from storage
         if (oldImageUrl) {
           const oldImageRef = ref(storage, oldImageUrl);
           await deleteObject(oldImageRef);
@@ -145,7 +146,6 @@ const SingleProduct = () => {
       }
 
       if (isUpdated) {
-        // check the flag variable to display the success message
         await updateDoc(docRef, updates);
         showSuccessToast("Product data is updated", 1000);
         navigate(-1);
@@ -171,14 +171,15 @@ const SingleProduct = () => {
 
             <h1 className="title">Product Information</h1>
             <div className="item">
-              {/*------------------ Food Image ------------------*/}
+              {/*------------------ Product Image ------------------*/}
               <img src={productData?.img} alt="" className="itemImg" />
               <div className="details">
-                {/*------------------ Food Name ------------------*/}
+                {/*------------------ Product Name ------------------*/}
                 <h1 className="itemTitle">{productData?.productName}</h1>
                 <input
                   type="text"
                   placeholder="New Food Name"
+                  className="itemInput"
                   onChange={(e) => setNewProductName(e.target.value)}
                 />
 
@@ -203,7 +204,7 @@ const SingleProduct = () => {
                   />
                 </div>
 
-                {/*------------------ Food Description ------------------*/}
+                {/*------------------ Product Description ------------------*/}
                 <div className="detailItem">
                   <span className="itemKey">Description:</span>
                   <span className="itemValue">{productData?.description}</span>
@@ -217,9 +218,7 @@ const SingleProduct = () => {
                 {/*------------------ Product Category ------------------*/}
                 <div className="detailItem">
                   <span className="itemKey">Category:</span>
-                  <span className="itemValue">
-                    {productData?.categoryProduct}
-                  </span>
+                  <span className="itemValue">{productData?.categoryName}</span>
                 </div>
 
                 <select
@@ -273,10 +272,10 @@ const SingleProduct = () => {
             <Chart aspect={3 / 1} title="User Spending ( Last 6 Months)" />
           </div>
         </div>
-        <div className="bottom">
+        {/* <div className="bottom">
           <h1 className="title">Last Transactions</h1>
           <List />
-        </div>
+        </div> */}
       </div>
     </div>
   );
