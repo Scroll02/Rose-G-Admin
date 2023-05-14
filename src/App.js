@@ -3,6 +3,8 @@ import { productInputs, userInputs, productCategoryInputs } from "./formSource";
 import { AuthContext } from "./context/AuthContext";
 import { useContext, useState } from "react";
 import "./App.css";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 import Home from "./pages/home/Home";
 import Login from "./pages/login/Login";
 
@@ -11,7 +13,9 @@ import UserList from "./pages/list/UserList"; //USER LIST
 import ProductList from "./pages/list/ProductList"; //PRODUCT LIST
 import OrderList from "./pages/list/OrderList"; //ORDER LIST
 import ProductCategoriesList from "./pages/list/ProductCategoriesList"; //PRODUCT CATEGORIES LIST
-import NotificationList from "./pages/list/NotificationList";
+import NotificationList from "./pages/list/NotificationList"; //NOTIFICATION LIST
+import ContentManagement from "./pages/list/ContentManagement"; //CONTENT MANAGEMENT LIST
+import AuditTrail from "./pages/list/AuditTrail"; //AUDIT TRAIL LIST
 
 // ADDING NEW
 import NewUser from "./pages/new/NewUser"; //ADDING NEW USER
@@ -215,6 +219,30 @@ function App() {
                 element={
                   <RequireAuth>
                     <NotificationList />
+                  </RequireAuth>
+                }
+              />
+            </Route>
+
+            {/*------------------ Content Management Route  ------------------*/}
+            <Route path="contentManagement">
+              <Route
+                index
+                element={
+                  <RequireAuth>
+                    <ContentManagement />
+                  </RequireAuth>
+                }
+              />
+            </Route>
+
+            {/*------------------ Audit Trail Route  ------------------*/}
+            <Route path="auditTrail">
+              <Route
+                index
+                element={
+                  <RequireAuth>
+                    <AuditTrail />
                   </RequireAuth>
                 }
               />

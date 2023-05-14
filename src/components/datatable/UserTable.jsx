@@ -9,10 +9,13 @@ import AddIcon from "@mui/icons-material/Add";
 
 // Firebase
 import { collection, deleteDoc, doc, onSnapshot } from "firebase/firestore";
-import { db, auth } from "../../firebase";
+import { db } from "../../firebase";
 
 // Toast
-import { showErrorToast } from "../toast/Toast";
+import { showErrorToast, showSuccessToast } from "../toast/Toast";
+
+// Modal
+import ConfirmationModal from "../modal/ConfirmationModal";
 
 const UserTable = () => {
   const [data, setData] = useState([]);
@@ -40,13 +43,15 @@ const UserTable = () => {
   console.log(data);
 
   //------------------ Delete User Data  ------------------//
-  const handleDelete = async (id) => {
+  const [selectedUserId, setSelectedUserId] = useState(null);
+  const handleDelete = async () => {
     try {
-      await deleteDoc(doc(db, "UserData", id));
-      setData(data.filter((item) => item.id !== id));
-      showErrorToast("User data is deleted", 1000);
+      await deleteDoc(doc(db, "UserData", selectedUserId));
+      setData(data.filter((item) => item.id !== selectedUserId));
+      showSuccessToast("User data is successfully deleted", 2000);
     } catch (err) {
       console.log(err);
+      showErrorToast("Error deleting user", 2000);
     }
   };
 
@@ -72,35 +77,12 @@ const UserTable = () => {
   //   }
   // };
 
-  const actionColumn = [
-    {
-      field: "action",
-      headerName: "Action",
-      width: 150,
-      headerClassName: "headerName",
-      renderCell: (params) => {
-        return (
-          <div className="cellAction">
-            <Link
-              to={`/users/${params.row.id}`}
-              style={{ textDecoration: "none" }}
-            >
-              <div className="viewButton">
-                <VisibilityIcon />
-                <span>View</span>
-              </div>
-            </Link>
-            <div
-              className="deleteButton"
-              onClick={() => handleDelete(params.row.id)}
-            >
-              <DeleteForeverIcon />
-            </div>
-          </div>
-        );
-      },
-    },
-  ];
+  // Modal
+
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+  const closeConfirmationModal = () => {
+    setShowConfirmationModal(false);
+  };
 
   return (
     <div className="datatable">
@@ -116,11 +98,50 @@ const UserTable = () => {
       <DataGrid
         className="datagrid"
         rows={data}
-        columns={userColumns.concat(actionColumn)}
+        columns={userColumns.concat([
+          {
+            field: "action",
+            headerName: "Action",
+            width: 150,
+            headerClassName: "headerName",
+            renderCell: (params) => {
+              return (
+                <div className="cellAction">
+                  <Link
+                    to={`/users/${params.row.id}`}
+                    style={{ textDecoration: "none" }}
+                  >
+                    <div className="viewButton">
+                      <VisibilityIcon />
+                      <span>View</span>
+                    </div>
+                  </Link>
+                  <div
+                    className="deleteButton"
+                    onClick={() => {
+                      setSelectedUserId(params.row.id);
+                      setShowConfirmationModal(true);
+                    }}
+                  >
+                    <DeleteForeverIcon />
+                  </div>
+                </div>
+              );
+            },
+          },
+        ])}
         pageSize={10}
         rowsPerPageOptions={[10]}
         // checkboxSelection
       />
+
+      {/* Confirmation Modal */}
+      {showConfirmationModal && (
+        <ConfirmationModal
+          handleDelete={handleDelete}
+          closeConfirmationModal={closeConfirmationModal}
+        />
+      )}
     </div>
   );
 };

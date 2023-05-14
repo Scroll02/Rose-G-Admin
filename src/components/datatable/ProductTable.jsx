@@ -6,7 +6,6 @@ import { useState, useEffect } from "react";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
-import ConfirmationModal from "../modal/ConfirmationModal";
 import AddIcon from "@mui/icons-material/Add";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 
@@ -23,6 +22,9 @@ import { db } from "../../firebase";
 
 // Toast
 import { showErrorToast, showSuccessToast } from "../toast/Toast";
+
+// Modal
+import ConfirmationModal from "../modal/ConfirmationModal";
 
 const ProductTable = () => {
   const [data, setData] = useState([]);
@@ -82,35 +84,6 @@ const ProductTable = () => {
     setShowConfirmationModal(false);
   };
 
-  // const actionColumn = [
-  //   {
-  //     field: "action",
-  //     headerName: "Action",
-  //     width: 200,
-  //     renderCell: (params) => {
-  //       return (
-  //         <div className="cellAction">
-  //           <Link
-  //             to={`/products/${params.row.id}`}
-  //             style={{ textDecoration: "none" }}
-  //           >
-  //             <div className="viewButton">
-  //               <EditIcon />
-  //               <span>Edit</span>
-  //             </div>
-  //           </Link>
-  //           <div
-  //             className="deleteButton"
-  //             onClick={() => handleDelete(params.row.id)}
-  //           >
-  //             <DeleteForeverIcon />
-  //           </div>
-  //         </div>
-  //       );
-  //     },
-  //   },
-  // ];
-
   return (
     <div className="datatable">
       <div className="datatableTitle">
@@ -165,6 +138,8 @@ const ProductTable = () => {
         rowsPerPageOptions={[10]}
         // checkboxSelection
       />
+
+      {/* Confirmation Modal */}
       {showConfirmationModal && (
         <ConfirmationModal
           handleDelete={handleDelete}

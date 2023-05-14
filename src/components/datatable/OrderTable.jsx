@@ -89,42 +89,11 @@ const OrderTable = ({ datatableTitle }) => {
     setShowConfirmationModal(false);
   };
 
-  const actionColumn = [
-    {
-      field: "action",
-      headerName: "Action",
-      width: 220,
-      renderCell: (params) => {
-        return (
-          <div className="cellAction">
-            <Link
-              to={`/orders/${params.row.id}`}
-              style={{ textDecoration: "none" }}
-            >
-              <div className="viewButton">
-                <VisibilityIcon />
-                <span>View</span>
-              </div>
-            </Link>
-            <div
-              className="deleteButton"
-              // onClick={() => handleDelete(params.row.id)}
-              onClick={() => setShowConfirmationModal(true)}
-            >
-              <DeleteForeverIcon />
-            </div>
-          </div>
-        );
-      },
-    },
-  ];
   return (
     <div className="datatable">
       <div className="datatableTitle">
         {datatableTitle}
-        {/* <Link to="/products/new" className="link">
-          Add New Food
-        </Link> */}
+
         <select onChange={(e) => setSortByDate(e.target.value)}>
           <option disabled>---Date---</option>
           <option value="Today">Today</option>
@@ -171,6 +140,8 @@ const OrderTable = ({ datatableTitle }) => {
         rowsPerPageOptions={[10]}
         // checkboxSelection
       />
+
+      {/* Confirmation Modal */}
       {showConfirmationModal && (
         <ConfirmationModal
           handleDelete={handleDelete}

@@ -29,10 +29,10 @@ const Home = () => {
           <Widget type="orderCancelled" />
         </div>
 
-        <div className="listContainer">
+        {/* <div className="listContainer">
           <div className="listTitle">Latest Orders</div>
           <LatestTransaction />
-        </div>
+        </div> */}
 
         {/* Charts */}
         <div className="charts">

@@ -5,10 +5,12 @@ import Person2RoundedIcon from "@mui/icons-material/Person2Rounded";
 import FoodBankRoundedIcon from "@mui/icons-material/FoodBankRounded";
 import BorderColorRoundedIcon from "@mui/icons-material/BorderColorRounded";
 import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
+import ManageSearchRoundedIcon from "@mui/icons-material/ManageSearchRounded";
 import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
+import PriorityHighIcon from "@mui/icons-material/PriorityHigh";
+
 import { Link, useNavigate, NavLink } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
-import PriorityHighIcon from "@mui/icons-material/PriorityHigh";
 
 // Firebase
 import { onSnapshot, collection } from "firebase/firestore";
@@ -25,10 +27,11 @@ const Sidebar = () => {
   //------------------ User Orders Data ------------------//
   const [orderCount, setOrderCount] = useState(0);
   const [orderData, setOrderData] = useState([]);
+  const [productData, setProductData] = useState([]);
 
-  // Retrieve User Orders Data
   useEffect(() => {
-    const unsubscribe = onSnapshot(
+    // Retrieve User Orders Data
+    const unsubscribeUserOrders = onSnapshot(
       collection(db, "UserOrders"),
       (snapshot) => {
         const orders = snapshot.docs.map((doc) => ({
@@ -39,8 +42,49 @@ const Sidebar = () => {
       },
       (error) => console.log(error)
     );
-    return unsubscribe;
+
+    // Retrieve Product Data
+    const unsubscribeProductData = onSnapshot(
+      collection(db, "ProductData"),
+      (snapshot) => {
+        setProductData(
+          snapshot.docs.map((doc) => {
+            const data = { id: doc.id, ...doc.data() };
+            if (data.stock <= data.criticalStock) {
+              data.isCritical = true;
+            } else {
+              data.isCritical = false;
+            }
+            return data;
+          })
+        );
+      },
+      (error) => {
+        console.error(error);
+      }
+    );
+
+    return () => {
+      unsubscribeUserOrders();
+      unsubscribeProductData();
+    };
   }, []);
+
+  // Retrieve User Orders Data
+  // useEffect(() => {
+  //   const unsubscribe = onSnapshot(
+  //     collection(db, "UserOrders"),
+  //     (snapshot) => {
+  //       const orders = snapshot.docs.map((doc) => ({
+  //         id: doc.id,
+  //         ...doc.data(),
+  //       }));
+  //       setOrderData(orders);
+  //     },
+  //     (error) => console.log(error)
+  //   );
+  //   return unsubscribe;
+  // }, []);
 
   // Filtered by orders today's date and order status is pending
   const filterOrdersByDate = (orders) => {
@@ -81,31 +125,31 @@ const Sidebar = () => {
   }, [orderData]);
 
   //------------------ Products Data ------------------//
-  const [productData, setProductData] = useState([]);
+  // const [productData, setProductData] = useState([]);
 
-  // Retrieve Product Data
-  useEffect(() => {
-    const unsubscribe = onSnapshot(
-      collection(db, "ProductData"),
-      (snapshot) => {
-        setProductData(
-          snapshot.docs.map((doc) => {
-            const data = { id: doc.id, ...doc.data() };
-            if (data.stock <= data.criticalStock) {
-              data.isCritical = true;
-            } else {
-              data.isCritical = false;
-            }
-            return data;
-          })
-        );
-      },
-      (error) => {
-        console.error(error);
-      }
-    );
-    return unsubscribe;
-  }, []);
+  // // Retrieve Product Data
+  // useEffect(() => {
+  //   const unsubscribe = onSnapshot(
+  //     collection(db, "ProductData"),
+  //     (snapshot) => {
+  //       setProductData(
+  //         snapshot.docs.map((doc) => {
+  //           const data = { id: doc.id, ...doc.data() };
+  //           if (data.stock <= data.criticalStock) {
+  //             data.isCritical = true;
+  //           } else {
+  //             data.isCritical = false;
+  //           }
+  //           return data;
+  //         })
+  //       );
+  //     },
+  //     (error) => {
+  //       console.error(error);
+  //     }
+  //   );
+  //   return unsubscribe;
+  // }, []);
 
   // Logout function
   const handleLogout = () => {
@@ -169,7 +213,12 @@ const Sidebar = () => {
                 <PriorityHighIcon />
               </div> */}
               {productData.some((product) => product.isCritical) && (
-                <PriorityHighIcon className="PriorityHighIcon" />
+                <>
+                  <div className="priorityHigh">
+                    <PriorityHighIcon className="PriorityHighIcon" />
+                    <span>Low Stock</span>
+                  </div>
+                </>
               )}
             </NavLink>
           </li>
@@ -184,12 +233,15 @@ const Sidebar = () => {
               <BorderColorRoundedIcon className="icon" />
               <span>Orders</span>
               {orderCount !== null && orderCount >= 1 ? (
-                <span className="linkCounter">{orderCount}</span>
+                <span className="linkCounter">
+                  {orderCount}&nbsp;New&nbsp;order
+                </span>
               ) : null}
             </NavLink>
           </li>
 
           <p className="title">USEFUL</p>
+
           {/* Notifications */}
           <li>
             <NavLink
@@ -199,6 +251,30 @@ const Sidebar = () => {
             >
               <NotificationsNoneIcon className="icon" />
               <span>Notifications</span>
+            </NavLink>
+          </li>
+
+          {/* Content Management */}
+          <li>
+            <NavLink
+              to="/contentManagement"
+              style={{ textDecoration: "none" }}
+              className={(navClass) => (navClass.isActive ? "activeLink" : "")}
+            >
+              <BorderColorRoundedIcon className="icon" />
+              <span>Content Management</span>
+            </NavLink>
+          </li>
+
+          {/* Audit Trail */}
+          <li>
+            <NavLink
+              to="/auditTrail"
+              style={{ textDecoration: "none" }}
+              className={(navClass) => (navClass.isActive ? "activeLink" : "")}
+            >
+              <ManageSearchRoundedIcon className="icon" />
+              <span>Audit Trail</span>
             </NavLink>
           </li>
 

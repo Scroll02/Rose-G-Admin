@@ -121,6 +121,8 @@ const ProductCategoriesTable = () => {
         rowsPerPageOptions={[10]}
         // checkboxSelection
       />
+
+      {/* Confirmation Modal */}
       {showConfirmationModal && (
         <ConfirmationModal
           handleDelete={handleDelete}

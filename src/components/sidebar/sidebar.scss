@@ -46,27 +46,90 @@
         padding: 5px;
         cursor: pointer;
 
-        // :hover {
-        //   color: var(--background-color2);
-        // }
+        a {
+          display: flex;
+          align-items: center;
+          padding: 5px;
+
+          :hover {
+            color: var(--background-color2);
+          }
+        }
+
+        // Highlighted when selected/active
+        .activeLink {
+          position: relative;
+          background-color: var(--background-color2);
+          width: 100%;
+          padding: 5px;
+          border-radius: 0.5rem;
+
+          .icon {
+            color: var(--background-color1);
+          }
+
+          span {
+            color: var(--text-color2);
+          }
+
+          .priorityHigh {
+            background-color: var(--background-color1);
+            padding: 0 5px;
+            .PriorityHighIcon {
+              display: flex;
+              color: var(--background-color2);
+              font-size: 1.4rem;
+              animation: jiggle 0.5s ease-in-out infinite;
+
+              &:hover {
+                color: var(--background-color2) !important;
+              }
+            }
+            span {
+              color: var(--text-color1);
+              margin-left: 0.1rem;
+            }
+          }
+
+          .linkCounter {
+            background-color: var(--background-color1);
+            color: var(--text-color1);
+            font-size: 1rem;
+            font-weight: 600;
+            padding: 1px 7px;
+            border-radius: 0.5rem;
+            margin-left: 10px;
+          }
+        }
 
         .icon {
           font-size: 18px;
           color: var(--background-color2);
         }
 
-        .PriorityHighIcon {
+        // Priority High on "Products"
+        .priorityHigh {
           display: flex;
-          background-color: var(--background-color2);
-          color: red;
-          font-size: 1.4rem;
-          // padding: 1px 2px;
-          border-radius: 50%;
           margin-left: 10px;
-          animation: jiggle 0.5s ease-in-out infinite;
+          background-color: var(--background-color2);
+          border-radius: 0.5rem;
+          padding: 0 5px;
 
-          &:hover {
-            color: red !important;
+          .PriorityHighIcon {
+            display: flex;
+            color: red;
+            font-size: 1.4rem;
+
+            // padding: 1px 2px;
+            animation: jiggle 0.5s ease-in-out infinite;
+            &:hover {
+              color: red !important;
+            }
+          }
+          span {
+            color: var(--text-color2);
+            font-size: 1rem;
+            margin-left: 0.1rem;
           }
         }
 
@@ -91,6 +154,7 @@
           }
         }
 
+        // Orders Counter
         span {
           font-size: 1.2rem;
           font-weight: 600;
@@ -103,29 +167,9 @@
             font-size: 1rem;
             font-weight: 600;
             padding: 1px 7px;
-            border-radius: 50%;
+            border-radius: 0.5rem;
             margin-left: 10px;
           }
-        }
-      }
-      a {
-        display: flex;
-        align-items: center;
-        padding: 5px;
-      }
-      .activeLink {
-        position: relative;
-        background-color: var(--background-color2);
-        width: 100%;
-        padding: 5px;
-        border-radius: 0.5rem;
-
-        .icon {
-          color: var(--background-color1);
-        }
-
-        span {
-          color: var(--text-color2);
         }
       }
     }
