@@ -1,0 +1,140 @@
+.feedbackListWrapper {
+  width: 100%;
+  margin: 0 auto;
+  // background-color: #fae9bd;
+  padding: 20px;
+  border-radius: 0.5rem;
+
+  .feedbackListRow {
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+
+  .feedbackItem {
+    position: relative;
+    background-color: #f2f2f2;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.1);
+    // width: calc(33.33% - 20px);
+    width: calc(20% - 20px);
+    margin-bottom: 20px;
+    height: 350px;
+    overflow: hidden;
+
+    .feedbackRating {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+    }
+
+    .feedbackMsg {
+      font-weight: 600;
+      font-size: 1.1rem;
+      text-align: justify;
+    }
+
+    .postButton {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      padding: 10px;
+      color: var(--text-color2);
+      font-weight: 600;
+      border: none;
+      border-radius: 0 10px 0 0;
+      cursor: pointer;
+      transition: background-color 0.3s ease-in-out;
+      font-size: 1.2rem;
+    }
+    .posted {
+      background-color: #4caf50;
+    }
+
+    .unposted {
+      background-color: #f44336;
+    }
+
+    .postButton:hover {
+      transform: scale(1.1);
+    }
+  }
+
+  .filterButtons {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+
+    .filterButton {
+      border: 2px solid var(--background-color1);
+      box-shadow: 2px 2px 2px var(--background-color2);
+      background-color: var(--text-color1);
+      border-radius: 5px;
+      color: var(--text-color2);
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 16px;
+      padding: 10px 20px;
+      margin-right: 10px;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background-color: var(--background-color1);
+        color: var(--text-color1);
+      }
+
+      &:active {
+        transform: translateY(2px);
+      }
+    }
+    .active {
+      background-color: var(--background-color1);
+      color: var(--text-color1);
+    }
+  }
+
+  .paginationWrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+
+    .MuiPaginationItem-page {
+      color: #ffffff;
+      background-color: var(--background-color1);
+      border-radius: 0.5rem;
+      border: none;
+      margin: 0 2px;
+      transition: background-color 0.3s ease-in-out;
+
+      &:hover {
+        background-color: var(--background-color2);
+      }
+
+      &.Mui-selected {
+        background-color: var(--background-color1);
+      }
+    }
+
+    .Mui-selected {
+      color: #ffffff;
+      background-color: var(--background-color1);
+      border-radius: 0.5rem;
+      border: none;
+      margin: 0 2px;
+      transition: background-color 0.3s ease-in-out;
+
+      &:hover {
+        background-color: var(--background-color1);
+      }
+    }
+  }
+}

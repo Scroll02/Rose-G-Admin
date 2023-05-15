@@ -1,0 +1,52 @@
+.contentManagementBody {
+  display: flex;
+  width: 100%;
+
+  .contentManagementWrapper {
+    flex: 6;
+    border-width: 2ch;
+
+    .contentManagementContainer {
+      display: flex;
+      flex-direction: column;
+      background-color: #fae9bd;
+      border: 2px solid var(--background-color2);
+      border-radius: 0.5rem;
+      overflow: hidden;
+      margin: 20px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+      .toggleButtonsContainer {
+        display: flex;
+        background-color: var(--background-color1);
+        border-bottom: 2px solid var(--background-color2);
+        padding: 10px;
+
+        .toggleButton {
+          background-color: transparent;
+
+          border: none;
+          padding: 10px;
+          font-size: 16px;
+          color: var(--text-color1);
+          cursor: pointer;
+          transition: all 0.3s ease-in-out;
+
+          &:hover {
+            color: var(--background-color2);
+          }
+
+          &.active {
+            color: var(--background-color2);
+            font-weight: bold;
+            border-bottom: 2px solid var(--background-color2);
+          }
+        }
+      }
+
+      .activeContentContainer {
+        padding: 20px;
+      }
+    }
+  }
+}

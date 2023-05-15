@@ -1,156 +1,184 @@
 .sliderBody {
   flex: 6;
   width: 100%;
-  background: green;
-  padding: 20px;
+  // padding: 20px;
 
-  .addBannerButton {
-    cursor: pointer;
-    background-color: #6ac9ff;
-    color: #fff;
-    border: none;
-    padding: 10px;
-    border: radius 10px;
-  }
+  .sliderContainer {
+    // background: #fae9bd;
+    // -webkit-box-shadow: 2px 4px 10px 1px rgba(1, 0, 0, 0.47);
+    // box-shadow: 2px 4px 10px 1px rgba(201, 201, 201, 0.6);
+    // border-radius: 10px;
 
-  .sliderWrapper {
-    background-color: #f2f2f2;
-    max-width: 1000px;
-    border: 1px solid green;
-    background-color: #fae9bd;
+    .sliderHeader {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 10px 0;
 
-    .slideContainer {
-      position: relative;
-      height: 400px;
+      .headerLeft {
+        display: flex;
+        align-items: center;
 
-      .slideImage {
-        max-width: 100%;
-        height: 100%;
-        object-fit: cover;
-      }
-
-      .caption {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        padding: 20px;
-
-        .slideTitle {
-          color: #fff;
-          font-size: 24px;
-          margin: 0;
-          font-weight: bold;
-          text-transform: uppercase;
-        }
-
-        .slideButtons {
-          margin-top: 20px;
+        .sliderInput {
           display: flex;
           align-items: center;
 
-          .slideEditButton,
-          .slideDeleteButton {
-            color: #fff;
-            background-color: transparent;
-            border: none;
-            cursor: pointer;
-            transition: all 0.2s ease;
+          label {
             display: flex;
             align-items: center;
-            font-size: 16px;
-
-            &:hover {
-              transform: scale(1.1);
-            }
+            font-weight: 600;
+            font-size: 1.2rem;
+            gap: 10px;
+            cursor: pointer;
           }
+        }
+      }
+      .headerRight {
+        .addBannerButton {
+          display: flex;
+          align-items: center;
+          cursor: pointer;
+          text-decoration: none;
+          color: var(--background-color1);
+          border: 2px solid var(--background-color1);
+          box-shadow: 2px 2px 2px var(--background-color2);
+          font-size: 16px;
+          font-weight: 600;
+          padding: 5px;
+          border-radius: 5px;
 
-          .slideEditButton {
-            margin-right: 10px;
-
-            &:hover {
-              color: #6ac9ff;
-            }
-          }
-
-          .slideDeleteButton {
-            img {
-              width: 20px;
-              height: 20px;
-            }
-
-            &:hover {
-              color: #ff4f4f;
-            }
+          &:hover {
+            background-color: var(--background-color1);
+            color: var(--text-color1);
           }
         }
       }
     }
 
-    .sliderContainer {
-      .slick-prev,
-      .slick-next {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        z-index: 1;
-        cursor: pointer;
-        color: #fff;
-        background-color: rgba(0, 0, 0, 0.5);
-        border: none;
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        transition: all 0.2s ease;
+    .sliderWrapper {
+      max-width: 1000px;
+      background-color: #fae9bd;
+      margin: auto;
+      padding-bottom: 50px;
 
-        &:hover {
-          background-color: rgba(0, 0, 0, 0.7);
+      .slideContainer {
+        position: relative;
+
+        height: 600px;
+        width: 100%;
+
+        .slideImage {
+          height: 100%;
+          width: 100%;
+          object-fit: fill;
+        }
+
+        .caption {
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          width: 100%;
+          background-color: rgba(0, 0, 0, 0.5);
+          padding: 20px;
+
+          .slideTitle {
+            color: #fff;
+            font-size: 20px;
+            margin: 0;
+            font-weight: bold;
+            text-transform: uppercase;
+          }
+
+          .slideButtons {
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+
+            .slideDeleteButton {
+              color: red;
+              background-color: transparent;
+              border: none;
+              cursor: pointer;
+              transition: all 0.2s ease;
+              display: flex;
+              align-items: center;
+
+              .slideDeleteIcon {
+                font-size: 2rem;
+              }
+              &:hover {
+                transform: scale(1.5);
+                color: red;
+              }
+            }
+          }
         }
       }
 
-      .slick-prev {
-        left: 20px;
-      }
+      .sliderContainer {
+        .slick-prev,
+        .slick-next {
+          position: absolute;
+          top: 50%;
+          transform: translateY(-50%);
+          z-index: 1;
+          cursor: pointer;
+          color: #fff;
+          background-color: rgba(0, 0, 0, 0.5);
+          border: none;
+          width: 50px;
+          height: 50px;
+          border-radius: 50%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          transition: all 0.2s ease;
 
-      .slick-next {
-        right: 20px;
-      }
+          &:hover {
+            background-color: rgba(0, 0, 0, 0.7);
+          }
+        }
 
-      .slick-dots {
-        position: absolute;
-        bottom: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        margin: 0;
+        .slick-prev {
+          left: 20px;
+        }
 
-        li {
-          display: inline-block;
-          margin: 0 5px;
-          button {
-            color: #fff;
-            background-color: transparent;
-            border: none;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 16px;
+        .slick-next {
+          right: 20px;
+        }
 
-            &:hover {
-              transform: scale(1.2);
-            }
+        .slick-dots {
+          position: absolute;
+          bottom: 20px;
+          left: 50%;
+          transform: translateX(-50%);
+          margin: 0;
 
-            &.slick-active {
-              background-color: #fff;
-              color: #000;
+          li {
+            display: inline-block;
+            margin: 0 5px;
+            button {
+              color: #fff;
+              background-color: transparent;
+              border: none;
+              cursor: pointer;
+              transition: all 0.2s ease;
+              width: 20px;
+              height: 20px;
+              border-radius: 50%;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              font-size: 16px;
+
+              &:hover {
+                transform: scale(1.2);
+              }
+
+              &.slick-active {
+                background-color: #fff;
+                color: #000;
+              }
             }
           }
         }
