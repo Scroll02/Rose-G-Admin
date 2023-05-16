@@ -120,8 +120,8 @@ const SingleProduct = () => {
       }
 
       if (newStock !== "") {
-        updates.stock = newStock;
-        newCriticalStock = Math.round(newStock * 0.2); // calculate new criticalStock value
+        updates.initialStock = newStock;
+        newCriticalStock = Math.round(newStock * 0.4); // calculate new criticalStock value
         updates.criticalStock = newCriticalStock; // update the criticalStock field in updates object
         isUpdated = true;
       }

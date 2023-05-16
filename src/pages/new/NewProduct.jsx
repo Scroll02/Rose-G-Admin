@@ -66,7 +66,7 @@ const NewFood = ({ inputs, title }) => {
       const downloadURL = await getDownloadURL(snapshot.ref);
 
       // Calculate critical stock level
-      const criticalStock = Math.floor(data.stock * 0.2);
+      const criticalStock = Math.floor(data.initialStock * 0.4);
 
       // Add document to Firestore with image download URL and critical stock level
       await addDoc(collection(db, "ProductData"), {

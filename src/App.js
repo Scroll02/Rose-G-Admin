@@ -3,8 +3,13 @@ import { productInputs, userInputs, productCategoryInputs } from "./formSource";
 import { AuthContext } from "./context/AuthContext";
 import { useContext, useState } from "react";
 import "./App.css";
+
+// React-Slick
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+
+// React-Date Picker
+import "react-datepicker/dist/react-datepicker.css";
 import Home from "./pages/home/Home";
 import Login from "./pages/login/Login";
 
@@ -16,6 +21,7 @@ import ProductCategoriesList from "./pages/list/ProductCategoriesList"; //PRODUC
 import NotificationList from "./pages/list/NotificationList"; //NOTIFICATION LIST
 import ContentManagement from "./pages/list/ContentManagement"; //CONTENT MANAGEMENT LIST
 import AuditTrail from "./pages/list/AuditTrail"; //AUDIT TRAIL LIST
+import SalesReport from "./pages/list/SalesReportList"; //SALES REPORT LIST
 
 // ADDING NEW
 import NewUser from "./pages/new/NewUser"; //ADDING NEW USER
@@ -207,6 +213,18 @@ function App() {
                 element={
                   <RequireAuth>
                     <SingleOrder />
+                  </RequireAuth>
+                }
+              />
+            </Route>
+
+            {/*------------------ Sales Report Route  ------------------*/}
+            <Route path="salesReport">
+              <Route
+                index
+                element={
+                  <RequireAuth>
+                    <SalesReport />
                   </RequireAuth>
                 }
               />

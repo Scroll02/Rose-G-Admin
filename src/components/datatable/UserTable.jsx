@@ -22,25 +22,13 @@ const UserTable = () => {
 
   //------------------ Retrieve Users Data ------------------//
   useEffect(() => {
-    //LISTEN (REALTIME)
-    const unsub = onSnapshot(
-      collection(db, "UserData"),
-      (snapShot) => {
-        let list = [];
-        snapShot.docs.forEach((doc) => {
-          list.push({ id: doc.id, ...doc.data() });
-        });
-        setData(list);
-      },
-      (error) => {
-        console.log(error);
-      }
-    );
-    return () => {
-      unsub();
-    };
+    const unsub = onSnapshot(collection(db, "UserData"), (snapShot) => {
+      setData(snapShot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+    });
+    return () => unsub();
   }, []);
-  console.log(data);
+
+  // console.log(data);
 
   //------------------ Delete User Data  ------------------//
   const [selectedUserId, setSelectedUserId] = useState(null);

@@ -40,9 +40,15 @@ const ProductTable = () => {
           ...doc.data(),
         }));
         newData.sort((a, b) => {
-          if (a.stock <= a.criticalStock && b.stock > b.criticalStock) {
+          if (
+            a.currentStock <= a.criticalStock &&
+            b.currentStock > b.criticalStock
+          ) {
             return -1; // a should be sorted before b
-          } else if (a.stock > a.criticalStock && b.stock <= b.criticalStock) {
+          } else if (
+            a.currentStock > a.criticalStock &&
+            b.currentStock <= b.criticalStock
+          ) {
             return 1; // a should be sorted after b
           } else {
             return 0; // the order doesn't matter

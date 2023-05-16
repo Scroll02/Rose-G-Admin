@@ -56,7 +56,7 @@ export const productInputs = [
     placeholder: "100",
   },
   {
-    id: "stock",
+    id: "initialStock",
     label: "Stock",
     type: "number",
     placeholder: "50",

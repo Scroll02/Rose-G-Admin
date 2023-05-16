@@ -1,12 +1,14 @@
+import React, { useState } from "react";
 import Sidebar from "../../components/sidebar/Sidebar";
-import { useState } from "react";
-import "./contentManagement.scss";
+import "./list.scss";
 import Navbar from "../../components/navbar/Navbar";
+import TodaySalesReportTable from "../../components/datatable/TodaySalesReportTable";
+import AllSalesReportTable from "../../components/datatable/AllSalesReportTable";
+
 import BannerSlider from "../../components/slider/BannerSlider";
 import FeedbackList from "./FeedbackList";
-
-const ContentManagement = () => {
-  const [activeContent, setActiveContent] = useState("Banner Slider");
+const SalesReportList = () => {
+  const [activeContent, setActiveContent] = useState("Today's sales report");
 
   const handleButtonClick = (contentName) => {
     setActiveContent(contentName);
@@ -22,24 +24,26 @@ const ContentManagement = () => {
           <div className="toggleButtonsContainer">
             <button
               className={`toggleButton ${
-                activeContent === "Banner Slider" ? "active" : ""
+                activeContent === "Today's sales report" ? "active" : ""
               }`}
-              onClick={() => handleButtonClick("Banner Slider")}
+              onClick={() => handleButtonClick("Today's sales report")}
             >
-              Banner Slider
+              Today's sales report
             </button>
             <button
               className={`toggleButton ${
-                activeContent === "List of Feedbacks" ? "active" : ""
+                activeContent === "All sales report" ? "active" : ""
               }`}
-              onClick={() => handleButtonClick("List of Feedbacks")}
+              onClick={() => handleButtonClick("All sales report")}
             >
-              List of Feedbacks
+              All sales report
             </button>
           </div>
           <div className="activeContentContainer">
-            {activeContent === "Banner Slider" && <BannerSlider />}
-            {activeContent === "List of Feedbacks" && <FeedbackList />}
+            {activeContent === "Today's sales report" && (
+              <TodaySalesReportTable />
+            )}
+            {activeContent === "All sales report" && <AllSalesReportTable />}
           </div>
         </div>
       </div>
@@ -47,4 +51,4 @@ const ContentManagement = () => {
   );
 };
 
-export default ContentManagement;
+export default SalesReportList;

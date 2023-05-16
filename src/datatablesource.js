@@ -121,9 +121,9 @@ export const productColumns = [
     width: 230,
     renderCell: (params) => {
       const criticalStock = params.row.criticalStock;
-      const stock = params.row.stock;
-      const textColor = stock <= criticalStock ? "red" : "inherit";
-      const fontWeight = stock <= criticalStock ? 700 : "inherit";
+      const currentStock = params.row.currentStock;
+      const textColor = currentStock <= criticalStock ? "red" : "inherit";
+      const fontWeight = currentStock <= criticalStock ? 700 : "inherit";
       return (
         <div className="cellWithImg">
           <img className="cellImg" src={params.row.img} alt="avatar" />
@@ -169,19 +169,19 @@ export const productColumns = [
   //   width: 100,
   // },
   {
-    field: "stock",
+    field: "currentStock",
     headerName: "Stock",
     width: 100,
-    renderCell: ({ row: { stock, criticalStock } }) => {
-      const textColor = stock <= criticalStock ? "red" : "inherit";
+    renderCell: ({ row: { currentStock, criticalStock, initialStock } }) => {
+      const textColor = currentStock <= criticalStock ? "red" : "inherit";
       return (
         <div
           style={{
             color: textColor,
-            fontWeight: stock <= criticalStock ? 700 : "normal",
+            fontWeight: currentStock <= criticalStock ? 700 : "normal",
           }}
         >
-          {stock}
+          {currentStock || initialStock}
         </div>
       );
     },
@@ -294,5 +294,66 @@ export const orderColumns = [
     field: "deliveryRider",
     headerName: "Delivery Rider",
     width: 180,
+  },
+];
+
+/*------------------ Sales Report Columns ------------------*/
+export const salesReportColumns = [
+  {
+    field: "productName",
+    headerName: "Product",
+    width: 250,
+    renderCell: (params) => {
+      const { categoryName, productName } = params.value;
+      if (categoryName) {
+        // If the current row is a category, show the category name in bold
+        return <strong>{categoryName}</strong>;
+      } else {
+        // Otherwise, show the product name
+        return productName;
+      }
+    },
+  },
+  {
+    field: "unitCost",
+    headerName: "Unit Cost",
+    width: 120,
+    headerClassName: "headerName",
+  },
+  {
+    field: "sellingPrice",
+    headerName: "Selling Price",
+    width: 120,
+    headerClassName: "headerName",
+  },
+  {
+    field: "remained",
+    headerName: "Remained",
+    width: 120,
+    headerClassName: "headerName",
+  },
+  {
+    field: "qtySold",
+    headerName: "Qty. Sold",
+    width: 120,
+    headerClassName: "headerName",
+  },
+  {
+    field: "amount",
+    headerName: "Amount",
+    width: 120,
+    headerClassName: "headerName",
+  },
+  {
+    field: "note",
+    headerName: "Note",
+    width: 120,
+    headerClassName: "headerName",
+  },
+  {
+    field: "netProfit",
+    headerName: "Net Profit",
+    width: 120,
+    headerClassName: "headerName",
   },
 ];

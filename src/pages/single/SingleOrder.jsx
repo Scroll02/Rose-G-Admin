@@ -47,19 +47,34 @@ const SingleOrder = () => {
   // console.log(userOrderData);
 
   //------------------- Change Order Status -------------------//
-  // const changeOrderStatus = (id, orderdata, status) => {
+  // const changeOrderStatus = async (id, orderData, status) => {
   //   const docRef = doc(db, "UserOrders", id);
   //   const data = {
-  //     ...orderdata,
+  //     ...orderData,
   //     orderStatus: status,
   //   };
-  //   setDoc(docRef, data)
-  //     .then(() => {
-  //       showSuccessToast("Order Status is updated!");
-  //     })
-  //     .catch((error) => {
-  //       showErrorToast("Error writing document: ", error);
-  //     });
+
+  //   // When order status is confirmed, reduce the stock of each product
+  //   if (status === "Prepared") {
+  //     const orderItems = orderData.orderData;
+  //     for (const item of orderItems) {
+  //       const productRef = doc(collection(db, "ProductData"), item.productId);
+  //       const productDoc = await getDoc(productRef);
+  //       if (productDoc.exists()) {
+  //         const productData = productDoc.data();
+  //         const newStock = productData.stock - item.productQty;
+  //         await updateDoc(productRef, { stock: newStock });
+  //       }
+  //     }
+  //   }
+
+  //   try {
+  //     await setDoc(docRef, data);
+  //     showSuccessToast("Order Status is updated!");
+  //   } catch (error) {
+  //     showErrorToast("Error writing document: ", error);
+  //   }
+
   //   getUserOrderData();
   // };
   const changeOrderStatus = async (id, orderData, status) => {
@@ -77,8 +92,24 @@ const SingleOrder = () => {
         const productDoc = await getDoc(productRef);
         if (productDoc.exists()) {
           const productData = productDoc.data();
-          const newStock = productData.stock - item.productQty;
-          await updateDoc(productRef, { stock: newStock });
+          let currentStock =
+            productData.currentStock || productData.initialStock;
+          currentStock -= item.productQty;
+          await updateDoc(productRef, { currentStock });
+        }
+      }
+    }
+
+    // When order status is delivered, update totalSold for each product
+    if (status === "Delivered") {
+      const orderItems = orderData.orderData;
+      for (const item of orderItems) {
+        const productRef = doc(collection(db, "ProductData"), item.productId);
+        const productDoc = await getDoc(productRef);
+        if (productDoc.exists()) {
+          const productData = productDoc.data();
+          const totalSold = (productData.totalSold || 0) + item.productQty;
+          await updateDoc(productRef, { totalSold });
         }
       }
     }

@@ -5,9 +5,11 @@ import Person2RoundedIcon from "@mui/icons-material/Person2Rounded";
 import FoodBankRoundedIcon from "@mui/icons-material/FoodBankRounded";
 import BorderColorRoundedIcon from "@mui/icons-material/BorderColorRounded";
 import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
+import NotificationsRoundedIcon from "@mui/icons-material/NotificationsRounded";
 import ManageSearchRoundedIcon from "@mui/icons-material/ManageSearchRounded";
 import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
 import PriorityHighIcon from "@mui/icons-material/PriorityHigh";
+import AssessmentRoundedIcon from "@mui/icons-material/AssessmentRounded";
 
 import { Link, useNavigate, NavLink } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
@@ -50,7 +52,7 @@ const Sidebar = () => {
         setProductData(
           snapshot.docs.map((doc) => {
             const data = { id: doc.id, ...doc.data() };
-            if (data.stock <= data.criticalStock) {
+            if (data.currentStock <= data.criticalStock) {
               data.isCritical = true;
             } else {
               data.isCritical = false;
@@ -240,6 +242,18 @@ const Sidebar = () => {
             </NavLink>
           </li>
 
+          {/* Sales Report */}
+          <li>
+            <NavLink
+              to="/salesReport"
+              style={{ textDecoration: "none" }}
+              className={(navClass) => (navClass.isActive ? "activeLink" : "")}
+            >
+              <AssessmentRoundedIcon className="icon" />
+              <span>Sales Report</span>
+            </NavLink>
+          </li>
+
           <p className="title">USEFUL</p>
 
           {/* Notifications */}
@@ -249,7 +263,7 @@ const Sidebar = () => {
               style={{ textDecoration: "none" }}
               className={(navClass) => (navClass.isActive ? "activeLink" : "")}
             >
-              <NotificationsNoneIcon className="icon" />
+              <NotificationsRoundedIcon className="icon" />
               <span>Notifications</span>
             </NavLink>
           </li>
