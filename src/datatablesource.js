@@ -16,14 +16,18 @@ export const userColumns = [
     renderCell: (params) => {
       return (
         <div className="cellWithImg">
-          {params.row.img == null ? (
+          {params.row.profileImageUrl == null ? (
             <img
               className="cellImg"
               src={defaultUserIcon}
               alt={defaultUserIcon}
             />
           ) : (
-            <img className="cellImg" src={params.row.img} alt="avatar" />
+            <img
+              className="cellImg"
+              src={params.row.profileImageUrl}
+              alt="avatar"
+            />
           )}
           {params.row.firstName}&nbsp;{params.row.lastName}
         </div>
@@ -50,18 +54,24 @@ export const userColumns = [
     headerClassName: "headerName",
   },
   {
-    field: "status",
-    headerName: "Status",
+    field: "role",
+    headerName: "Role",
     width: 160,
     headerClassName: "headerName",
-    renderCell: (params) => {
-      return (
-        <div className={`cellWithStatus ${params.row.status}`}>
-          {params.row.status}
-        </div>
-      );
-    },
   },
+  // {
+  //   field: "status",
+  //   headerName: "Status",
+  //   width: 160,
+  //   headerClassName: "headerName",
+  //   renderCell: (params) => {
+  //     return (
+  //       <div className={`cellWithStatus ${params.row.status}`}>
+  //         {params.row.status}
+  //       </div>
+  //     );
+  //   },
+  // },
 
   // {
   //   field: "isVerified",
@@ -102,19 +112,6 @@ export const userColumns = [
 /*------------------ Product Column ------------------*/
 export const productColumns = [
   { field: "id", headerName: "Product ID", width: 120 },
-  // {
-  //   field: "productName",
-  //   headerName: "Product Name",
-  //   width: 230,
-  //   renderCell: (params) => {
-  //     return (
-  //       <div className="cellWithImg">
-  //         <img className="cellImg" src={params.row.img} alt="avatar" />
-  //         {params.row.productName}
-  //       </div>
-  //     );
-  //   },
-  // },
   {
     field: "productName",
     headerName: "Product Name",
@@ -163,11 +160,6 @@ export const productColumns = [
     width: 150,
   },
 
-  // {
-  //   field: "stock",
-  //   headerName: "Stock",
-  //   width: 100,
-  // },
   {
     field: "currentStock",
     headerName: "Stock",
@@ -225,14 +217,18 @@ export const orderColumns = [
     renderCell: (params) => {
       return (
         <div className="cellWithImg">
-          {params.row.img == null ? (
+          {params.row.profileImageUrl == null ? (
             <img
               className="cellImg"
               src={defaultUserIcon}
               alt="Default User Icon"
             />
           ) : (
-            <img className="cellImg" src={params.row.img} alt="avatar" />
+            <img
+              className="cellImg"
+              src={params.row.profileImageUrl}
+              alt="avatar"
+            />
           )}
           <div className="customerName">
             <span>

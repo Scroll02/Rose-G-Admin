@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import EditIcon from "@mui/icons-material/Edit";
+import AddIcon from "@mui/icons-material/Add";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import ConfirmationModal from "../modal/ConfirmationModal";
 
@@ -79,7 +80,8 @@ const ProductCategoriesTable = () => {
         List of Product Categories
         <div className="datatableButtons">
           <Link to="/products/newCategory" className="link">
-            Add New Category
+            <AddIcon />
+            New Category
           </Link>
         </div>
       </div>

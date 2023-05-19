@@ -34,6 +34,7 @@ import SingleProduct from "./pages/single/SingleProduct"; //SINGLE PRODUCT
 import SingleOrder from "./pages/single/SingleOrder"; //SINGLE ORDER
 import SingleProductCategory from "./pages/single/SingleProductCategory"; //SINGLE PRODUCT CATEGORY
 
+import NewOrderAlert from "./components/alert/NewOrderAlert";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -43,20 +44,6 @@ function App() {
   const RequireAuth = ({ children }) => {
     return currentUser ? children : <Navigate to="/login" />;
   };
-  // const RequireAuth = ({ children }) => {
-  //   if (!currentUser) {
-  //     return <Navigate to="/login" />;
-  //   } else if (
-  //     currentUser.userType === "Super Admin" ||
-  //     currentUser.userType === "Admin"
-  //   ) {
-  //     return children;
-  //   } else {
-  //     return <Navigate to="/home" />;
-  //   }
-  // };
-
-  // console.log(currentUser);
 
   const autoCloseTime = 1000;
   return (

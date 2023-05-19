@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { DataGrid } from "@mui/x-data-grid";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
+import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 
 // Modal
 import ConfirmationModal from "../modal/ConfirmationModal";
@@ -18,6 +19,8 @@ import { showErrorToast } from "../toast/Toast";
 const OrderTable = ({ datatableTitle }) => {
   const [data, setData] = useState([]);
   const [todaysData, setTodaysData] = useState([]);
+  const [searchValue, setSearchValue] = useState("");
+  const [selectedColumn, setSelectedColumn] = useState("orderFirstName");
 
   //------------------ Retrieve User Orders Data ------------------//
   useEffect(() => {
@@ -39,25 +42,47 @@ const OrderTable = ({ datatableTitle }) => {
       unsub();
     };
   }, []);
-  // console.log(data);
 
-  // Filter orders by today's date
+  // Filtering by date
   const filterOrdersByDate = (orders) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    return orders.filter((order) => {
+    const filteredOrders = orders.filter((order) => {
       if (!order.orderDate) return false;
       const orderDate = new Date(order.orderDate.seconds * 1000);
       orderDate.setHours(0, 0, 0, 0);
-      return orderDate.getTime() === today.getTime();
+      const matchesSearchValue =
+        order.orderId?.toLowerCase()?.includes(searchValue.toLowerCase()) ||
+        order.orderFirstName
+          .toLowerCase()
+          .includes(searchValue.toLowerCase()) ||
+        order.orderPayment.toLowerCase().includes(searchValue.toLowerCase()) ||
+        order.orderLastName.toLowerCase().includes(searchValue.toLowerCase()) ||
+        order.orderTotalCost.toString().includes(searchValue) ||
+        (selectedColumn === "orderDate" &&
+          orderDate
+            .toLocaleString("en-US", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+              hour: "numeric",
+              minute: "numeric",
+              second: "numeric",
+            })
+            .toLowerCase()
+            .includes(searchValue.toLowerCase())) ||
+        order.orderStatus.toLowerCase().includes(searchValue.toLowerCase());
+
+      return orderDate.getTime() === today.getTime() && matchesSearchValue;
     });
+    return filteredOrders;
   };
 
   // Filter orders by today's date and store it in todaysData state
   useEffect(() => {
     const filteredData = filterOrdersByDate(data);
     setTodaysData(filteredData);
-  }, [data]);
+  }, [data, searchValue]);
 
   // Delete Function
   const [selectedOrderId, setSelectedOrderId] = useState(null);
@@ -71,7 +96,7 @@ const OrderTable = ({ datatableTitle }) => {
     }
   };
 
-  // Drop Down Sort Date
+  //  Sort Date Drop Down
   const [sortByDate, setSortByDate] = useState("Today");
   const [selectedDate, setSelectedDate] = useState("");
   // Update todaysData and data based on the selected date
@@ -89,10 +114,72 @@ const OrderTable = ({ datatableTitle }) => {
     setShowConfirmationModal(false);
   };
 
+  // Search handler
+  const handleSearch = (event) => {
+    setSearchValue(event.target.value);
+  };
+  const handleColumnSelect = (event) => {
+    setSelectedColumn(event.target.value);
+  };
+
+  // Search Filtering
+  const searchFiltered = data.filter((order) => {
+    const lowerCaseSearchValue = searchValue.toLowerCase();
+    switch (selectedColumn) {
+      case "orderId":
+        return order.orderId?.toLowerCase()?.includes(lowerCaseSearchValue);
+      case "orderFirstName":
+        return order.orderFirstName
+          .toLowerCase()
+          .includes(lowerCaseSearchValue);
+      case "orderLastName":
+        return order.orderLastName.toLowerCase().includes(lowerCaseSearchValue);
+      case "orderPayment":
+        return order.orderPayment.toLowerCase().includes(lowerCaseSearchValue);
+      case "orderTotalCost":
+        return order.orderTotalCost.toString().includes(searchValue);
+      case "orderDate":
+        const orderDate = new Date(order.orderDate.seconds * 1000);
+        const formattedDate = orderDate.toLocaleString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+          hour: "numeric",
+          minute: "numeric",
+          second: "numeric",
+        });
+        return formattedDate.toLowerCase().includes(lowerCaseSearchValue);
+      case "orderStatus":
+        return order.orderStatus.toLowerCase().includes(lowerCaseSearchValue);
+      default:
+        return true; // No column selected, show all data
+    }
+  });
+
   return (
     <div className="datatable">
       <div className="datatableTitle">
-        {datatableTitle}
+        <div className="datatableHeader">
+          <label>{datatableTitle}</label>
+          <div className="searchContainer">
+            <input
+              type="text"
+              placeholder="Search..."
+              value={searchValue}
+              onChange={handleSearch}
+            />
+            <select value={selectedColumn} onChange={handleColumnSelect}>
+              <option value="orderId">Order ID</option>
+              <option value="orderFirstName">First Name</option>
+              <option value="orderLastName">Last Name</option>
+              <option value="orderPayment">Order Payment</option>
+              <option value="orderTotalCost">Total Cost</option>
+              <option value="orderDate">Order Date</option>
+              <option value="orderStatus">Order Status</option>
+            </select>
+            <SearchRoundedIcon />
+          </div>
+        </div>
 
         <select onChange={(e) => setSortByDate(e.target.value)}>
           <option disabled>---Date---</option>
@@ -103,7 +190,7 @@ const OrderTable = ({ datatableTitle }) => {
 
       <DataGrid
         className="datagrid"
-        rows={sortByDate === "Today" ? todaysData : data}
+        rows={sortByDate === "Today" ? todaysData : searchFiltered}
         // columns={orderColumns.concat(actionColumn)}
         columns={orderColumns.concat([
           {

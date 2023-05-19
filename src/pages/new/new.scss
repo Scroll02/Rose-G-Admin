@@ -53,6 +53,7 @@
               gap: 10px;
               margin-top: 20px;
               width: auto;
+              font-size: 1.2rem;
 
               .icon {
                 cursor: pointer;
@@ -60,12 +61,21 @@
             }
 
             input {
+              border: 2px solid var(--text-color1);
               width: 100%;
               padding: 5px;
-              border: none;
-              border-bottom: 1px solid gray;
+              border-radius: 0.5rem;
+              box-shadow: 4px 4px 2px var(--background-color1);
               margin-bottom: 20px;
               font-size: large;
+              outline: none;
+              font-weight: 600;
+
+              &:hover,
+              &:focus {
+                outline: none;
+                border: 2px solid var(--background-color1);
+              }
             }
             select {
               width: 100%;
@@ -74,18 +84,25 @@
           }
         }
         button {
-          width: 150px;
-          padding: 10px;
+          width: 40%;
+          padding: 5px 10px;
           border: none;
-          background-color: teal;
-          color: white;
-          font-weight: bold;
+          color: var(--background-color1);
+          background-color: var(--text-color1);
+          border: 2px solid var(--background-color1);
+          box-shadow: 2px 2px 2px var(--background-color2);
+          font-weight: 600;
+          font-size: 1.1rem;
           cursor: pointer;
-          margin-top: 10px;
+          margin: 10px 0;
 
           &:disabled {
             background-color: rgba(3, 92, 92, 0.322);
             cursor: not-allowed;
+          }
+          &:hover {
+            background-color: var(--background-color1);
+            color: var(--text-color1);
           }
         }
       }

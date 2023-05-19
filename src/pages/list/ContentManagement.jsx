@@ -4,6 +4,7 @@ import "./contentManagement.scss";
 import Navbar from "../../components/navbar/Navbar";
 import BannerSlider from "../../components/slider/BannerSlider";
 import FeedbackList from "./FeedbackList";
+import DeliveryFee from "../../components/box/DeliveryFee";
 
 const ContentManagement = () => {
   const [activeContent, setActiveContent] = useState("Banner Slider");
@@ -20,6 +21,7 @@ const ContentManagement = () => {
 
         <div className="contentManagementContainer">
           <div className="toggleButtonsContainer">
+            {/* Banner Slider */}
             <button
               className={`toggleButton ${
                 activeContent === "Banner Slider" ? "active" : ""
@@ -28,6 +30,8 @@ const ContentManagement = () => {
             >
               Banner Slider
             </button>
+
+            {/* List of Feedbacks */}
             <button
               className={`toggleButton ${
                 activeContent === "List of Feedbacks" ? "active" : ""
@@ -36,10 +40,21 @@ const ContentManagement = () => {
             >
               List of Feedbacks
             </button>
+
+            {/* Delivery Fee */}
+            <button
+              className={`toggleButton ${
+                activeContent === "Delivery Fee" ? "active" : ""
+              }`}
+              onClick={() => handleButtonClick("Delivery Fee")}
+            >
+              Delivery Fee
+            </button>
           </div>
           <div className="activeContentContainer">
             {activeContent === "Banner Slider" && <BannerSlider />}
             {activeContent === "List of Feedbacks" && <FeedbackList />}
+            {activeContent === "Delivery Fee" && <DeliveryFee />}
           </div>
         </div>
       </div>

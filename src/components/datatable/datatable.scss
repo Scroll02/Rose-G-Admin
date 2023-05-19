@@ -13,6 +13,43 @@
     align-items: center;
     justify-content: space-between;
 
+    .datatableHeader {
+      display: flex;
+      align-items: center;
+      gap: 30px;
+
+      .searchContainer {
+        display: flex;
+        align-items: center;
+        background-color: var(--text-color1);
+        padding: 6px 15px;
+        border-radius: 0.5rem;
+        border: 2px solid var(--background-color1);
+
+        input[type="text"] {
+          border: none;
+          outline: none;
+          flex: 1;
+          padding: 4px;
+          font-size: 1rem;
+          font-weight: 600;
+          background-color: transparent;
+          color: var(--text-color2);
+
+          &::placeholder {
+            color: #999;
+          }
+        }
+
+        .MuiSvgIcon-root {
+          color: var(--background-color1);
+          font-size: 20px;
+          margin-left: 8px;
+          cursor: pointer;
+        }
+      }
+    }
+
     .datatableButtons {
       display: flex;
 

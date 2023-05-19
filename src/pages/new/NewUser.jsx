@@ -29,7 +29,7 @@ const userRoles = [
   },
   {
     userRoleId: 3,
-    userRoleName: "User",
+    userRoleName: "Rider",
   },
 ];
 
@@ -153,6 +153,7 @@ const NewUser = ({ inputs, title }) => {
                 <select
                   value={selectedUserRole}
                   onChange={(e) => setSelectedUserRole(e.target.value)}
+                  className="selectCategory"
                 >
                   <option value="" disabled>
                     ---Select user type---

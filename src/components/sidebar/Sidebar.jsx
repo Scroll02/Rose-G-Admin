@@ -11,7 +11,9 @@ import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
 import PriorityHighIcon from "@mui/icons-material/PriorityHigh";
 import AssessmentRoundedIcon from "@mui/icons-material/AssessmentRounded";
 
-import { Link, useNavigate, NavLink } from "react-router-dom";
+import NewOrderAlert from "../alert/NewOrderAlert";
+
+import { Link, useNavigate, NavLink, useLocation } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 
 // Firebase
@@ -25,6 +27,7 @@ import { showSuccessToast } from "../toast/Toast";
 const Sidebar = () => {
   const { dispatch } = useContext(AuthContext);
   const navigate = useNavigate();
+  const location = useLocation();
 
   //------------------ User Orders Data ------------------//
   const [orderCount, setOrderCount] = useState(0);
@@ -72,22 +75,6 @@ const Sidebar = () => {
     };
   }, []);
 
-  // Retrieve User Orders Data
-  // useEffect(() => {
-  //   const unsubscribe = onSnapshot(
-  //     collection(db, "UserOrders"),
-  //     (snapshot) => {
-  //       const orders = snapshot.docs.map((doc) => ({
-  //         id: doc.id,
-  //         ...doc.data(),
-  //       }));
-  //       setOrderData(orders);
-  //     },
-  //     (error) => console.log(error)
-  //   );
-  //   return unsubscribe;
-  // }, []);
-
   // Filtered by orders today's date and order status is pending
   const filterOrdersByDate = (orders) => {
     const today = new Date();
@@ -103,6 +90,7 @@ const Sidebar = () => {
     });
   };
 
+  const [showNewOrderAlert, setShowNewOrderAlert] = useState(false);
   // Get the order count for today
   useEffect(() => {
     const filteredData = filterOrdersByDate(orderData);
@@ -121,37 +109,29 @@ const Sidebar = () => {
         }
       });
     });
+
+    // Set the showNewOrderAlert state based on order count
+    if (count > 0) {
+      setShowNewOrderAlert(true);
+    } else {
+      setShowNewOrderAlert(false);
+    }
     return () => {
       unsub();
     };
   }, [orderData]);
 
-  //------------------ Products Data ------------------//
-  // const [productData, setProductData] = useState([]);
+  const closeNewOrderAlert = () => {
+    setShowNewOrderAlert(false);
+  };
 
-  // // Retrieve Product Data
-  // useEffect(() => {
-  //   const unsubscribe = onSnapshot(
-  //     collection(db, "ProductData"),
-  //     (snapshot) => {
-  //       setProductData(
-  //         snapshot.docs.map((doc) => {
-  //           const data = { id: doc.id, ...doc.data() };
-  //           if (data.stock <= data.criticalStock) {
-  //             data.isCritical = true;
-  //           } else {
-  //             data.isCritical = false;
-  //           }
-  //           return data;
-  //         })
-  //       );
-  //     },
-  //     (error) => {
-  //       console.error(error);
-  //     }
-  //   );
-  //   return unsubscribe;
-  // }, []);
+  useEffect(() => {
+    // Check if the current location is "/orders"
+    const isOrdersPage = location.pathname.startsWith("/orders");
+
+    // Update the showNewOrderAlert state based on the current location
+    setShowNewOrderAlert(!isOrdersPage && orderCount > 0);
+  }, [location, orderCount]);
 
   // Logout function
   const handleLogout = () => {
@@ -241,6 +221,12 @@ const Sidebar = () => {
               ) : null}
             </NavLink>
           </li>
+          {showNewOrderAlert && orderCount >= 1 && (
+            <NewOrderAlert
+              orderCount={orderCount}
+              closeNewOrderAlert={closeNewOrderAlert}
+            />
+          )}
 
           {/* Sales Report */}
           <li>

@@ -25,12 +25,28 @@ const TodaySalesReportTable = () => {
 
   const resetTime = moment().endOf("day").add(1, "hour");
 
+  // useEffect(() => {
+  //   const unsub = onSnapshot(collection(db, "ProductData"), (snapShot) => {
+  //     setData(snapShot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+  //   });
+  //   return () => unsub();
+  // }, [resetTime.diff(moment()) > 0]);
   useEffect(() => {
+    const checkResetTime = setInterval(() => {
+      if (moment() > resetTime) {
+        setData([]);
+      }
+    }, 1000); // Check every second
+
     const unsub = onSnapshot(collection(db, "ProductData"), (snapShot) => {
       setData(snapShot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
     });
-    return () => unsub();
-  }, [resetTime.diff(moment()) > 0]);
+
+    return () => {
+      clearInterval(checkResetTime);
+      unsub();
+    };
+  }, []);
 
   const generateReportID = () => {
     const currentDate = moment().format("YYYY-MM-DD");

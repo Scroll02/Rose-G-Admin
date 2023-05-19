@@ -3,6 +3,7 @@ import { DataGrid } from "@mui/x-data-grid";
 import { userColumns } from "../../datatablesource";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
+import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import AddIcon from "@mui/icons-material/Add";
@@ -19,6 +20,8 @@ import ConfirmationModal from "../modal/ConfirmationModal";
 
 const UserTable = () => {
   const [data, setData] = useState([]);
+  const [searchValue, setSearchValue] = useState("");
+  const [selectedColumn, setSelectedColumn] = useState("firstName");
 
   //------------------ Retrieve Users Data ------------------//
   useEffect(() => {
@@ -67,15 +70,69 @@ const UserTable = () => {
 
   // Modal
 
+  // Modal
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const closeConfirmationModal = () => {
     setShowConfirmationModal(false);
   };
 
+  // Search handler
+  const handleSearch = (event) => {
+    setSearchValue(event.target.value);
+  };
+  const handleColumnSelect = (event) => {
+    setSelectedColumn(event.target.value);
+  };
+
+  // Filter the data based on the search value
+  const filteredData = data.filter((user) => {
+    const lowerCaseSearchValue = searchValue.toLowerCase();
+    switch (selectedColumn) {
+      case "uid":
+        return user.uid?.toLowerCase()?.includes(lowerCaseSearchValue);
+      case "firstName":
+        return user.firstName.toLowerCase().includes(lowerCaseSearchValue);
+      case "lastName":
+        return user.lastName.toLowerCase().includes(lowerCaseSearchValue);
+      case "email":
+        return user.email.toLowerCase().includes(lowerCaseSearchValue);
+      case "contactNumber":
+        const contactNumberStr = String(user.contactNumber);
+        return contactNumberStr.includes(lowerCaseSearchValue);
+      case "address":
+        return user.address?.toLowerCase()?.includes(lowerCaseSearchValue);
+      case "role":
+        return user.role.toLowerCase().includes(lowerCaseSearchValue);
+
+      default:
+        return true; // No column selected, show all data
+    }
+  });
+
   return (
     <div className="datatable">
       <div className="datatableTitle">
-        List of Users
+        <div className="datatableHeader">
+          <label> List of Products</label>
+          <div className="searchContainer">
+            <input
+              type="text"
+              placeholder="Search..."
+              value={searchValue}
+              onChange={handleSearch}
+            />
+            <select value={selectedColumn} onChange={handleColumnSelect}>
+              <option value="uid">User ID</option>
+              <option value="firstName">First Name</option>
+              <option value="lastName">Last Name</option>
+              <option value="email">Email</option>
+              <option value="contactNumber">Contact Number</option>
+              <option value="address">Address</option>
+              <option value="role">Role</option>
+            </select>
+            <SearchRoundedIcon />
+          </div>
+        </div>
         <div className="datatableButtons">
           <Link to="/users/new" className="link">
             <AddIcon />
@@ -85,7 +142,7 @@ const UserTable = () => {
       </div>
       <DataGrid
         className="datagrid"
-        rows={data}
+        rows={filteredData}
         columns={userColumns.concat([
           {
             field: "action",

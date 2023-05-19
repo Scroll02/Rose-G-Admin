@@ -1,0 +1,70 @@
+.newOrderAlert {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+
+  .MuiAlert-root {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    padding: 16px 24px;
+    background-color: var(--background-color2);
+    color: var(--text-color2);
+    border-radius: 4px;
+    box-shadow: 5px 5px 5px var(--background-color1);
+    cursor: pointer;
+    transition: background-color 0.3s;
+
+    .MuiAlert-icon {
+      color: var(--background-color1); // Replace with your desired color
+    }
+
+    &:hover {
+      background-color: var(--background-color2);
+    }
+
+    &.with-audio {
+      background-color: var(--background-color2);
+    }
+
+    .alertContent {
+      width: 100%;
+
+      .alertHeader {
+        display: flex;
+        justify-content: space-between;
+
+        .alertTitle {
+          font-size: 18px;
+          font-weight: bold;
+          margin-right: 8px;
+          display: flex;
+        }
+
+        .closeIcon {
+          cursor: pointer;
+          font-size: 1.5rem;
+          color: red;
+        }
+      }
+
+      .alertDescription {
+        font-size: 1rem;
+        margin-top: 8px;
+        font-weight: 600;
+
+        .viewOrdersLink {
+          color: var(--text-color2);
+          text-decoration: underline;
+          font-size: 1rem;
+          font-weight: 600;
+
+          &:hover {
+            text-decoration: none;
+          }
+        }
+      }
+    }
+  }
+}

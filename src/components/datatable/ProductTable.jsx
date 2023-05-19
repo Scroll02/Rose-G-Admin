@@ -4,11 +4,12 @@ import { productColumns } from "../../datatablesource";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import AddIcon from "@mui/icons-material/Add";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-
+import moment from "moment";
 // Firebase
 import {
   collection,
@@ -16,6 +17,7 @@ import {
   doc,
   onSnapshot,
   getDoc,
+  writeBatch,
 } from "firebase/firestore";
 import { getStorage, ref, deleteObject } from "firebase/storage";
 import { db } from "../../firebase";
@@ -28,6 +30,8 @@ import ConfirmationModal from "../modal/ConfirmationModal";
 
 const ProductTable = () => {
   const [data, setData] = useState([]);
+  const [searchValue, setSearchValue] = useState("");
+  const [selectedColumn, setSelectedColumn] = useState("productName");
 
   //------------------ Retrieve Product Data ------------------//
   // Once stock is below or less than criticalStock that product will displayed first on the table
@@ -55,11 +59,59 @@ const ProductTable = () => {
           }
         });
         setData(newData);
+
+        // Reset data at 10 PM
+        const resetDataAtSpecificTime = () => {
+          const currentTime = new Date();
+          const resetTime = new Date(
+            currentTime.getFullYear(),
+            currentTime.getMonth(),
+            currentTime.getDate(),
+            22, // 10 PM hour (change this to the desired hour)
+            0, // 0 minutes
+            0 // 0 seconds
+          );
+          let millisecondsUntilReset = resetTime - currentTime;
+
+          if (millisecondsUntilReset < 0) {
+            // If the reset time has already passed today, schedule it for the next day
+            const nextDay = new Date(
+              currentTime.getFullYear(),
+              currentTime.getMonth(),
+              currentTime.getDate() + 1
+            );
+            millisecondsUntilReset = nextDay - currentTime;
+          }
+
+          setTimeout(() => {
+            const batch = writeBatch(db);
+            const productsRef = collection(db, "ProductData");
+
+            newData.forEach((product) => {
+              batch.update(doc(productsRef, product.id), {
+                totalSold: 0,
+                initialStock: product.currentStock,
+              });
+            });
+
+            batch
+              .commit()
+              .then(() => {
+                console.log("Data reset successful.");
+              })
+              .catch((error) => {
+                console.error("Data reset failed:", error);
+              });
+          }, millisecondsUntilReset);
+        };
+
+        resetDataAtSpecificTime(); // Call the function to start the reset process
       },
       (error) => {
         console.error(error);
       }
     );
+
     return unsubscribe;
   }, []);
 
@@ -90,10 +142,61 @@ const ProductTable = () => {
     setShowConfirmationModal(false);
   };
 
+  // Search handler
+  const handleSearch = (event) => {
+    setSearchValue(event.target.value);
+  };
+  const handleColumnSelect = (event) => {
+    setSelectedColumn(event.target.value);
+  };
+
+  // Filter the data based on the search value
+  const filteredData = data.filter((product) => {
+    const lowerCaseSearchValue = searchValue.toLowerCase();
+    switch (selectedColumn) {
+      case "productName":
+        return product.productName.toLowerCase().includes(lowerCaseSearchValue);
+      case "description":
+        return product.description.toLowerCase().includes(lowerCaseSearchValue);
+      case "price":
+        return product.price.toString().includes(searchValue);
+      case "categoryName":
+        return product.categoryName
+          .toLowerCase()
+          .includes(lowerCaseSearchValue);
+      case "stock":
+        return (
+          product.initialStock.toString().includes(searchValue) ||
+          product.currentStock.toString().includes(searchValue)
+        );
+      default:
+        return true; // No column selected, show all data
+    }
+  });
+
   return (
     <div className="datatable">
       <div className="datatableTitle">
-        List of Products
+        <div className="datatableHeader">
+          <label> List of Products</label>
+          <div className="searchContainer">
+            <input
+              type="text"
+              placeholder="Search..."
+              value={searchValue}
+              onChange={handleSearch}
+            />
+            <select value={selectedColumn} onChange={handleColumnSelect}>
+              <option value="productName">Product Name</option>
+              <option value="description">Description</option>
+              <option value="price">Price</option>
+              <option value="categoryName">Category Name</option>
+              <option value="stock">Stock</option>
+            </select>
+            <SearchRoundedIcon />
+          </div>
+        </div>
+
         <div className="datatableButtons">
           <Link to="/products/productCategories" className="link">
             <VisibilityIcon />
@@ -107,7 +210,7 @@ const ProductTable = () => {
       </div>
       <DataGrid
         className="datagrid"
-        rows={data}
+        rows={filteredData}
         slots={{ toolbar: GridToolbar }}
         columns={productColumns.concat([
           {
