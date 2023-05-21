@@ -1,29 +1,14 @@
 import "./navbar.scss";
 import { useEffect, useState, useContext } from "react";
-import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
-import LanguageOutlinedIcon from "@mui/icons-material/LanguageOutlined";
-import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
-import FullscreenExitOutlinedIcon from "@mui/icons-material/FullscreenExitOutlined";
 import NotificationsNoneOutlinedIcon from "@mui/icons-material/NotificationsNoneOutlined";
-import ChatBubbleOutlineOutlinedIcon from "@mui/icons-material/ChatBubbleOutlineOutlined";
-import ListOutlinedIcon from "@mui/icons-material/ListOutlined";
 import UserIcon from "../../images/user.png";
 
 // Context
 import { AuthContext } from "../../context/AuthContext";
 
 // Firebase
-import { db, auth } from "../../firebase";
-import { onAuthStateChanged } from "firebase/auth";
-import {
-  onSnapshot,
-  collection,
-  doc,
-  getDoc,
-  query,
-  where,
-  getDocs,
-} from "firebase/firestore";
+import { db } from "../../firebase";
+import { collection, query, where, getDocs } from "firebase/firestore";
 
 const Navbar = () => {
   // const { currentUser } = useContext(AuthContext);
@@ -78,7 +63,7 @@ const Navbar = () => {
           </div>
           <div className="item">
             <img
-              src={userData?.profileImgUrl || UserIcon}
+              src={userData?.profileImageUrl || UserIcon}
               alt="Profile Avatar"
               className="avatar"
             />

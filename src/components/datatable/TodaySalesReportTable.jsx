@@ -171,8 +171,8 @@ const TodaySalesReportTable = () => {
       netProfitTotal,
     };
 
-    // Save the data object to the database
-    addDoc(collection(db, "SalesReports"), salesData)
+    // Save the data object to the database with the reportID as the document ID
+    setDoc(doc(db, "SalesReports", reportID), salesData)
       .then(() => {
         showSuccessToast("Sales report saved to database!", 2000);
       })

@@ -47,7 +47,12 @@ const OrderTable = ({ datatableTitle }) => {
   const filterOrdersByDate = (orders) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const filteredOrders = orders.filter((order) => {
+    const sortedOrders = orders.sort((a, b) => {
+      const dateA = new Date(a.orderDate?.seconds * 1000);
+      const dateB = new Date(b.orderDate?.seconds * 1000);
+      return dateB - dateA;
+    });
+    const filteredOrders = sortedOrders.filter((order) => {
       if (!order.orderDate) return false;
       const orderDate = new Date(order.orderDate.seconds * 1000);
       orderDate.setHours(0, 0, 0, 0);

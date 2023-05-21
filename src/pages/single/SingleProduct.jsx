@@ -31,7 +31,6 @@ const SingleProduct = () => {
 
   //------------------ Retrieve Product Data  ------------------//
   const [productData, setProductData] = useState();
-
   const getProductData = async () => {
     const docRef = doc(db, "ProductData", productId);
     const docSnap = await getDoc(docRef);
@@ -44,11 +43,9 @@ const SingleProduct = () => {
       console.log("No such document!");
     }
   };
-
   useEffect(() => {
     getProductData();
   }, []);
-  // console.log(productData);
 
   //------------------ Handle Change for Input  ------------------//
   const [newImageFile, setNewImageFile] = useState("");
@@ -87,7 +84,6 @@ const SingleProduct = () => {
       unsub();
     };
   }, []);
-  // console.log(categoriesData);
 
   //------------------ Update Product Data Function  ------------------//
   const [newSelectedCategory, setNewSelectedCategory] = useState("");
@@ -189,7 +185,7 @@ const SingleProduct = () => {
                     htmlFor="file"
                     style={{ display: "flex", alignItems: "center" }}
                   >
-                    New Image:
+                    New Product Image:
                     <DriveFolderUploadOutlinedIcon className="icon" />
                     {newImageFileName}
                   </label>

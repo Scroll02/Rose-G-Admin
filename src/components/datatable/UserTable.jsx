@@ -10,7 +10,8 @@ import AddIcon from "@mui/icons-material/Add";
 
 // Firebase
 import { collection, deleteDoc, doc, onSnapshot } from "firebase/firestore";
-import { db } from "../../firebase";
+import { db, storage } from "../../firebase";
+import { deleteObject, ref } from "firebase/storage";
 
 // Toast
 import { showErrorToast, showSuccessToast } from "../toast/Toast";
@@ -37,6 +38,12 @@ const UserTable = () => {
   const [selectedUserId, setSelectedUserId] = useState(null);
   const handleDelete = async () => {
     try {
+      const user = data.find((item) => item.id === selectedUserId);
+      if (user.profileImageUrl) {
+        const storageRef = ref(storage, user.profileImageUrl);
+        await deleteObject(storageRef);
+      }
+
       await deleteDoc(doc(db, "UserData", selectedUserId));
       setData(data.filter((item) => item.id !== selectedUserId));
       showSuccessToast("User data is successfully deleted", 2000);

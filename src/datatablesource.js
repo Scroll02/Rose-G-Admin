@@ -16,7 +16,8 @@ export const userColumns = [
     renderCell: (params) => {
       return (
         <div className="cellWithImg">
-          {params.row.profileImageUrl == null ? (
+          {params.row.profileImageUrl == "" ||
+          params.row.profileImageUrl == null ? (
             <img
               className="cellImg"
               src={defaultUserIcon}
