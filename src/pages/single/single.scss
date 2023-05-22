@@ -53,15 +53,19 @@
             }
 
             .detailItem {
-              margin: 15px 0;
+              display: flex;
+              align-items: center;
+              margin: 25px 0;
               font-size: 1rem;
 
               .itemKey,
               label {
+                flex-shrink: 0;
                 font-weight: bold;
                 color: var(--text-color2);
                 font-size: 1rem;
                 margin-right: 5px;
+                display: inline-flex;
               }
 
               .itemValue {
@@ -85,10 +89,28 @@
                 font-weight: 600;
               }
             }
+            select {
+              border: 2px solid var(--text-color1);
+              font-size: 1rem;
+              font-weight: 600;
+              color: var(--text-color2);
+              padding: 5px 10px;
+              width: 80%;
+              border-radius: 0.5rem;
+              outline: none;
+              box-shadow: 4px 4px 2px var(--background-color1);
+              margin-bottom: 10px;
+              margin-left: 5px; /* Added */
+
+              &:hover,
+              &:focus {
+                outline: none;
+                border: 2px solid var(--background-color1);
+              }
+            }
           }
 
-          input,
-          select {
+          input {
             border: 2px solid var(--text-color1);
             font-size: 1rem;
             font-weight: 600;
@@ -111,6 +133,44 @@
 
       .right {
         flex: 2;
+
+        .orderSummaryContainer {
+          background-color: var(--background-color1);
+          border-radius: 8px;
+          padding: 20px;
+          max-width: 600px;
+
+          .orderSummary {
+            .title {
+              font-size: 25px;
+              font-weight: bold;
+              color: var(--background-color2);
+            }
+
+            .orderTable {
+              width: 100%;
+              border-collapse: collapse;
+
+              th,
+              td {
+                border: 1px solid #ccc;
+                padding: 8px;
+                text-align: left;
+              }
+              th {
+                color: var(--text-color2);
+              }
+              td {
+                color: var(--text-color1);
+              }
+
+              th {
+                background-color: var(--background-color3);
+                font-weight: bold;
+              }
+            }
+          }
+        }
       }
     }
 

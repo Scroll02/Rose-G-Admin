@@ -17,12 +17,13 @@ import { db } from "../../firebase";
 const FeedbackList = () => {
   const [feedbackData, setFeedbackData] = useState([]);
   const [page, setPage] = useState(1);
-  const [perPage, setPerPage] = useState(10); //Set number of items shown per page
+  const [perPage, setPerPage] = useState(8); //Set number of items shown per page
   const [filteredData, setFilteredData] = useState([]);
   const [posted, setPosted] = useState(false);
   const [activeFilterRating, setActiveFilterRating] = useState("All");
   const [activeFilterStatus, setActiveFilterStatus] = useState("All");
 
+  // Retrieve Feedback Data
   useEffect(() => {
     const fetchFeedbackData = async () => {
       const querySnapshot = await getDocs(collection(db, "FeedbackData"));
@@ -41,6 +42,7 @@ const FeedbackList = () => {
   const startIndex = (page - 1) * perPage;
   const endIndex = startIndex + perPage;
 
+  // Handle Filter
   const handleFilterClick = (rating, status) => {
     setActiveFilterRating(rating);
     setActiveFilterStatus(status);
@@ -66,6 +68,7 @@ const FeedbackList = () => {
     setPage(1);
   };
 
+  // Post & Unpost Button
   const handlePostClick = async (feedback) => {
     const feedbackQuery = query(
       collection(db, "FeedbackData"),
@@ -100,7 +103,7 @@ const FeedbackList = () => {
 
   return (
     <div className="feedbackListWrapper">
-      {/* <h1 className="feedbackListTitle">Feedback List</h1> */}
+      {/* Filter Buttons */}
       <div className="filterButtons">
         <button
           // className="filterButton"

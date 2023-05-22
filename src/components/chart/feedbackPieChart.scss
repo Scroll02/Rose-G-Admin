@@ -1,0 +1,24 @@
+.PieChartContainer {
+  text-align: center;
+
+  .ChartCard {
+    background-color: #ffffff;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.4);
+    padding: 20px;
+    border-radius: 8px;
+    display: inline-block;
+
+    h3 {
+      margin-bottom: 20px;
+    }
+
+    .recharts-wrapper {
+      display: inline-block;
+
+      .recharts-text {
+        font-size: 18px;
+        font-weight: bold;
+      }
+    }
+  }
+}

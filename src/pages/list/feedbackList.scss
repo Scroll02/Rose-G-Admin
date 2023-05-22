@@ -1,76 +1,15 @@
 .feedbackListWrapper {
   width: 100%;
   margin: 0 auto;
-  // background-color: #fae9bd;
   padding: 20px;
   border-radius: 0.5rem;
-
-  .feedbackListRow {
-    display: flex;
-    justify-content: flex-start;
-    flex-wrap: wrap;
-    gap: 20px;
-  }
-
-  .feedbackItem {
-    position: relative;
-    background-color: #f2f2f2;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.1);
-    // width: calc(33.33% - 20px);
-    width: calc(20% - 20px);
-    margin-bottom: 20px;
-    height: 350px;
-    overflow: hidden;
-
-    .feedbackRating {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 20px;
-      font-weight: 600;
-      font-size: 1.1rem;
-    }
-
-    h2 {
-      margin-bottom: 20px;
-    }
-
-    .feedbackMsg {
-      font-weight: 600;
-      font-size: 1.1rem;
-      text-align: justify;
-    }
-
-    .postButton {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      padding: 10px;
-      color: var(--text-color2);
-      font-weight: 600;
-      border: none;
-      border-radius: 0 10px 0 0;
-      cursor: pointer;
-      transition: background-color 0.3s ease-in-out;
-      font-size: 1.2rem;
-    }
-    .posted {
-      background-color: #4caf50;
-    }
-
-    .unposted {
-      background-color: #f44336;
-    }
-
-    .postButton:hover {
-      transform: scale(1.1);
-    }
-  }
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 
   .filterButtons {
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
     margin-bottom: 20px;
 
@@ -91,14 +30,92 @@
         background-color: var(--background-color1);
         color: var(--text-color1);
       }
-
-      &:active {
-        transform: translateY(2px);
-      }
     }
-    .active {
+
+    .filterButton.active {
       background-color: var(--background-color1);
       color: var(--text-color1);
+    }
+  }
+
+  .feedbackList {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+
+    .feedbackListRow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+      width: 100%;
+      max-width: 1200px;
+
+      .feedbackItem {
+        position: relative;
+        background-color: #f2f2f2;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.1);
+        width: calc(25% - 20px);
+        margin-bottom: 20px;
+        min-height: 350px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+
+        @media (max-width: 1024px) {
+          width: calc(50% - 20px);
+        }
+
+        @media (max-width: 768px) {
+          width: 100%;
+        }
+
+        .feedbackRating {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          margin-bottom: 10px;
+          font-weight: 600;
+          font-size: 1.1rem;
+        }
+
+        h2 {
+          margin-bottom: 10px;
+        }
+
+        .feedbackMsg {
+          flex-grow: 1;
+          font-weight: 600;
+          font-size: 1.1rem;
+          text-align: justify;
+          margin-bottom: 10px;
+        }
+
+        .postButton {
+          padding: 10px;
+          color: var(--text-color2);
+          font-weight: 600;
+          border: none;
+          border-radius: 0.5rem;
+          cursor: pointer;
+          transition: background-color 0.3s ease-in-out;
+          font-size: 1.2rem;
+        }
+        .posted {
+          background-color: #4caf50;
+        }
+
+        .unposted {
+          background-color: #f44336;
+        }
+
+        .postButton:hover {
+          transform: scale(1.1);
+        }
+      }
     }
   }
 

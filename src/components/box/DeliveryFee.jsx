@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import "./deliveryFee.scss";
+import DeliveryImg from "../../images/delivery-fee.svg";
 
 // Firebase
-import { doc, getDoc, setDoc } from "firebase/firestore"; // Update the path to your firebase.js file
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../../firebase";
 
 // Toast
@@ -73,6 +74,9 @@ const DeliveryFee = () => {
 
   return (
     <div className="deliveryWrapper">
+      <div class="imageWrapper">
+        <img src={DeliveryImg} alt="Delivery Image" />
+      </div>
       <h1>Delivery Fee</h1>
       <input
         type="text"

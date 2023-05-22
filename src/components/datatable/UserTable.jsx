@@ -120,7 +120,7 @@ const UserTable = () => {
     <div className="datatable">
       <div className="datatableTitle">
         <div className="datatableHeader">
-          <label> List of Products</label>
+          <label> List of Users</label>
           <div className="searchContainer">
             <input
               type="text"

@@ -158,12 +158,6 @@ const SingleOrder = () => {
               <div className="details">
                 {/*------------------ Order ID ------------------*/}
                 <h1 className="itemTitle">Order ID: {userOrderData.orderId}</h1>
-                {/* <input
-                  type="text"
-                  // defaultValue={userData?.contactNumber}
-                  placeholder="New Food Name"
-                  onChange={(e) => setNewFoodName(e.target.value)}
-                /> */}
 
                 {/*------------------ Full Name ------------------*/}
                 <div className="detailItem">
@@ -183,7 +177,7 @@ const SingleOrder = () => {
                 </div>
 
                 {/*------------------ Change For ------------------*/}
-                {userOrderData.changeFor == undefined ||
+                {/* {userOrderData.changeFor == undefined ||
                 userOrderData.changeFor == "" ? (
                   <div className="detailItem"></div>
                 ) : (
@@ -193,7 +187,7 @@ const SingleOrder = () => {
                       ₱{parseFloat(userOrderData.changeFor).toFixed(2)}
                     </span>
                   </div>
-                )}
+                )} */}
 
                 {/*------------------ Total Cost ------------------*/}
                 <div className="detailItem">
@@ -320,7 +314,7 @@ const SingleOrder = () => {
                 </div>
 
                 {/*------------------ Delivery Rider & Contact Number ------------------*/}
-                <div className="detailItem">
+                {/* <div className="detailItem">
                   <span className="itemKey">
                     Delivery Rider & Contact Number:
                   </span>
@@ -347,46 +341,40 @@ const SingleOrder = () => {
                       </option>
                     </select>
                   )}
-                </div>
-
-                {/*------------------ Order Summary ------------------*/}
-                <span
-                  style={{
-                    fontSize: 25,
-                    fontWeight: "bold",
-                    color: "#555",
-                  }}
-                >
-                  Order Summary:
-                </span>
-                {Object.values(Object(data)).map((item, index) => {
-                  return (
-                    <div style={{ flex: 2, fontSize: 17 }} key={index}>
-                      <div
-                        style={{
-                          display: "flex",
-                          flexDirection: "row",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                          marginTop: 10,
-                        }}
-                      >
-                        <span>{item.productQty}x&nbsp;</span>
-                        <span>{item.productName}</span>
-                        <span>₱{parseFloat(item.price).toFixed(2)}</span>
-                        <span>
-                          ₱{parseFloat(item.productQty * item.price).toFixed(2)}
-                        </span>
-                      </div>
-                    </div>
-                  );
-                })}
+                </div> */}
               </div>
             </div>
           </div>
-          {/* <div className="right">
-            //<Chart aspect={3 / 1} title="User Spending ( Last 6 Months)" /> 
-          </div> */}
+          <div className="right">
+            {/*------------------ Order Summary ------------------*/}
+            <div className="orderSummaryContainer">
+              <div className="orderSummary">
+                <h2 className="title">Order Summary:</h2>
+                <table className="orderTable">
+                  <thead>
+                    <tr>
+                      <th>Quantity</th>
+                      <th>Product</th>
+                      <th>Price</th>
+                      <th>Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {Object.values(Object(data)).map((item, index) => (
+                      <tr key={index}>
+                        <td>{item.productQty}x</td>
+                        <td>{item.productName}</td>
+                        <td>₱{parseFloat(item.price).toFixed(2)}</td>
+                        <td>
+                          ₱{parseFloat(item.productQty * item.price).toFixed(2)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
         </div>
         {/* <div className="bottom">
           <h1 className="title">Last Transactions</h1>
