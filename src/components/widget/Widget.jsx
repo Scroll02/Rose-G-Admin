@@ -8,15 +8,7 @@ import { useEffect, useState } from "react";
 import moment from "moment";
 
 // Firebase
-import {
-  collection,
-  query,
-  where,
-  getDocs,
-  onSnapshot,
-  startAt,
-  endAt,
-} from "firebase/firestore";
+import { collection, query, where, getDocs } from "firebase/firestore";
 
 import { db } from "../../firebase";
 
@@ -230,14 +222,6 @@ const Widget = ({ type }) => {
   }
 
   useEffect(() => {
-    // Get the start and end of today in UTC
-    const startOfDayUtc = moment().utc().startOf("day");
-    const endOfDayUtc = moment().utc().endOf("day");
-
-    // Format the start and end of today in a format that Firestore can understand
-    const startOfDayUtcFormatted = startOfDayUtc.format("YYYY-MM-DDTHH:mm:ss");
-    const endOfDayUtcFormatted = endOfDayUtc.format("YYYY-MM-DDTHH:mm:ss");
-
     // Queries
     let queryRef;
     if (type === "user") {

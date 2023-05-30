@@ -116,9 +116,18 @@ const SingleProduct = () => {
       }
 
       if (newStock !== "") {
-        updates.initialStock = newStock;
-        newCriticalStock = Math.round(newStock * 0.4); // calculate new criticalStock value
-        updates.criticalStock = newCriticalStock; // update the criticalStock field in updates object
+        const docSnapshot = await getDoc(docRef);
+        const currentStock =
+          docSnapshot.data().currentStock || docSnapshot.data().initialStock;
+        const updatedStock =
+          parseInt(newStock, 10) -
+          (currentStock - parseInt(docSnapshot.data().initialStock, 10));
+
+        updates.initialStock = updatedStock;
+        updates.currentStock = updatedStock;
+        newCriticalStock = Math.round(updatedStock * 0.4); // Calculate the new criticalStock value based on the updated stock
+        updates.criticalStock = newCriticalStock;
+
         isUpdated = true;
       }
 
@@ -143,7 +152,7 @@ const SingleProduct = () => {
 
       if (isUpdated) {
         await updateDoc(docRef, updates);
-        showSuccessToast("Product data is updated", 1000);
+        showSuccessToast("Product data is updated", 2000);
         navigate(-1);
       } else {
         showInfoToast("No changes were made.");
@@ -236,7 +245,7 @@ const SingleProduct = () => {
                   })}
                 </select>
 
-                {/*------------------ Food Price ------------------*/}
+                {/*------------------ Product Price ------------------*/}
                 <div className="detailItem">
                   <span className="itemKey">Price:</span>
                   <span className="itemValue">
@@ -250,10 +259,12 @@ const SingleProduct = () => {
                   onChange={handleChangeNewPrice}
                 />
 
-                {/*------------------ Food Stock ------------------*/}
+                {/*------------------ Product Stock ------------------*/}
                 <div className="detailItem">
                   <span className="itemKey">Stock:</span>
-                  <span className="itemValue">{productData?.stock}</span>
+                  <span className="itemValue">
+                    {productData?.currentStock || productData?.initialStock}
+                  </span>
                 </div>
                 <input
                   type="text"

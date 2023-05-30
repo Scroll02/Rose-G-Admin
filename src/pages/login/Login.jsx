@@ -44,7 +44,7 @@ const Login = () => {
               // Signed in
               const user = userCredential.user;
               dispatch({ type: "LOGIN", payload: user });
-              showSuccessToast("You've successfully logged in", 1000);
+              showSuccessToast("You've successfully logged in", 2000);
               navigate("/home");
             })
             .catch((error) => {
@@ -64,7 +64,7 @@ const Login = () => {
       .catch((error) => {
         showErrorToast(
           "Failed to retrieve user information. Please try again later.",
-          1000
+          2000
         );
       });
   };

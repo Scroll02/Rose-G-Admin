@@ -191,9 +191,6 @@ const Sidebar = () => {
             >
               <FoodBankRoundedIcon className="icon" />
               <span>Products</span>
-              {/* <div className="PriorityHighIcon">
-                <PriorityHighIcon />
-              </div> */}
               {productData.some((product) => product.isCritical) && (
                 <>
                   <div className="priorityHigh">

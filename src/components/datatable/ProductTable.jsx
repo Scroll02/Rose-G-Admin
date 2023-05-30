@@ -91,6 +91,7 @@ const ProductTable = () => {
               batch.update(doc(productsRef, product.id), {
                 totalSold: 0,
                 initialStock: product.currentStock,
+                currentStock: product.currentStock,
               });
             });
 

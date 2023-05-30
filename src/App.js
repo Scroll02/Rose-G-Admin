@@ -35,7 +35,7 @@ import SingleOrder from "./pages/single/SingleOrder"; //SINGLE ORDER
 import SingleProductCategory from "./pages/single/SingleProductCategory"; //SINGLE PRODUCT CATEGORY
 
 import NewOrderAlert from "./components/alert/NewOrderAlert";
-import { ToastContainer } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 function App() {
@@ -59,6 +59,7 @@ function App() {
         draggable
         pauseOnHover
         theme="light"
+        toastClassName="custom-toast"
       />
 
       <BrowserRouter>

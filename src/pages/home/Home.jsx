@@ -6,6 +6,8 @@ import Featured from "../../components/featured/Featured";
 import Chart from "../../components/chart/Chart";
 import FeedbackPieChart from "../../components/chart/FeedbackPieChart";
 import ProductBarChart from "../../components/chart/ProductBarChart";
+import BestSellingBarChart from "../../components/chart/BestSellingBarChart";
+import UserChart from "../../components/chart/UserChart";
 import Table from "../../components/table/Table";
 import OrderTable from "../../components/datatable/OrderTable";
 import LatestTransaction from "../../components/table/LatestTransaction";
@@ -42,8 +44,12 @@ const Home = () => {
           <Chart title="Last 6 Months (Revenue)" aspect={2 / 1} />
         </div> */}
         <div className="charts">
-          <FeedbackPieChart />
+          <BestSellingBarChart />
           <ProductBarChart />
+        </div>
+        <div className="charts">
+          <FeedbackPieChart />
+          <UserChart />
         </div>
 
         {/* Latest Orders Table */}

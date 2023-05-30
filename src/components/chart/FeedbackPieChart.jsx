@@ -40,42 +40,40 @@ const FeedbackPieChart = () => {
   }));
 
   return (
-    <div className="PieChartContainer">
-      <div className="ChartCard">
-        <h3>Feedback Ratings</h3>
-        <ResponsiveContainer width={300} height={300}>
-          <PieChart>
-            <Pie
-              data={chartData}
-              dataKey="count"
-              nameKey="rating"
-              cx="50%"
-              cy="50%"
-              outerRadius={80}
-              fill="#8884d8"
-              label
-            >
-              {chartData.map((entry, index) => (
-                <Cell
-                  key={`cell-${index}`}
-                  fill={COLORS[index % COLORS.length]}
-                />
-              ))}
-            </Pie>
-            {/* <Tooltip /> */}
-            <Legend
-              wrapperStyle={{
-                fontSize: "16px",
-                fontWeight: "bold",
-              }}
-              contentStyle={{
-                fontSize: "16px",
-                fontWeight: "bold",
-              }}
-            />
-          </PieChart>
-        </ResponsiveContainer>
-      </div>
+    <div className="pieChartContainer">
+      <h3>Customer Feedback Ratings</h3>
+      <ResponsiveContainer width="100%" height={400}>
+        <PieChart>
+          <Pie
+            data={chartData}
+            dataKey="count"
+            nameKey="rating"
+            cx="50%"
+            cy="50%"
+            outerRadius={120}
+            fill="#8884d8"
+            label
+          >
+            {chartData.map((entry, index) => (
+              <Cell
+                key={`cell-${index}`}
+                fill={COLORS[index % COLORS.length]}
+              />
+            ))}
+          </Pie>
+          {/* <Tooltip /> */}
+          <Legend
+            wrapperStyle={{
+              fontSize: "16px",
+              fontWeight: "bold",
+            }}
+            contentStyle={{
+              fontSize: "16px",
+              fontWeight: "bold",
+            }}
+          />
+        </PieChart>
+      </ResponsiveContainer>
     </div>
   );
 };
