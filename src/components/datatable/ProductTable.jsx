@@ -78,7 +78,10 @@ const ProductTable = () => {
             const nextDay = new Date(
               currentTime.getFullYear(),
               currentTime.getMonth(),
-              currentTime.getDate() + 1
+              currentTime.getDate() + 1,
+              22, // 10 PM hour (change this to the desired hour)
+              0, // 0 minutes
+              0 // 0 seconds
             );
             millisecondsUntilReset = nextDay - currentTime;
           }

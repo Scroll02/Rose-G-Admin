@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { productInputs, userInputs, productCategoryInputs } from "./formSource";
 import { AuthContext } from "./context/AuthContext";
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import "./App.css";
 
 // React-Slick
@@ -20,7 +20,7 @@ import OrderList from "./pages/list/OrderList"; //ORDER LIST
 import ProductCategoriesList from "./pages/list/ProductCategoriesList"; //PRODUCT CATEGORIES LIST
 import NotificationList from "./pages/list/NotificationList"; //NOTIFICATION LIST
 import ContentManagement from "./pages/list/ContentManagement"; //CONTENT MANAGEMENT LIST
-import AuditTrail from "./pages/list/AuditTrail"; //AUDIT TRAIL LIST
+import ActivityLog from "./pages/list/ActivityLog"; //AUDIT TRAIL LIST
 import SalesReport from "./pages/list/SalesReportList"; //SALES REPORT LIST
 
 // ADDING NEW
@@ -36,16 +36,64 @@ import SingleProductCategory from "./pages/single/SingleProductCategory"; //SING
 
 import NewOrderAlert from "./components/alert/NewOrderAlert";
 import { ToastContainer, toast } from "react-toastify";
+import { showErrorToast } from "./components/toast/Toast";
 import "react-toastify/dist/ReactToastify.css";
+
+// Firebase
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "./firebase";
 
 function App() {
   const { currentUser } = useContext(AuthContext);
+
+  const autoCloseTime = 2000;
 
   const RequireAuth = ({ children }) => {
     return currentUser ? children : <Navigate to="/login" />;
   };
 
-  const autoCloseTime = 1000;
+  const RequireSuperAdmin = ({ children }) => {
+    const [userData, setUserData] = useState(null);
+    const [hasPermission, setHasPermission] = useState(false);
+    const [errorShown, setErrorShown] = useState(false);
+
+    useEffect(() => {
+      const fetchUserData = async () => {
+        try {
+          const userDocRef = doc(db, "UserData", currentUser.uid);
+          const userDocSnap = await getDoc(userDocRef);
+          const userData = userDocSnap.exists() ? userDocSnap.data() : null;
+          setUserData(userData);
+          setHasPermission(userData?.role === "Super Admin");
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+        }
+      };
+
+      fetchUserData();
+    }, [db, currentUser]);
+
+    useEffect(() => {
+      if (
+        !hasPermission &&
+        userData &&
+        userData.role !== "Super Admin" &&
+        !errorShown
+      ) {
+        showErrorToast("You do not have permission to access this page.", 2000);
+        setErrorShown(true);
+      }
+    }, [hasPermission, userData, errorShown]);
+
+    // console.log("Current User:", currentUser);
+
+    if (hasPermission || !userData || userData.role === "Super Admin") {
+      return children;
+    } else {
+      return <Navigate to="/home" />;
+    }
+  };
+
   return (
     <div className="App">
       <ToastContainer
@@ -207,12 +255,24 @@ function App() {
             </Route>
 
             {/*------------------ Sales Report Route  ------------------*/}
-            <Route path="salesReport">
+            {/* <Route path="salesReport">
               <Route
                 index
                 element={
                   <RequireAuth>
                     <SalesReport />
+                  </RequireAuth>
+                }
+              />
+            </Route> */}
+            <Route path="salesReport">
+              <Route
+                index
+                element={
+                  <RequireAuth>
+                    <RequireSuperAdmin>
+                      <SalesReport />
+                    </RequireSuperAdmin>
                   </RequireAuth>
                 }
               />
@@ -243,12 +303,14 @@ function App() {
             </Route>
 
             {/*------------------ Audit Trail Route  ------------------*/}
-            <Route path="auditTrail">
+            <Route path="activityLog">
               <Route
                 index
                 element={
                   <RequireAuth>
-                    <AuditTrail />
+                    <RequireSuperAdmin>
+                      <ActivityLog />
+                    </RequireSuperAdmin>
                   </RequireAuth>
                 }
               />

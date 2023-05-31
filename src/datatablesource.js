@@ -354,3 +354,64 @@ export const salesReportColumns = [
     headerClassName: "headerName",
   },
 ];
+
+/*------------------ Activity Log Columns ------------------*/
+export const activityLogColumns = [
+  {
+    field: "uid",
+    headerName: "User ID",
+    width: 120,
+    headerClassName: "headerName",
+  },
+  {
+    field: "fullName",
+    headerName: "Full Name",
+    width: 230,
+    headerClassName: "headerName",
+    renderCell: (params) => {
+      return (
+        <div className="cellWithImg">
+          {params.row.profileImageUrl == "" ||
+          params.row.profileImageUrl == null ? (
+            <img
+              className="cellImg"
+              src={defaultUserIcon}
+              alt={defaultUserIcon}
+            />
+          ) : (
+            <img
+              className="cellImg"
+              src={params.row.profileImageUrl}
+              alt="avatar"
+            />
+          )}
+          {params.row.firstName}&nbsp;{params.row.lastName}
+        </div>
+      );
+    },
+  },
+  {
+    field: "lastLoginAt",
+    headerName: "Last Login At",
+    width: 220,
+    headerClassName: "headerName",
+    valueGetter: (params) => {
+      const lastLoginAt = params.row.lastLoginAt;
+      return lastLoginAt
+        ? moment(lastLoginAt).format("MMMM D, YYYY h:mm A")
+        : "";
+    },
+  },
+  {
+    field: "lastLogoutAt",
+    headerName: "Last Logout At",
+    width: 220,
+    headerClassName: "headerName",
+    valueGetter: (params) => {
+      const lastLogoutAt = params.row.lastLogoutAt;
+      return lastLogoutAt
+        ? moment(lastLogoutAt).format("MMMM D, YYYY h:mm A")
+        : "";
+    },
+  },
+];

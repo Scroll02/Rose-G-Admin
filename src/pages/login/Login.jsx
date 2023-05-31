@@ -2,6 +2,7 @@ import "./login.scss";
 import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
+import moment from "moment";
 
 // Icon and Images
 import adminlogo from "../../images/adminlogo.png";
@@ -11,7 +12,17 @@ import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 // Firebase
 import { db, auth } from "../../firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { collection, where, getDocs, query } from "firebase/firestore";
+import {
+  collection,
+  where,
+  getDocs,
+  query,
+  doc,
+  updateDoc,
+  onSnapshot,
+  getDoc,
+  setDoc,
+} from "firebase/firestore";
 
 // Toast
 import { showSuccessToast, showErrorToast } from "../../components/toast/Toast";
@@ -28,7 +39,36 @@ const Login = () => {
   const [emailFocus, setEmailFocus] = useState(false);
   const [passwordFocus, setPasswordFocus] = useState(false);
 
-  const handleLogin = (e) => {
+  // Update Activity Log Data once login
+  const updateActivityLog = async (uid, userData) => {
+    const monthDocumentId = moment().format("YYYY-MM");
+
+    const docRef = doc(db, "ActivityLog", monthDocumentId);
+    const docSnap = await getDoc(docRef);
+
+    const uniqueId = `${uid}-${Date.now()}`; // Generate a unique ID
+    const logData = {
+      id: uniqueId,
+      uid,
+      profileImageUrl: userData.profileImageUrl,
+      firstName: userData.firstName,
+      lastName: userData.lastName,
+      lastLoginAt: new Date().toISOString(),
+    };
+
+    const updatedLogData = { ...logData }; // Create a copy of logData
+
+    if (docSnap.exists()) {
+      const activityLogData = docSnap.data().activityLogData || [];
+      activityLogData.push(updatedLogData);
+      await updateDoc(docRef, { activityLogData });
+    } else {
+      await setDoc(docRef, { activityLogData: [updatedLogData] });
+    }
+  };
+
+  // Login function
+  const handleLogin = async (e) => {
     e.preventDefault();
 
     // Check if the user has the correct role
@@ -40,11 +80,26 @@ const Login = () => {
         if (userDoc && ["Super Admin", "Admin"].includes(userDoc.data().role)) {
           // User has the correct role, proceed with login
           signInWithEmailAndPassword(auth, email, password)
-            .then((userCredential) => {
+            .then(async (userCredential) => {
               // Signed in
               const user = userCredential.user;
               dispatch({ type: "LOGIN", payload: user });
               showSuccessToast("You've successfully logged in", 2000);
+
+              // Query the UserData collection again to get the updated document
+              const updatedQuerySnapshot = await getDocs(queryRef);
+              const updatedUserDoc = updatedQuerySnapshot.docs[0];
+              const userData = updatedUserDoc.data();
+
+              // Update lastLoginAt field in UserData
+              const userRef = doc(db, "UserData", user.uid);
+              await updateDoc(userRef, {
+                lastLoginAt: new Date().toISOString(),
+              });
+
+              // Call the function to update activity log with user data
+              updateActivityLog(user.uid, userData);
+
               navigate("/home");
             })
             .catch((error) => {

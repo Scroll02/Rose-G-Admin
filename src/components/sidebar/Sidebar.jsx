@@ -4,30 +4,55 @@ import DashboardIcon from "@mui/icons-material/Dashboard";
 import Person2RoundedIcon from "@mui/icons-material/Person2Rounded";
 import FoodBankRoundedIcon from "@mui/icons-material/FoodBankRounded";
 import BorderColorRoundedIcon from "@mui/icons-material/BorderColorRounded";
-import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
-import NotificationsRoundedIcon from "@mui/icons-material/NotificationsRounded";
 import ManageSearchRoundedIcon from "@mui/icons-material/ManageSearchRounded";
 import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
 import PriorityHighIcon from "@mui/icons-material/PriorityHigh";
 import AssessmentRoundedIcon from "@mui/icons-material/AssessmentRounded";
-
+import moment from "moment";
+// Alert
 import NewOrderAlert from "../alert/NewOrderAlert";
-
+// Navigation
 import { Link, useNavigate, NavLink, useLocation } from "react-router-dom";
+// Context
 import { AuthContext } from "../../context/AuthContext";
-
 // Firebase
-import { onSnapshot, collection } from "firebase/firestore";
+import {
+  onSnapshot,
+  collection,
+  doc,
+  getDoc,
+  updateDoc,
+  setDoc,
+} from "firebase/firestore";
 import { signOut } from "firebase/auth";
 import { auth, db } from "../../firebase";
-
 // Toast
-import { showSuccessToast } from "../toast/Toast";
+import { showSuccessToast, showErrorToast } from "../toast/Toast";
 
 const Sidebar = () => {
   const { dispatch } = useContext(AuthContext);
   const navigate = useNavigate();
   const location = useLocation();
+
+  //------------------ User Data (For Restricting Access on Sidebar Menu) ------------------//
+  const [userData, setUserData] = useState(null);
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const userDocRef = doc(db, "UserData", auth.currentUser.uid);
+        const userDocSnap = await getDoc(userDocRef);
+
+        if (userDocSnap.exists()) {
+          const userData = userDocSnap.data();
+          setUserData(userData);
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   //------------------ User Orders Data ------------------//
   const [orderCount, setOrderCount] = useState(0);
@@ -121,10 +146,12 @@ const Sidebar = () => {
     };
   }, [orderData]);
 
+  // Close New Order Alert
   const closeNewOrderAlert = () => {
     setShowNewOrderAlert(false);
   };
 
+  // Show New Order Alert
   useEffect(() => {
     // Check if the current location is "/orders"
     const isOrdersPage = location.pathname.startsWith("/orders");
@@ -134,16 +161,68 @@ const Sidebar = () => {
   }, [location, orderCount]);
 
   // Logout function
-  const handleLogout = () => {
-    signOut(auth)
-      .then(() => {
-        dispatch({ type: "LOGOUT" });
-        showSuccessToast("You've successfully logged out", 1000);
-        navigate("/");
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+  const handleLogout = async () => {
+    // Get the current user
+    const currentUser = auth.currentUser;
+    if (currentUser) {
+      // Retrieve the UserData document
+      const userRef = doc(db, "UserData", currentUser.uid);
+      const userDoc = await getDoc(userRef);
+
+      const userData = userDoc.data();
+      const now = new Date().toISOString();
+      const logoutData = { lastLogoutAt: now };
+
+      // Update lastLogoutAt field in UserData
+      await updateDoc(userRef, logoutData);
+
+      // Update lastLogoutAt field in ActivityLog
+      const startOfMonth = moment().startOf("month").toISOString();
+      const endOfMonth = moment().endOf("month").toISOString();
+      const monthDocumentId = moment().format("YYYY-MM");
+
+      const activityLogRef = doc(db, "ActivityLog", monthDocumentId);
+      const activityLogDoc = await getDoc(activityLogRef);
+
+      if (activityLogDoc.exists()) {
+        const activityLogData = activityLogDoc.data().activityLogData || [];
+
+        // Find the login entry to update
+        const entryToUpdate = activityLogData.find(
+          (entry) => entry.uid === currentUser.uid && !entry.lastLogoutAt
+        );
+
+        if (entryToUpdate) {
+          // Update the entry with the lastLogoutAt value
+          entryToUpdate.lastLogoutAt = now;
+
+          // Update the activityLogData field in ActivityLog
+          await updateDoc(activityLogRef, { activityLogData });
+        }
+      }
+
+      // Proceed with regular logout
+      signOut(auth)
+        .then(() => {
+          dispatch({ type: "LOGOUT" });
+          showSuccessToast("You've successfully logged out", 1000);
+          navigate("/");
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } else {
+      // User is not logged in, proceed with regular logout
+      signOut(auth)
+        .then(() => {
+          dispatch({ type: "LOGOUT" });
+          showSuccessToast("You've successfully logged out", 1000);
+          navigate("/");
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
   };
 
   return (
@@ -226,21 +305,25 @@ const Sidebar = () => {
           )}
 
           {/* Sales Report */}
-          <li>
-            <NavLink
-              to="/salesReport"
-              style={{ textDecoration: "none" }}
-              className={(navClass) => (navClass.isActive ? "activeLink" : "")}
-            >
-              <AssessmentRoundedIcon className="icon" />
-              <span>Sales Report</span>
-            </NavLink>
-          </li>
+          {userData && userData.role === "Super Admin" && (
+            <li>
+              <NavLink
+                to="/salesReport"
+                style={{ textDecoration: "none" }}
+                className={(navClass) =>
+                  navClass.isActive ? "activeLink" : ""
+                }
+              >
+                <AssessmentRoundedIcon className="icon" />
+                <span>Sales Report</span>
+              </NavLink>
+            </li>
+          )}
 
           <p className="title">USEFUL</p>
 
           {/* Notifications */}
-          <li>
+          {/* <li>
             <NavLink
               to="/notification"
               style={{ textDecoration: "none" }}
@@ -249,7 +332,7 @@ const Sidebar = () => {
               <NotificationsRoundedIcon className="icon" />
               <span>Notifications</span>
             </NavLink>
-          </li>
+          </li> */}
 
           {/* Content Management */}
           <li>
@@ -263,17 +346,21 @@ const Sidebar = () => {
             </NavLink>
           </li>
 
-          {/* Audit Trail */}
-          <li>
-            <NavLink
-              to="/auditTrail"
-              style={{ textDecoration: "none" }}
-              className={(navClass) => (navClass.isActive ? "activeLink" : "")}
-            >
-              <ManageSearchRoundedIcon className="icon" />
-              <span>Audit Trail</span>
-            </NavLink>
-          </li>
+          {/* ActivityLog */}
+          {userData && userData.role === "Super Admin" && (
+            <li>
+              <NavLink
+                to="/activityLog"
+                style={{ textDecoration: "none" }}
+                className={(navClass) =>
+                  navClass.isActive ? "activeLink" : ""
+                }
+              >
+                <ManageSearchRoundedIcon className="icon" />
+                <span>System Activity Log</span>
+              </NavLink>
+            </li>
+          )}
 
           <p className="title">USER</p>
           {/* Logout */}

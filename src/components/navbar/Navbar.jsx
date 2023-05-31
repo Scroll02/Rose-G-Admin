@@ -57,10 +57,10 @@ const Navbar = () => {
           <SearchRoundedIcon />
         </div> */}
         <div className="items">
-          <div className="item">
+          {/* <div className="item">
             <NotificationsNoneOutlinedIcon className="icon" />{" "}
             <div className="counter">1</div>
-          </div>
+          </div> */}
           <div className="item">
             <img
               src={userData?.profileImageUrl || UserIcon}
