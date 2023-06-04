@@ -8,8 +8,7 @@ import { useEffect, useState } from "react";
 import moment from "moment";
 
 // Firebase
-import { collection, query, where, getDocs } from "firebase/firestore";
-
+import { collection, query, where, onSnapshot } from "firebase/firestore";
 import { db } from "../../firebase";
 
 const Widget = ({ type }) => {
@@ -221,81 +220,77 @@ const Widget = ({ type }) => {
       break;
   }
 
+  // Display data for today UserOrders
   useEffect(() => {
-    // Queries
+    // Get the current date
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth() + 1;
+    const day = now.getDate();
+    const startOfDay = new Date(year, month - 1, day, 0, 0, 0);
+    const endOfDay = new Date(year, month - 1, day, 23, 59, 59);
+
+    console.log(startOfDay);
+
+    // Query
     let queryRef;
-    if (type === "user") {
-      queryRef = query(collection(db, data.query));
-    } else if (type === "product") {
-      queryRef = query(collection(db, data.query));
-    } else if (type === "orderPending") {
+    if (type === "orderPending") {
       queryRef = query(
         collection(db, data.query),
-        where("orderStatus", "==", "Pending")
+        where("orderStatus", "==", "Pending"),
+        where("orderDate", ">=", startOfDay),
+        where("orderDate", "<=", endOfDay)
       );
     } else if (type === "orderConfirmed") {
       queryRef = query(
         collection(db, data.query),
-        where("orderStatus", "==", "Confirmed")
+        where("orderStatus", "==", "Confirmed"),
+        where("orderDate", ">=", startOfDay),
+        where("orderDate", "<=", endOfDay)
       );
     } else if (type === "orderPrepared") {
       queryRef = query(
         collection(db, data.query),
-        where("orderStatus", "==", "Prepared")
+        where("orderStatus", "==", "Prepared"),
+        where("orderDate", ">=", startOfDay),
+        where("orderDate", "<=", endOfDay)
       );
     } else if (type === "orderDelivery") {
       queryRef = query(
         collection(db, data.query),
-        where("orderStatus", "==", "Delivery")
+        where("orderStatus", "==", "Delivery"),
+        where("orderDate", ">=", startOfDay),
+        where("orderDate", "<=", endOfDay)
       );
     } else if (type === "orderDelivered") {
       queryRef = query(
         collection(db, data.query),
-        where("orderStatus", "==", "Delivered")
+        where("orderStatus", "==", "Delivered"),
+        where("orderDate", ">=", startOfDay),
+        where("orderDate", "<=", endOfDay)
       );
     } else if (type === "orderCancelled") {
       queryRef = query(
         collection(db, data.query),
-        where("orderStatus", "==", "Cancelled")
+        where("orderStatus", "==", "Cancelled"),
+        where("orderDate", ">=", startOfDay),
+        where("orderDate", "<=", endOfDay)
       );
     } else {
       queryRef = null;
     }
 
-    // Fetching data based on query
-    const fetchData = async () => {
-      if (type === "user") {
-        const queryData = await getDocs(queryRef);
-        setAmount(queryData.docs.length);
-      } else if (type === "product") {
-        const queryData = await getDocs(queryRef);
-        setAmount(queryData.docs.length);
-      } else if (type === "orderPending") {
-        const queryData = await getDocs(queryRef);
-        setAmount(queryData.docs.length);
-      } else if (type === "orderConfirmed") {
-        const queryData = await getDocs(queryRef);
-        setAmount(queryData.docs.length);
-      } else if (type === "orderPrepared") {
-        const queryData = await getDocs(queryRef);
-        setAmount(queryData.docs.length);
-      } else if (type === "orderDelivery") {
-        const queryData = await getDocs(queryRef);
-        setAmount(queryData.docs.length);
-      } else if (type === "orderDelivered") {
-        const queryData = await getDocs(queryRef);
-        setAmount(queryData.docs.length);
-      } else if (type === "orderCancelled") {
-        const queryData = await getDocs(queryRef);
-        setAmount(queryData.docs.length);
-      } else {
-        // Default data fetch
-        const queryData = await getDocs(queryRef);
-        setAmount(queryData.docs.length);
-      }
-    };
+    // Real-time listener
+    const unsubscribe =
+      queryRef &&
+      onSnapshot(queryRef, (snapshot) => {
+        setAmount(snapshot.size);
+      });
 
-    fetchData();
+    return () => {
+      // Unsubscribe from the real-time listener when the component unmounts
+      unsubscribe && unsubscribe();
+    };
   }, []);
 
   return (

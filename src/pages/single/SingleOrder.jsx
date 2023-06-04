@@ -14,8 +14,8 @@ import {
   serverTimestamp,
   updateDoc,
 } from "firebase/firestore";
-import { Link, useParams } from "react-router-dom";
-import { db, auth, storage } from "../../firebase";
+import { useParams } from "react-router-dom";
+import { db } from "../../firebase";
 import moment from "moment";
 
 // Toast
@@ -25,9 +25,8 @@ const SingleOrder = () => {
   const { orderId } = useParams();
   // console.log(orderId);
 
-  //------------------ Retrieve Food Data  ------------------//
+  //------------------ Retrieve User Order Data ------------------//
   const [userOrderData, setUserOrderData] = useState([]);
-
   const getUserOrderData = async () => {
     const docRef = doc(db, "UserOrders", orderId);
     const docSnap = await getDoc(docRef);
@@ -44,7 +43,6 @@ const SingleOrder = () => {
   useEffect(() => {
     getUserOrderData();
   }, []);
-  // console.log(userOrderData);
 
   //------------------- Change Order Status -------------------//
   // const changeOrderStatus = async (id, orderData, status) => {
@@ -57,13 +55,39 @@ const SingleOrder = () => {
   //   // When order status is confirmed, reduce the stock of each product
   //   if (status === "Prepared") {
   //     const orderItems = orderData.orderData;
+
   //     for (const item of orderItems) {
   //       const productRef = doc(collection(db, "ProductData"), item.productId);
   //       const productDoc = await getDoc(productRef);
+
   //       if (productDoc.exists()) {
   //         const productData = productDoc.data();
-  //         const newStock = productData.stock - item.productQty;
-  //         await updateDoc(productRef, { stock: newStock });
+  //         let currentStock =
+  //           productData.currentStock || productData.initialStock;
+
+  //         if (item.productQty > currentStock) {
+  //           showErrorToast("Product quantity exceeds current stock.");
+  //           return;
+  //         }
+
+  //         currentStock -= item.productQty;
+  //         await updateDoc(productRef, { currentStock });
+  //       }
+  //     }
+  //   }
+
+  //   // When order status is delivered, update totalSold for each product
+  //   if (status === "Delivered") {
+  //     const orderItems = orderData.orderData;
+
+  //     for (const item of orderItems) {
+  //       const productRef = doc(collection(db, "ProductData"), item.productId);
+  //       const productDoc = await getDoc(productRef);
+
+  //       if (productDoc.exists()) {
+  //         const productData = productDoc.data();
+  //         const totalSold = (productData.totalSold || 0) + item.productQty;
+  //         await updateDoc(productRef, { totalSold });
   //       }
   //     }
   //   }
@@ -87,31 +111,44 @@ const SingleOrder = () => {
     // When order status is confirmed, reduce the stock of each product
     if (status === "Prepared") {
       const orderItems = orderData.orderData;
+
       for (const item of orderItems) {
         const productRef = doc(collection(db, "ProductData"), item.productId);
         const productDoc = await getDoc(productRef);
+
         if (productDoc.exists()) {
           const productData = productDoc.data();
           let currentStock =
             productData.currentStock || productData.initialStock;
+
+          if (item.productQty > currentStock) {
+            showErrorToast("Product quantity exceeds current stock.");
+            return;
+          }
+
           currentStock -= item.productQty;
           await updateDoc(productRef, { currentStock });
         }
       }
     }
 
-    // When order status is delivered, update totalSold for each product
+    // When order status is delivered, update totalSold for each product and set paymentStatus to "Paid"
     if (status === "Delivered") {
       const orderItems = orderData.orderData;
+
       for (const item of orderItems) {
         const productRef = doc(collection(db, "ProductData"), item.productId);
         const productDoc = await getDoc(productRef);
+
         if (productDoc.exists()) {
           const productData = productDoc.data();
           const totalSold = (productData.totalSold || 0) + item.productQty;
           await updateDoc(productRef, { totalSold });
         }
       }
+
+      // Update paymentStatus to "Paid"
+      data.paymentStatus = "Paid";
     }
 
     try {
@@ -176,19 +213,6 @@ const SingleOrder = () => {
                   </span>
                 </div>
 
-                {/*------------------ Change For ------------------*/}
-                {/* {userOrderData.changeFor == undefined ||
-                userOrderData.changeFor == "" ? (
-                  <div className="detailItem"></div>
-                ) : (
-                  <div className="detailItem">
-                    <span className="itemKey">Change For:</span>
-                    <span className="itemValue">
-                      ₱{parseFloat(userOrderData.changeFor).toFixed(2)}
-                    </span>
-                  </div>
-                )} */}
-
                 {/*------------------ Total Cost ------------------*/}
                 <div className="detailItem">
                   <span className="itemKey">Total Cost:</span>
@@ -197,13 +221,21 @@ const SingleOrder = () => {
                   </span>
                 </div>
 
-                {/*------------------ Total Cost ------------------*/}
+                {/*------------------ Order Date ------------------*/}
                 <div className="detailItem">
                   <span className="itemKey">Order Date:</span>
                   <span className="itemValue">
                     {moment(userOrderData.orderDate?.toDate()).format(
                       "MMM D, YYYY h:mm A"
                     )}
+                  </span>
+                </div>
+
+                {/*------------------ Payment Status ------------------*/}
+                <div className="detailItem">
+                  <span className="itemKey">Payment Status:</span>
+                  <span className="itemValue">
+                    {userOrderData.paymentStatus}
                   </span>
                 </div>
 

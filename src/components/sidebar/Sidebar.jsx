@@ -205,7 +205,7 @@ const Sidebar = () => {
       signOut(auth)
         .then(() => {
           dispatch({ type: "LOGOUT" });
-          showSuccessToast("You've successfully logged out", 1000);
+          showSuccessToast("You've successfully logged out", 2000);
           navigate("/");
         })
         .catch((error) => {
@@ -216,7 +216,7 @@ const Sidebar = () => {
       signOut(auth)
         .then(() => {
           dispatch({ type: "LOGOUT" });
-          showSuccessToast("You've successfully logged out", 1000);
+          showSuccessToast("You've successfully logged out", 2000);
           navigate("/");
         })
         .catch((error) => {

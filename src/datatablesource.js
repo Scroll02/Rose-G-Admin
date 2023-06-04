@@ -218,7 +218,7 @@ export const orderColumns = [
     renderCell: (params) => {
       return (
         <div className="cellWithImg">
-          {params.row.profileImageUrl == null ? (
+          {params.row.customerProfileImg == null ? (
             <img
               className="cellImg"
               src={defaultUserIcon}
@@ -227,7 +227,7 @@ export const orderColumns = [
           ) : (
             <img
               className="cellImg"
-              src={params.row.profileImageUrl}
+              src={params.row.customerProfileImg}
               alt="avatar"
             />
           )}
@@ -285,6 +285,11 @@ export const orderColumns = [
         </div>
       );
     },
+  },
+  {
+    field: "paymentStatus",
+    headerName: "Payment Status",
+    width: 150,
   },
 
   {
