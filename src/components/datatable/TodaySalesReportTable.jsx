@@ -21,29 +21,32 @@ import { db } from "../../firebase";
 import { showSuccessToast, showErrorToast } from "../toast/Toast";
 
 const TodaySalesReportTable = () => {
+  // Retrieve today sales report data from product data
   const [data, setData] = useState([]);
-
-  const resetTime = moment().endOf("day").add(1, "hour");
-
   // useEffect(() => {
+  //   const resetTime = moment().endOf("day").add(1, "hour");
+  //   const checkResetTime = setInterval(() => {
+  //     if (moment() > resetTime) {
+  //       setData([]);
+  //     }
+  //   }, 1000); // Check every second
+
   //   const unsub = onSnapshot(collection(db, "ProductData"), (snapShot) => {
   //     setData(snapShot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
   //   });
-  //   return () => unsub();
-  // }, [resetTime.diff(moment()) > 0]);
-  useEffect(() => {
-    const checkResetTime = setInterval(() => {
-      if (moment() > resetTime) {
-        setData([]);
-      }
-    }, 1000); // Check every second
 
-    const unsub = onSnapshot(collection(db, "ProductData"), (snapShot) => {
-      setData(snapShot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+  //   return () => {
+  //     clearInterval(checkResetTime);
+  //     unsub();
+  //   };
+  // }, []);
+
+  useEffect(() => {
+    const unsub = onSnapshot(collection(db, "ProductData"), (snapshot) => {
+      setData(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
     });
 
     return () => {
-      clearInterval(checkResetTime);
       unsub();
     };
   }, []);

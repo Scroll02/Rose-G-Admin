@@ -29,7 +29,7 @@ const Home = () => {
           <Widget type="orderConfirmed" />
           <Widget type="orderPrepared" />
           <Widget type="orderDelivery" />
-          <Widget type="orderDelivered" />
+          <Widget type="orderCompleted" />
           <Widget type="orderCancelled" />
         </div>
 

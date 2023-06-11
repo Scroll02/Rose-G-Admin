@@ -346,18 +346,18 @@ const Sidebar = () => {
             </NavLink>
           </li>
 
-          {/* ActivityLog */}
+          {/* Audit Trail */}
           {userData && userData.role === "Super Admin" && (
             <li>
               <NavLink
-                to="/activityLog"
+                to="/auditTrail"
                 style={{ textDecoration: "none" }}
                 className={(navClass) =>
                   navClass.isActive ? "activeLink" : ""
                 }
               >
                 <ManageSearchRoundedIcon className="icon" />
-                <span>System Activity Log</span>
+                <span>Audit Trail</span>
               </NavLink>
             </li>
           )}

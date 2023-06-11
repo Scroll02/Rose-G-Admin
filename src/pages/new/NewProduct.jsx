@@ -2,12 +2,25 @@ import Navbar from "../../components/navbar/Navbar";
 import "./new.scss";
 import Sidebar from "../../components/sidebar/Sidebar";
 import DriveFolderUploadOutlinedIcon from "@mui/icons-material/DriveFolderUploadOutlined";
+import moment from "moment";
 import { useState, useEffect } from "react";
-import { addDoc, collection, onSnapshot } from "firebase/firestore";
-import { db, storage } from "../../firebase";
+import {
+  addDoc,
+  collection,
+  onSnapshot,
+  getDoc,
+  doc,
+  setDoc,
+  updateDoc,
+} from "firebase/firestore";
+import { db, storage, auth } from "../../firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { useNavigate } from "react-router-dom";
-import { showSuccessToast } from "../../components/toast/Toast";
+import {
+  showSuccessToast,
+  showInfoToast,
+  showErrorToast,
+} from "../../components/toast/Toast";
 
 const NewFood = ({ inputs, title }) => {
   const [productImgFile, setProductImgFile] = useState("");
@@ -50,35 +63,85 @@ const NewFood = ({ inputs, title }) => {
 
   //------------------ Add New Food Function ------------------//
   const [selectedCategory, setSelectedCategory] = useState("");
-
   const handleAdd = async (e) => {
     e.preventDefault();
-
     const storageRef = ref(
       storage,
       `product_images/${new Date().getTime()}_${productImgFile.name}`
-    ); // replace 'images' with your storage path
+    );
 
     try {
-      // Upload image to storage
       const uploadTask = uploadBytesResumable(storageRef, productImgFile);
       const snapshot = await uploadTask;
       const downloadURL = await getDownloadURL(snapshot.ref);
 
-      // Calculate critical stock level
       const criticalStock = Math.floor(data.initialStock * 0.4);
 
-      // Add document to Firestore with image download URL and critical stock level
-      await addDoc(collection(db, "ProductData"), {
+      const newProductRef = await addDoc(collection(db, "ProductData"), {
         ...data,
         img: downloadURL,
-        productId: new Date().getTime().toString(),
         categoryName: selectedCategory,
         criticalStock: criticalStock,
       });
 
-      navigate(-1);
-      showSuccessToast("Product is added", 1000);
+      const newProductId = newProductRef.id;
+
+      await updateDoc(doc(db, "ProductData", newProductId), {
+        productId: newProductId,
+      });
+
+      const currentUser = auth.currentUser;
+      const userId = currentUser.uid;
+
+      const userDocRef = doc(db, "UserData", userId);
+      const userDocSnapshot = await getDoc(userDocRef);
+      if (userDocSnapshot.exists()) {
+        const userData = userDocSnapshot.data();
+        const firstName = userData.firstName;
+        const lastName = userData.lastName;
+        const profileImageUrl = userData.profileImageUrl;
+
+        const monthDocumentId = moment().format("YYYY-MM");
+
+        const activityLogDocRef = doc(db, "ActivityLog", monthDocumentId);
+        const activityLogDocSnapshot = await getDoc(activityLogDocRef);
+        const activityLogData = activityLogDocSnapshot.exists()
+          ? activityLogDocSnapshot.data().actionLogData || []
+          : [];
+
+        const createdFields = [];
+
+        Object.entries(data).forEach(([field, value]) => {
+          createdFields.push({
+            field: field,
+            value: value,
+          });
+        });
+
+        activityLogData.push({
+          timestamp: new Date().toISOString(),
+          createdFields: createdFields,
+          userId: userId,
+          firstName: firstName,
+          lastName: lastName,
+          profileImageUrl: profileImageUrl,
+          actionType: "Create",
+          actionDescription: "Created product data",
+        });
+
+        await setDoc(
+          activityLogDocRef,
+          {
+            actionLogData: activityLogData,
+          },
+          { merge: true }
+        );
+
+        navigate(-1);
+        showSuccessToast("Product is added", 1000);
+      } else {
+        showInfoToast("No product data");
+      }
     } catch (err) {
       console.log(err);
     }

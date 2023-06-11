@@ -3,6 +3,7 @@ import Sidebar from "../../components/sidebar/Sidebar";
 import Navbar from "../../components/navbar/Navbar";
 import Chart from "../../components/chart/Chart";
 import List from "../../components/table/Table";
+import moment from "moment";
 import DriveFolderUploadOutlinedIcon from "@mui/icons-material/DriveFolderUploadOutlined";
 import { useState, useEffect } from "react";
 import {
@@ -11,6 +12,9 @@ import {
   updateDoc,
   onSnapshot,
   collection,
+  setDoc,
+  serverTimestamp,
+  arrayUnion,
 } from "firebase/firestore";
 import {
   ref,
@@ -19,7 +23,7 @@ import {
   deleteObject,
 } from "firebase/storage";
 import { useParams } from "react-router-dom";
-import { db, storage } from "../../firebase";
+import { db, storage, auth } from "../../firebase";
 import { useNavigate } from "react-router-dom";
 import { showSuccessToast, showInfoToast } from "../../components/toast/Toast"; //SUCCESS & INFO TOAST
 
@@ -36,7 +40,7 @@ const SingleProduct = () => {
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
-      console.log("Document data: ", docSnap.data());
+      // console.log("Document data: ", docSnap.data());
       setProductData(docSnap.data());
     } else {
       // doc.data() will be undefined in this case
@@ -88,30 +92,77 @@ const SingleProduct = () => {
   //------------------ Update Product Data Function  ------------------//
   const [newSelectedCategory, setNewSelectedCategory] = useState("");
   const handleUpdate = async () => {
+    const monthDocumentId = moment().format("YYYY-MM");
+    const user = auth.currentUser;
     const docRef = doc(db, "ProductData", productId);
 
     if (docRef !== null) {
       const updates = {};
+      const updatedFields = [];
       let isUpdated = false;
       let newCriticalStock = 0; // add a variable for new criticalStock
 
       if (newProductName !== "") {
-        updates.productName = newProductName;
+        const oldProductName = productData?.productName;
+        const newProductNameValue = newProductName;
+
+        if (oldProductName !== newProductNameValue) {
+          updatedFields.push({
+            field: "productName",
+            oldValue: oldProductName,
+            newValue: newProductNameValue,
+          });
+        }
+
+        updates.productName = newProductNameValue;
         isUpdated = true;
       }
 
       if (newDescription !== "") {
-        updates.description = newDescription;
+        const oldDescription = productData?.description;
+        const newDescriptionValue = newDescription;
+
+        if (oldDescription !== newDescriptionValue) {
+          updatedFields.push({
+            field: "description",
+            oldValue: oldDescription,
+            newValue: newDescriptionValue,
+          });
+        }
+
+        updates.description = newDescriptionValue;
         isUpdated = true;
       }
 
       if (newSelectedCategory !== "") {
-        updates.categoryName = newSelectedCategory;
+        const oldCategoryName = productData?.categoryName;
+        const newCategoryNameValue = newSelectedCategory;
+
+        if (oldCategoryName !== newCategoryNameValue) {
+          updatedFields.push({
+            field: "categoryName",
+            oldValue: oldCategoryName,
+            newValue: newCategoryNameValue,
+          });
+        }
+
+        updates.categoryName = newCategoryNameValue;
         isUpdated = true;
       }
 
       if (newPrice !== "") {
-        updates.price = newPrice;
+        const oldPrice = productData?.price;
+        const newPriceValue = newPrice;
+
+        if (oldPrice !== newPriceValue) {
+          updatedFields.push({
+            field: "price",
+            oldValue: oldPrice,
+            newValue: newPriceValue,
+          });
+        }
+
+        updates.price = newPriceValue;
         isUpdated = true;
       }
 
@@ -123,10 +174,44 @@ const SingleProduct = () => {
           parseInt(newStock, 10) -
           (currentStock - parseInt(docSnapshot.data().initialStock, 10));
 
-        updates.initialStock = updatedStock;
-        updates.currentStock = updatedStock;
+        const oldInitialStock = docSnapshot.data().initialStock;
+        const newInitialStockValue = updatedStock;
+
+        if (oldInitialStock !== newInitialStockValue) {
+          updatedFields.push({
+            field: "initialStock",
+            oldValue: oldInitialStock,
+            newValue: newInitialStockValue,
+          });
+        }
+
+        const oldCurrentStock = currentStock;
+        const newCurrentStockValue = updatedStock;
+
+        if (oldCurrentStock !== newCurrentStockValue) {
+          updatedFields.push({
+            field: "currentStock",
+            oldValue: oldCurrentStock,
+            newValue: newCurrentStockValue,
+          });
+        }
+
         newCriticalStock = Math.round(updatedStock * 0.4); // Calculate the new criticalStock value based on the updated stock
-        updates.criticalStock = newCriticalStock;
+
+        const oldCriticalStock = docSnapshot.data().criticalStock;
+        const newCriticalStockValue = newCriticalStock;
+
+        if (oldCriticalStock !== newCriticalStockValue) {
+          updatedFields.push({
+            field: "criticalStock",
+            oldValue: oldCriticalStock,
+            newValue: newCriticalStockValue,
+          });
+        }
+
+        updates.initialStock = newInitialStockValue;
+        updates.currentStock = newCurrentStockValue;
+        updates.criticalStock = newCriticalStockValue;
 
         isUpdated = true;
       }
@@ -141,7 +226,19 @@ const SingleProduct = () => {
         );
         await uploadBytes(storageRef, newImageFile);
         const downloadURL = await getDownloadURL(storageRef);
-        updates.img = downloadURL;
+
+        const oldImg = docSnapshot.data().img;
+        const newImgValue = downloadURL;
+
+        if (oldImg !== newImgValue) {
+          updatedFields.push({
+            field: "img",
+            oldValue: oldImg,
+            newValue: newImgValue,
+          });
+        }
+
+        updates.img = newImgValue;
 
         if (oldImageUrl) {
           const oldImageRef = ref(storage, oldImageUrl);
@@ -150,16 +247,58 @@ const SingleProduct = () => {
         isUpdated = true;
       }
 
-      if (isUpdated) {
-        await updateDoc(docRef, updates);
-        showSuccessToast("Product data is updated", 2000);
-        navigate(-1);
+      const currentUser = auth.currentUser;
+      const userId = currentUser.uid;
+
+      // Retrieve the user document from the UserData collection
+      const userDocRef = doc(db, "UserData", userId);
+      const userDocSnapshot = await getDoc(userDocRef);
+      if (userDocSnapshot.exists()) {
+        const userData = userDocSnapshot.data();
+        const firstName = userData.firstName;
+        const lastName = userData.lastName;
+        const profileImageUrl = userData.profileImageUrl;
+
+        if (isUpdated) {
+          await updateDoc(docRef, updates);
+
+          // Check if the document exists in the ActivityLog collection
+          const activityLogDocRef = doc(db, "ActivityLog", monthDocumentId);
+          const activityLogDocSnapshot = await getDoc(activityLogDocRef);
+          const activityLogData = activityLogDocSnapshot.exists()
+            ? activityLogDocSnapshot.data().actionLogData || []
+            : [];
+
+          // Push the current update to the action log data array
+          activityLogData.push({
+            timestamp: new Date().toISOString(),
+            updatedFields: updatedFields,
+            userId: userId,
+            firstName: firstName,
+            lastName: lastName,
+            profileImageUrl: profileImageUrl,
+            actionType: "Update",
+            actionDescription: "Updated product data",
+          });
+
+          // Update the actionLogData field in the ActivityLog collection
+          await setDoc(
+            activityLogDocRef,
+            {
+              actionLogData: activityLogData,
+            },
+            { merge: true }
+          );
+
+          showSuccessToast("Product data is updated", 2000);
+          navigate(-1);
+        } else {
+          showInfoToast("No changes were made.");
+          navigate(-1);
+        }
       } else {
-        showInfoToast("No changes were made.");
-        navigate(-1);
+        showInfoToast("No product data");
       }
-    } else {
-      showInfoToast("No product data");
     }
   };
 
@@ -279,10 +418,6 @@ const SingleProduct = () => {
             <Chart aspect={3 / 1} title="User Spending ( Last 6 Months)" />
           </div>
         </div>
-        {/* <div className="bottom">
-          <h1 className="title">Last Transactions</h1>
-          <List />
-        </div> */}
       </div>
     </div>
   );

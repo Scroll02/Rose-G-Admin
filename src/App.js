@@ -22,6 +22,7 @@ import NotificationList from "./pages/list/NotificationList"; //NOTIFICATION LIS
 import ContentManagement from "./pages/list/ContentManagement"; //CONTENT MANAGEMENT LIST
 import ActivityLog from "./pages/list/ActivityLog"; //AUDIT TRAIL LIST
 import SalesReport from "./pages/list/SalesReportList"; //SALES REPORT LIST
+import AuditTrail from "./pages/list/AuditTrail"; // AUDIT TRAIL LIST
 
 // ADDING NEW
 import NewUser from "./pages/new/NewUser"; //ADDING NEW USER
@@ -303,13 +304,13 @@ function App() {
             </Route>
 
             {/*------------------ Audit Trail Route  ------------------*/}
-            <Route path="activityLog">
+            <Route path="auditTrail">
               <Route
                 index
                 element={
                   <RequireAuth>
                     <RequireSuperAdmin>
-                      <ActivityLog />
+                      <AuditTrail />
                     </RequireSuperAdmin>
                   </RequireAuth>
                 }

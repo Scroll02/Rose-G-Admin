@@ -2,12 +2,20 @@ import Navbar from "../../components/navbar/Navbar";
 import "./new.scss";
 import Sidebar from "../../components/sidebar/Sidebar";
 import DriveFolderUploadOutlinedIcon from "@mui/icons-material/DriveFolderUploadOutlined";
+import moment from "moment";
 import { useState } from "react";
-import { addDoc, collection } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  getDoc,
+  doc,
+  setDoc,
+  updateDoc,
+} from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { db, storage } from "../../firebase";
+import { db, storage, auth } from "../../firebase";
 import { useNavigate } from "react-router-dom";
-import { showSuccessToast } from "../../components/toast/Toast";
+import { showSuccessToast, showInfoToast } from "../../components/toast/Toast";
 
 const NewProductCategory = ({ inputs, title }) => {
   const [categoryImg, setCategoryImg] = useState("");
@@ -23,6 +31,84 @@ const NewProductCategory = ({ inputs, title }) => {
   };
 
   //------------------ Add New Product Category Function ------------------//
+  // const handleAdd = async (e) => {
+  //   e.preventDefault();
+
+  //   const storageRef = ref(
+  //     storage,
+  //     `productCategory_images/${new Date().getTime()}_${categoryImg.name}`
+  //   );
+
+  //   try {
+  //     const uploadTask = uploadBytesResumable(storageRef, categoryImg);
+  //     const snapshot = await uploadTask;
+  //     const downloadURL = await getDownloadURL(snapshot.ref);
+
+  //     const newCategoryRef = await addDoc(collection(db, "ProductCategories"), {
+  //       ...data,
+  //       categoryImg: downloadURL,
+  //       productCategoryId: new Date().getTime().toString(),
+  //     });
+
+  //     const newCategoryDataSnapshot = await getDoc(newCategoryRef);
+  //     const newCategoryData = newCategoryDataSnapshot.data();
+
+  //     const currentUser = auth.currentUser;
+  //     const userId = currentUser.uid;
+
+  //     const userDocRef = doc(db, "UserData", userId);
+  //     const userDocSnapshot = await getDoc(userDocRef);
+  //     if (userDocSnapshot.exists()) {
+  //       const userData = userDocSnapshot.data();
+  //       const firstName = userData.firstName;
+  //       const lastName = userData.lastName;
+  //       const profileImageUrl = userData.profileImageUrl;
+
+  //       const monthDocumentId = moment().format("YYYY-MM");
+
+  //       const activityLogDocRef = doc(db, "ActivityLog", monthDocumentId);
+  //       const activityLogDocSnapshot = await getDoc(activityLogDocRef);
+  //       const activityLogData = activityLogDocSnapshot.exists()
+  //         ? activityLogDocSnapshot.data().actionLogData || []
+  //         : [];
+
+  //       const createdFields = [];
+
+  //       Object.entries(newCategoryData).forEach(([field, value]) => {
+  //         createdFields.push({
+  //           field: field,
+  //           value: value,
+  //         });
+  //       });
+
+  //       activityLogData.push({
+  //         timestamp: new Date().toISOString(),
+  //         createdFields: createdFields,
+  //         userId: userId,
+  //         firstName: firstName,
+  //         lastName: lastName,
+  //         profileImageUrl: profileImageUrl,
+  //         actionType: "Create",
+  //         actionDescription: "Created product category data",
+  //       });
+
+  //       await setDoc(
+  //         activityLogDocRef,
+  //         {
+  //           actionLogData: activityLogData,
+  //         },
+  //         { merge: true }
+  //       );
+
+  //       navigate(-1);
+  //       showSuccessToast("New category is added", 1000);
+  //     } else {
+  //       showInfoToast("No user data");
+  //     }
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+  // };
   const handleAdd = async (e) => {
     e.preventDefault();
 
@@ -32,22 +118,82 @@ const NewProductCategory = ({ inputs, title }) => {
     ); // replace 'images' with your storage path
 
     try {
-      // Upload image to storage
       const uploadTask = uploadBytesResumable(storageRef, categoryImg);
       const snapshot = await uploadTask;
       const downloadURL = await getDownloadURL(snapshot.ref);
 
-      await addDoc(collection(db, "ProductCategories"), {
+      const newCategoryRef = await addDoc(collection(db, "ProductCategories"), {
         ...data,
         categoryImg: downloadURL,
-        productCategoryId: new Date().getTime().toString(),
       });
-      navigate(-1);
-      showSuccessToast("New category is added", 1000);
+
+      const newCategoryId = newCategoryRef.id;
+
+      await updateDoc(doc(db, "ProductCategories", newCategoryId), {
+        productCategoryId: newCategoryId,
+      });
+
+      const newCategoryDataSnapshot = await getDoc(newCategoryRef);
+      const newCategoryData = newCategoryDataSnapshot.data();
+
+      const currentUser = auth.currentUser;
+      const userId = currentUser.uid;
+
+      const userDocRef = doc(db, "UserData", userId);
+      const userDocSnapshot = await getDoc(userDocRef);
+      if (userDocSnapshot.exists()) {
+        const userData = userDocSnapshot.data();
+        const firstName = userData.firstName;
+        const lastName = userData.lastName;
+        const profileImageUrl = userData.profileImageUrl;
+
+        const monthDocumentId = moment().format("YYYY-MM");
+
+        const activityLogDocRef = doc(db, "ActivityLog", monthDocumentId);
+        const activityLogDocSnapshot = await getDoc(activityLogDocRef);
+        const activityLogData = activityLogDocSnapshot.exists()
+          ? activityLogDocSnapshot.data().actionLogData || []
+          : [];
+
+        const createdFields = [];
+
+        Object.entries(newCategoryData).forEach(([field, value]) => {
+          createdFields.push({
+            field: field,
+            value: value,
+          });
+        });
+
+        activityLogData.push({
+          timestamp: new Date().toISOString(),
+          createdFields: createdFields,
+          userId: userId,
+          firstName: firstName,
+          lastName: lastName,
+          profileImageUrl: profileImageUrl,
+          actionType: "Create",
+          actionDescription: "Created product category data",
+        });
+
+        await setDoc(
+          activityLogDocRef,
+          {
+            actionLogData: activityLogData,
+          },
+          { merge: true }
+        );
+
+        setCategoryImg(null);
+        showSuccessToast("New category is added", 1000);
+        navigate(-1);
+      } else {
+        showInfoToast("No user data");
+      }
     } catch (err) {
       console.log(err);
     }
   };
+
   return (
     <div className="new">
       <Sidebar />

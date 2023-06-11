@@ -183,7 +183,7 @@ export const productColumns = [
 
 /*------------------ Product Categories Column ------------------*/
 export const productCategoryColumns = [
-  { field: "productCategoryId", headerName: "Category ID", width: 160 },
+  { field: "id", headerName: "Category ID", width: 160 },
   {
     field: "categoryName",
     headerName: "Category Name",
@@ -277,15 +277,16 @@ export const orderColumns = [
   {
     field: "orderStatus",
     headerName: "Order Status",
-    width: 150,
+    width: 160,
     renderCell: (params) => {
-      return (
-        <div className={`cellOrderStatus ${params.row.orderStatus}`}>
-          {params.row.orderStatus}
-        </div>
-      );
+      const cellClassName = `cellOrderStatus ${params.row.orderStatus.replace(
+        /\s/g,
+        "-"
+      )}`;
+      return <div className={cellClassName}>{params.row.orderStatus}</div>;
     },
   },
+
   {
     field: "paymentStatus",
     headerName: "Payment Status",
@@ -293,7 +294,7 @@ export const orderColumns = [
   },
 
   {
-    field: "deliveryRider",
+    field: "deliveryRiderName",
     headerName: "Delivery Rider",
     width: 180,
   },
@@ -398,7 +399,7 @@ export const activityLogColumns = [
   {
     field: "lastLoginAt",
     headerName: "Last Login At",
-    width: 220,
+    width: 270,
     headerClassName: "headerName",
     valueGetter: (params) => {
       const lastLoginAt = params.row.lastLoginAt;
@@ -410,7 +411,7 @@ export const activityLogColumns = [
   {
     field: "lastLogoutAt",
     headerName: "Last Logout At",
-    width: 220,
+    width: 270,
     headerClassName: "headerName",
     valueGetter: (params) => {
       const lastLogoutAt = params.row.lastLogoutAt;
@@ -418,5 +419,64 @@ export const activityLogColumns = [
         ? moment(lastLogoutAt).format("MMMM D, YYYY h:mm A")
         : "";
     },
+  },
+];
+
+/*------------------ Action Log Columns ------------------*/
+export const actionLogColumns = [
+  {
+    field: "userId",
+    headerName: "User ID",
+    width: 120,
+    headerClassName: "headerName",
+  },
+  {
+    field: "fullName",
+    headerName: "Full Name",
+    width: 230,
+    headerClassName: "headerName",
+    renderCell: (params) => {
+      return (
+        <div className="cellWithImg">
+          {params.row.profileImageUrl == "" ||
+          params.row.profileImageUrl == null ? (
+            <img
+              className="cellImg"
+              src={defaultUserIcon}
+              alt={defaultUserIcon}
+            />
+          ) : (
+            <img
+              className="cellImg"
+              src={params.row.profileImageUrl}
+              alt="avatar"
+            />
+          )}
+          {params.row.firstName}&nbsp;{params.row.lastName}
+        </div>
+      );
+    },
+  },
+  {
+    field: "timestamp",
+    headerName: "Time Stamp",
+    width: 270,
+    headerClassName: "headerName",
+    valueGetter: (params) => {
+      const timestamp = params.row.timestamp;
+      return timestamp ? moment(timestamp).format("MMMM D, YYYY h:mm A") : "";
+    },
+  },
+  {
+    field: "actionType",
+    headerName: "Action Type",
+    width: 150,
+    headerClassName: "headerName",
+  },
+  {
+    field: "actionDescription",
+    headerName: "Action Description",
+    width: 300,
+    headerClassName: "headerName",
   },
 ];

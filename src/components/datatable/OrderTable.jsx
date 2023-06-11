@@ -10,8 +10,15 @@ import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import ConfirmationModal from "../modal/ConfirmationModal";
 
 // Firebase
-import { collection, deleteDoc, doc, onSnapshot } from "firebase/firestore";
-import { db } from "../../firebase";
+import {
+  collection,
+  deleteDoc,
+  doc,
+  onSnapshot,
+  getDoc,
+} from "firebase/firestore";
+import { ref, deleteObject } from "firebase/storage";
+import { db, storage } from "../../firebase";
 
 // Toast
 import { showErrorToast } from "../toast/Toast";
@@ -93,7 +100,23 @@ const OrderTable = ({ datatableTitle }) => {
   const [selectedOrderId, setSelectedOrderId] = useState(null);
   const handleDelete = async () => {
     try {
-      await deleteDoc(doc(db, "UserOrders", selectedOrderId));
+      const orderDocRef = doc(db, "UserOrders", selectedOrderId);
+      const orderDocSnapshot = await getDoc(orderDocRef);
+      const orderData = orderDocSnapshot.data();
+      const proofOfPaymentUrl = orderData.proofOfPaymentURL;
+      const userId = orderData.orderUserId;
+
+      if (proofOfPaymentUrl) {
+        const fileName = proofOfPaymentUrl.split("%2F").pop().split("?")[0];
+        const storageRef = ref(
+          storage,
+          `proofOfPayment_images/${userId}/${fileName}`
+        );
+        await deleteObject(storageRef);
+      }
+
+      await deleteDoc(orderDocRef);
+
       setData(data.filter((item) => item.id !== selectedOrderId));
       showErrorToast("Order is deleted", 1000);
     } catch (err) {

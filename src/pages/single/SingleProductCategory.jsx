@@ -3,9 +3,10 @@ import Sidebar from "../../components/sidebar/Sidebar";
 import Navbar from "../../components/navbar/Navbar";
 import Chart from "../../components/chart/Chart";
 import List from "../../components/table/Table";
+import moment from "moment";
 import DriveFolderUploadOutlinedIcon from "@mui/icons-material/DriveFolderUploadOutlined";
 import { useState, useEffect } from "react";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc, setDoc } from "firebase/firestore";
 import {
   ref,
   uploadBytes,
@@ -13,7 +14,7 @@ import {
   deleteObject,
 } from "firebase/storage";
 import { useParams } from "react-router-dom";
-import { db, storage } from "../../firebase";
+import { db, storage, auth } from "../../firebase";
 import { useNavigate } from "react-router-dom";
 import { showSuccessToast, showInfoToast } from "../../components/toast/Toast";
 
@@ -51,25 +52,101 @@ const SingleProductCategory = () => {
   const [newSlug, setNewSlug] = useState("");
 
   //------------------ Update Food Data Function  ------------------//
+  // const handleUpdate = async () => {
+  //   const docRef = doc(db, "ProductCategories", categoryId);
+  //   if (docRef !== null) {
+  //     const updates = {};
+  //     let isUpdated = false; // add a flag variable
+
+  //     if (newCategoryName !== "") {
+  //       updates.categoryName = newCategoryName;
+  //       isUpdated = true;
+  //     }
+
+  //     if (newSlug !== "") {
+  //       updates.slug = newSlug;
+  //       isUpdated = true;
+  //     }
+
+  //     if (newCategoryImg !== "") {
+  //       // Get the URL of the old image from Firestore
+  //       const docSnapshot = await getDoc(docRef);
+  //       const oldImageUrl = docSnapshot.data().categoryImg;
+
+  //       const storageRef = ref(
+  //         storage,
+  //         `productCategory_images/${new Date().getTime()}_${
+  //           newCategoryImg.name
+  //         }`
+  //       );
+  //       await uploadBytes(storageRef, newCategoryImg);
+  //       const downloadURL = await getDownloadURL(storageRef);
+  //       updates.categoryImg = downloadURL;
+
+  //       // Delete the old image from storage
+  //       if (oldImageUrl) {
+  //         const oldImageRef = ref(storage, oldImageUrl);
+  //         await deleteObject(oldImageRef);
+  //       }
+  //       isUpdated = true;
+  //     }
+
+  //     if (isUpdated) {
+  //       // check the flag variable to display the success message
+  //       await updateDoc(docRef, updates);
+  //       showSuccessToast("Category data is updated", 1000);
+  //       navigate(-1);
+  //     } else {
+  //       showInfoToast("No changes were made.");
+  //       navigate(-1);
+  //     }
+  //   } else {
+  //     alert("No product category data");
+  //   }
+  // };
   const handleUpdate = async () => {
     const docRef = doc(db, "ProductCategories", categoryId);
 
     if (docRef !== null) {
       const updates = {};
-      let isUpdated = false; // add a flag variable
+      const updatedFields = [];
+      let isUpdated = false;
 
       if (newCategoryName !== "") {
-        updates.categoryName = newCategoryName;
+        const docSnapshot = await getDoc(docRef);
+        const oldCategoryName = docSnapshot.data().categoryName;
+        const newCategoryNameValue = newCategoryName;
+
+        if (oldCategoryName !== newCategoryNameValue) {
+          updatedFields.push({
+            field: "categoryName",
+            oldValue: oldCategoryName,
+            newValue: newCategoryNameValue,
+          });
+        }
+
+        updates.categoryName = newCategoryNameValue;
         isUpdated = true;
       }
 
       if (newSlug !== "") {
-        updates.slug = newSlug;
+        const docSnapshot = await getDoc(docRef);
+        const oldSlug = docSnapshot.data().slug;
+        const newSlugValue = newSlug;
+
+        if (oldSlug !== newSlugValue) {
+          updatedFields.push({
+            field: "slug",
+            oldValue: oldSlug,
+            newValue: newSlugValue,
+          });
+        }
+
+        updates.slug = newSlugValue;
         isUpdated = true;
       }
 
       if (newCategoryImg !== "") {
-        // Get the URL of the old image from Firestore
         const docSnapshot = await getDoc(docRef);
         const oldImageUrl = docSnapshot.data().categoryImg;
 
@@ -81,9 +158,20 @@ const SingleProductCategory = () => {
         );
         await uploadBytes(storageRef, newCategoryImg);
         const downloadURL = await getDownloadURL(storageRef);
-        updates.categoryImg = downloadURL;
 
-        // Delete the old image from storage
+        const oldCategoryImg = docSnapshot.data().categoryImg;
+        const newCategoryImgValue = downloadURL;
+
+        if (oldCategoryImg !== newCategoryImgValue) {
+          updatedFields.push({
+            field: "categoryImg",
+            oldValue: oldCategoryImg,
+            newValue: newCategoryImgValue,
+          });
+        }
+
+        updates.categoryImg = newCategoryImgValue;
+
         if (oldImageUrl) {
           const oldImageRef = ref(storage, oldImageUrl);
           await deleteObject(oldImageRef);
@@ -91,19 +179,59 @@ const SingleProductCategory = () => {
         isUpdated = true;
       }
 
-      if (isUpdated) {
-        // check the flag variable to display the success message
-        await updateDoc(docRef, updates);
-        showSuccessToast("Category data is updated", 1000);
-        navigate(-1);
+      const currentUser = auth.currentUser;
+      const userId = currentUser.uid;
+
+      // Retrieve the user document from the UserData collection
+      const userDocRef = doc(db, "UserData", userId);
+      const userDocSnapshot = await getDoc(userDocRef);
+      if (userDocSnapshot.exists()) {
+        const userData = userDocSnapshot.data();
+        const firstName = userData.firstName;
+        const lastName = userData.lastName;
+        const profileImageUrl = userData.profileImageUrl;
+
+        if (isUpdated) {
+          await updateDoc(docRef, updates);
+
+          const monthDocumentId = moment().format("YYYY-MM");
+          const activityLogDocRef = doc(db, "ActivityLog", monthDocumentId);
+          const activityLogDocSnapshot = await getDoc(activityLogDocRef);
+          const activityLogData = activityLogDocSnapshot.exists()
+            ? activityLogDocSnapshot.data().actionLogData || []
+            : [];
+
+          activityLogData.push({
+            timestamp: new Date().toISOString(),
+            updatedFields: updatedFields,
+            userId: userId,
+            firstName: firstName,
+            lastName: lastName,
+            profileImageUrl: profileImageUrl,
+            actionType: "Update",
+            actionDescription: "Updated product category data",
+          });
+
+          await setDoc(
+            activityLogDocRef,
+            {
+              actionLogData: activityLogData,
+            },
+            { merge: true }
+          );
+
+          showSuccessToast("Category data is updated", 1000);
+          navigate(-1);
+        } else {
+          showInfoToast("No changes were made.");
+          navigate(-1);
+        }
       } else {
-        showInfoToast("No changes were made.");
-        navigate(-1);
+        showInfoToast("No user data");
       }
-    } else {
-      alert("No product category data");
     }
   };
+
   return (
     <div className="single">
       <Sidebar />

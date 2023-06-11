@@ -134,7 +134,7 @@ const Widget = ({ type }) => {
       break;
     case "orderDelivery":
       data = {
-        title: "DELIVERY ORDERS",
+        title: "DELIVERY/PICKUP ORDERS",
         isMoney: false,
         query: "UserOrders",
         link: (
@@ -152,9 +152,9 @@ const Widget = ({ type }) => {
         ),
       };
       break;
-    case "orderDelivered":
+    case "orderCompleted":
       data = {
-        title: "DELIVERED ORDERS",
+        title: "COMPLETED ORDERS",
         isMoney: false,
         query: "UserOrders",
         link: (
@@ -229,9 +229,6 @@ const Widget = ({ type }) => {
     const day = now.getDate();
     const startOfDay = new Date(year, month - 1, day, 0, 0, 0);
     const endOfDay = new Date(year, month - 1, day, 23, 59, 59);
-
-    console.log(startOfDay);
-
     // Query
     let queryRef;
     if (type === "orderPending") {
@@ -258,14 +255,14 @@ const Widget = ({ type }) => {
     } else if (type === "orderDelivery") {
       queryRef = query(
         collection(db, data.query),
-        where("orderStatus", "==", "Delivery"),
+        where("orderStatus", "in", ["Delivery", "Ready for Pickup"]),
         where("orderDate", ">=", startOfDay),
         where("orderDate", "<=", endOfDay)
       );
-    } else if (type === "orderDelivered") {
+    } else if (type === "orderCompleted") {
       queryRef = query(
         collection(db, data.query),
-        where("orderStatus", "==", "Delivered"),
+        where("orderStatus", "in", ["Delivered", "Order Picked up"]),
         where("orderDate", ">=", startOfDay),
         where("orderDate", "<=", endOfDay)
       );

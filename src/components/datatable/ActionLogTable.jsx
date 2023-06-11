@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { activityLogColumns } from "../../datatablesource";
+import { actionLogColumns } from "../../datatablesource";
 // MUI
 import { DataGrid } from "@mui/x-data-grid";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
@@ -8,14 +8,14 @@ import moment from "moment";
 import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "../../firebase";
 
-const ActivityLogTable = () => {
+const ActionLogTable = () => {
   const [data, setData] = useState([]);
   const [selectedMonth, setSelectedMonth] = useState("");
   const [selectedYear, setSelectedYear] = useState("");
   const [searchValue, setSearchValue] = useState("");
   const [selectedColumn, setSelectedColumn] = useState("");
 
-  // Retrieve Activity Log data
+  // Retrieve Action Log data
   useEffect(() => {
     const unsubscribe = onSnapshot(
       collection(db, "ActivityLog"),
@@ -23,17 +23,18 @@ const ActivityLogTable = () => {
         const newData = [];
 
         snapshot.docs.forEach((doc) => {
-          const activityLogData = doc.data().activityLogData || [];
+          const actionLogData = doc.data().actionLogData || [];
 
-          activityLogData.forEach((logData, index) => {
+          actionLogData.forEach((logData, index) => {
             const entry = {
               id: `${doc.id}-${index}`,
-              uid: logData.uid,
+              userId: logData.userId,
               firstName: logData.firstName,
               profileImageUrl: logData.profileImageUrl,
               lastName: logData.lastName,
-              lastLoginAt: new Date(logData.lastLoginAt),
-              lastLogoutAt: logData.lastLogoutAt,
+              timestamp: new Date(logData.timestamp),
+              actionType: logData.actionType,
+              actionDescription: logData.actionDescription,
             };
 
             newData.push(entry);
@@ -41,7 +42,7 @@ const ActivityLogTable = () => {
         });
 
         // Sort newData array in descending order based on lastLoginAt timestamp
-        newData.sort((a, b) => b.lastLoginAt - a.lastLoginAt);
+        newData.sort((a, b) => b.timestamp - a.timestamp);
 
         setData(newData);
       }
@@ -53,16 +54,16 @@ const ActivityLogTable = () => {
   // Filter data based on selected month and year
   const filteredData = data.filter((entry) => {
     if (selectedMonth && selectedYear) {
-      const entryMonth = entry.lastLoginAt.getMonth(); // Adjust for zero-based index
-      const entryYear = entry.lastLoginAt.getFullYear();
+      const entryMonth = entry.timestamp.getMonth(); // Adjust for zero-based index
+      const entryYear = entry.timestamp.getFullYear();
       return (
         entryMonth === parseInt(selectedMonth) && entryYear === selectedYear
       );
     } else if (selectedMonth) {
-      const entryMonth = entry.lastLoginAt.getMonth(); // Adjust for zero-based index
+      const entryMonth = entry.timestamp.getMonth(); // Adjust for zero-based index
       return entryMonth === parseInt(selectedMonth);
     } else if (selectedYear) {
-      const entryYear = entry.lastLoginAt.getFullYear();
+      const entryYear = entry.timestamp.getFullYear();
       return entryYear === selectedYear;
     }
     return true; // Return all data if no filters are selected
@@ -100,18 +101,18 @@ const ActivityLogTable = () => {
     "December",
   ];
   const availableYears = [
-    ...new Set(data.map((entry) => entry.lastLoginAt.getFullYear())),
+    ...new Set(data.map((entry) => entry.timestamp.getFullYear())),
   ];
 
   // Available columns for search
   const availableColumns = [
-    { key: "uid", label: "UID" },
+    { key: "userId", label: "User ID" },
     { key: "firstName", label: "First Name" },
     { key: "lastName", label: "Last Name" },
-    { key: "lastLoginAt", label: "Last Login" },
-    { key: "lastLogoutAt", label: "Last Logout" },
+    { key: "timestamp", label: "Time Stamp" },
+    { key: "actionType", label: "Action Type" },
+    { key: "actionDescription", label: "Action Description" },
   ];
-
   return (
     <div className="datatable">
       <div className="datatableTitle">
@@ -165,7 +166,7 @@ const ActivityLogTable = () => {
       <DataGrid
         className="datagrid"
         rows={searchedData}
-        columns={activityLogColumns}
+        columns={actionLogColumns}
         pageSize={10}
         rowsPerPageOptions={[10]}
       />
@@ -173,4 +174,4 @@ const ActivityLogTable = () => {
   );
 };
 
-export default ActivityLogTable;
+export default ActionLogTable;

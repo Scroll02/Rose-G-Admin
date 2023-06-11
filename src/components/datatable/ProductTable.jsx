@@ -18,13 +18,16 @@ import {
   onSnapshot,
   getDoc,
   writeBatch,
+  setDoc,
 } from "firebase/firestore";
 import { getStorage, ref, deleteObject } from "firebase/storage";
-import { db } from "../../firebase";
-
+import { db, storage, auth } from "../../firebase";
 // Toast
-import { showErrorToast, showSuccessToast } from "../toast/Toast";
-
+import {
+  showErrorToast,
+  showSuccessToast,
+  showInfoToast,
+} from "../toast/Toast";
 // Modal
 import ConfirmationModal from "../modal/ConfirmationModal";
 
@@ -48,26 +51,26 @@ const ProductTable = () => {
             a.currentStock <= a.criticalStock &&
             b.currentStock > b.criticalStock
           ) {
-            return -1; // a should be sorted before b
+            return -1;
           } else if (
             a.currentStock > a.criticalStock &&
             b.currentStock <= b.criticalStock
           ) {
-            return 1; // a should be sorted after b
+            return 1;
           } else {
-            return 0; // the order doesn't matter
+            return 0;
           }
         });
         setData(newData);
 
-        // Reset data at 10 PM
+        // Reset data at 9 PM
         const resetDataAtSpecificTime = () => {
           const currentTime = new Date();
           const resetTime = new Date(
             currentTime.getFullYear(),
             currentTime.getMonth(),
             currentTime.getDate(),
-            22, // 10 PM hour (change this to the desired hour)
+            21, // 9 PM hour
             0, // 0 minutes
             0 // 0 seconds
           );
@@ -79,7 +82,7 @@ const ProductTable = () => {
               currentTime.getFullYear(),
               currentTime.getMonth(),
               currentTime.getDate() + 1,
-              22, // 10 PM hour (change this to the desired hour)
+              21, // 9 PM hour
               0, // 0 minutes
               0 // 0 seconds
             );
@@ -95,6 +98,7 @@ const ProductTable = () => {
                 totalSold: 0,
                 initialStock: product.currentStock,
                 currentStock: product.currentStock,
+                criticalStock: Math.round(product.currentStock * 0.4),
               });
             });
 
@@ -102,13 +106,13 @@ const ProductTable = () => {
               .commit()
               .then(() => {
                 console.log("Data reset successful.");
+                setData(newData); // Set the updated data after the reset
               })
               .catch((error) => {
                 console.error("Data reset failed:", error);
               });
           }, millisecondsUntilReset);
         };
-
         resetDataAtSpecificTime(); // Call the function to start the reset process
       },
       (error) => {
@@ -121,8 +125,30 @@ const ProductTable = () => {
 
   // Delete Product Data
   const [selectedProductId, setSelectedProductId] = useState(null);
+  // const handleDelete = async () => {
+  //   const storage = getStorage();
+  //   try {
+  //     const docRef = doc(db, "ProductData", selectedProductId);
+  //     const docSnap = await getDoc(docRef);
+  //     const imageUrl = docSnap.data().img;
+
+  //     const imageRef = ref(storage, imageUrl);
+  //     await deleteObject(imageRef);
+
+  //     await deleteDoc(docRef);
+  //     setData(data.filter((item) => item.id !== selectedProductId));
+  //     showSuccessToast("Product data is deleted", 2000);
+  //   } catch (err) {
+  //     console.log(err);
+  //     showErrorToast("Error deleting product", 2000);
+  //   }
+  // };
+
+  // Modal
+
   const handleDelete = async () => {
     const storage = getStorage();
+
     try {
       const docRef = doc(db, "ProductData", selectedProductId);
       const docSnap = await getDoc(docRef);
@@ -131,16 +157,64 @@ const ProductTable = () => {
       const imageRef = ref(storage, imageUrl);
       await deleteObject(imageRef);
 
+      const deletedFields = {};
+
+      Object.entries(docSnap.data()).forEach(([field, value]) => {
+        deletedFields[field] = value;
+      });
+
       await deleteDoc(docRef);
-      setData(data.filter((item) => item.id !== selectedProductId));
-      showSuccessToast("Product data is deleted", 2000);
+
+      const currentUser = auth.currentUser;
+      const userId = currentUser.uid;
+
+      const userDocRef = doc(db, "UserData", userId);
+      const userDocSnapshot = await getDoc(userDocRef);
+
+      if (userDocSnapshot.exists()) {
+        const userData = userDocSnapshot.data();
+        const firstName = userData.firstName;
+        const lastName = userData.lastName;
+        const profileImageUrl = userData.profileImageUrl;
+
+        const monthDocumentId = moment().format("YYYY-MM");
+
+        const activityLogDocRef = doc(db, "ActivityLog", monthDocumentId);
+        const activityLogDocSnapshot = await getDoc(activityLogDocRef);
+        const activityLogData = activityLogDocSnapshot.exists()
+          ? activityLogDocSnapshot.data().actionLogData || []
+          : [];
+
+        activityLogData.push({
+          timestamp: new Date().toISOString(),
+          deletedFields: deletedFields,
+          userId: userId,
+          firstName: firstName,
+          lastName: lastName,
+          profileImageUrl: profileImageUrl,
+          actionType: "Delete",
+          actionDescription: "Deleted product data",
+        });
+
+        await setDoc(
+          activityLogDocRef,
+          {
+            actionLogData: activityLogData,
+          },
+          { merge: true }
+        );
+
+        setData(data.filter((item) => item.id !== selectedProductId));
+        showSuccessToast("Product data is deleted", 2000);
+      } else {
+        showInfoToast("No product data");
+      }
     } catch (err) {
       console.log(err);
       showErrorToast("Error deleting product", 2000);
     }
   };
 
-  // Modal
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const closeConfirmationModal = () => {
     setShowConfirmationModal(false);
