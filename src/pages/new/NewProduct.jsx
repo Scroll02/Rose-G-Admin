@@ -100,6 +100,7 @@ const NewFood = ({ inputs, title }) => {
         const firstName = userData.firstName;
         const lastName = userData.lastName;
         const profileImageUrl = userData.profileImageUrl;
+        const role = userData.role;
 
         const monthDocumentId = moment().format("YYYY-MM");
 
@@ -125,6 +126,7 @@ const NewFood = ({ inputs, title }) => {
           firstName: firstName,
           lastName: lastName,
           profileImageUrl: profileImageUrl,
+          role: role,
           actionType: "Create",
           actionDescription: "Created product data",
         });

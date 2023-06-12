@@ -137,93 +137,8 @@ const NewUser = ({ inputs, title }) => {
   //------------------ Add New User Function ------------------//
   const [selectedUserRole, setSelectedUserRole] = useState("");
   var bcrypt = require("bcryptjs");
-  // const handleAdd = async (e) => {
-  //   e.preventDefault();
-
-  //   // Check if any input field is empty
-  //   if (
-  //     !data.firstName ||
-  //     !data.lastName ||
-  //     !data.email ||
-  //     !data.contactNumber ||
-  //     !data.password ||
-  //     !data.cPassword ||
-  //     !selectedUserRole
-  //   ) {
-  //     showErrorToast("Please fill out all input fields.", 2000);
-  //     return;
-  //   }
-
-  //   // Check if all input fields meet the regex
-  //   if (
-  //     checkFirstName ||
-  //     checkLastName ||
-  //     checkValidEmail ||
-  //     checkContactNumber ||
-  //     checkValidPassword ||
-  //     data.password !== data.cPassword // Check if password and confirm password match
-  //   ) {
-  //     setInputError((prevError) => ({
-  //       ...prevError,
-  //       cPassword: "Confirm Password must match Password.",
-  //     }));
-  //     return;
-  //   }
-
-  //   try {
-  //     let hashedPassword = data.password; // Use the original password for logging in
-
-  //     const res = await createUserWithEmailAndPassword(
-  //       auth,
-  //       data.email,
-  //       hashedPassword
-  //     );
-
-  //     const passwordToHash = data.password; // Use the original password for hashing
-  //     hashedPassword = await bcrypt.hash(passwordToHash, 10); // Hash the password
-
-  //     let downloadURL = null;
-
-  //     if (file) {
-  //       const storageRef = ref(
-  //         storage,
-  //         `userProfile_images/${res.user.uid}/${new Date().getTime()}_${
-  //           file.name
-  //         }`
-  //       );
-  //       const uploadTask = uploadBytesResumable(storageRef, file);
-  //       const snapshot = await uploadTask;
-  //       downloadURL = await getDownloadURL(snapshot.ref);
-  //     }
-
-  //     const newDocRef = doc(collection(db, "UserData"), res.user.uid);
-  //     await setDoc(newDocRef, {
-  //       ...data,
-  //       profileImageUrl: downloadURL || "",
-  //       createdAt: serverTimestamp(),
-  //       emailVerified: "Not Verified",
-  //       role: selectedUserRole,
-  //       uid: res.user.uid,
-  //       password: hashedPassword, // Store the hashed password in Firebase
-  //     });
-
-  //     navigate(-1);
-  //     showSuccessToast("New user is created", 2000);
-  //   } catch (err) {
-  //     let errorMessage = "Failed to create user";
-
-  //     if (err.code === "auth/email-already-in-use") {
-  //       errorMessage = "Email address is already in use";
-  //     } else if (err.code === "auth/weak-password") {
-  //       errorMessage = "Password is too weak";
-  //     }
-  //     showErrorToast(errorMessage, 2000);
-  //   }
-  // };
-
   const handleAdd = async (e) => {
     e.preventDefault();
-
     // Check if any input field is empty
     if (
       !data.firstName ||
@@ -251,36 +166,6 @@ const NewUser = ({ inputs, title }) => {
     }
 
     try {
-      const res = await createUserWithEmailAndPassword(
-        auth,
-        data.email,
-        data.password
-      );
-
-      let downloadURL = null;
-
-      if (file) {
-        const storageRef = ref(
-          storage,
-          `userProfile_images/${res.user.uid}/${new Date().getTime()}_${
-            file.name
-          }`
-        );
-        const uploadTask = uploadBytesResumable(storageRef, file);
-        const snapshot = await uploadTask;
-        downloadURL = await getDownloadURL(snapshot.ref);
-      }
-
-      const newDocRef = doc(collection(db, "UserData"), res.user.uid);
-      await setDoc(newDocRef, {
-        ...data,
-        profileImageUrl: downloadURL || "",
-        createdAt: serverTimestamp(),
-        emailVerified: "Not Verified",
-        role: selectedUserRole,
-        uid: res.user.uid,
-      });
-
       const currentUser = auth.currentUser;
       const userId = currentUser.uid;
 
@@ -292,6 +177,7 @@ const NewUser = ({ inputs, title }) => {
         const firstName = userData.firstName;
         const lastName = userData.lastName;
         const profileImageUrl = userData.profileImageUrl;
+        const role = userData.role;
 
         const monthDocumentId = moment().format("YYYY-MM");
 
@@ -319,8 +205,39 @@ const NewUser = ({ inputs, title }) => {
           firstName: firstName,
           lastName: lastName,
           profileImageUrl: profileImageUrl,
+          role: role,
           actionType: "Create",
           actionDescription: "Created user data",
+        });
+
+        const res = await createUserWithEmailAndPassword(
+          auth,
+          data.email,
+          data.password
+        );
+
+        let downloadURL = null;
+
+        if (file) {
+          const storageRef = ref(
+            storage,
+            `userProfile_images/${res.user.uid}/${new Date().getTime()}_${
+              file.name
+            }`
+          );
+          const uploadTask = uploadBytesResumable(storageRef, file);
+          const snapshot = await uploadTask;
+          downloadURL = await getDownloadURL(snapshot.ref);
+        }
+
+        const newDocRef = doc(collection(db, "UserData"), res.user.uid);
+        await setDoc(newDocRef, {
+          ...data,
+          profileImageUrl: downloadURL || "",
+          createdAt: serverTimestamp(),
+          emailVerified: "Not Verified",
+          role: selectedUserRole,
+          uid: res.user.uid,
         });
 
         await setDoc(

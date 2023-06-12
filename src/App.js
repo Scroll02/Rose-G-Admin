@@ -34,6 +34,7 @@ import SingleUser from "./pages/single/SingleUser"; //SINGLE USER
 import SingleProduct from "./pages/single/SingleProduct"; //SINGLE PRODUCT
 import SingleOrder from "./pages/single/SingleOrder"; //SINGLE ORDER
 import SingleProductCategory from "./pages/single/SingleProductCategory"; //SINGLE PRODUCT CATEGORY
+import SingleActionLog from "./pages/single/SingleActionLog"; // SINGLE ACTION LOG
 
 import NewOrderAlert from "./components/alert/NewOrderAlert";
 import { ToastContainer, toast } from "react-toastify";
@@ -311,6 +312,18 @@ function App() {
                   <RequireAuth>
                     <RequireSuperAdmin>
                       <AuditTrail />
+                    </RequireSuperAdmin>
+                  </RequireAuth>
+                }
+              />
+
+              {/* Action Log Route (Single) */}
+              <Route
+                path=":actionLogId"
+                element={
+                  <RequireAuth>
+                    <RequireSuperAdmin>
+                      <SingleActionLog />
                     </RequireSuperAdmin>
                   </RequireAuth>
                 }

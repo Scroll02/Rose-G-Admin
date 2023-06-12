@@ -190,6 +190,7 @@ const SingleProductCategory = () => {
         const firstName = userData.firstName;
         const lastName = userData.lastName;
         const profileImageUrl = userData.profileImageUrl;
+        const role = userData.role;
 
         if (isUpdated) {
           await updateDoc(docRef, updates);
@@ -208,6 +209,7 @@ const SingleProductCategory = () => {
             firstName: firstName,
             lastName: lastName,
             profileImageUrl: profileImageUrl,
+            role: role,
             actionType: "Update",
             actionDescription: "Updated product category data",
           });

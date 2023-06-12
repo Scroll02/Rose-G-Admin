@@ -458,6 +458,12 @@ export const actionLogColumns = [
     },
   },
   {
+    field: "role",
+    headerName: "Role",
+    width: 150,
+    headerClassName: "headerName",
+  },
+  {
     field: "timestamp",
     headerName: "Time Stamp",
     width: 270,

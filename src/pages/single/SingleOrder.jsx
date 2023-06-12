@@ -1,9 +1,6 @@
 import "./single.scss";
 import Sidebar from "../../components/sidebar/Sidebar";
 import Navbar from "../../components/navbar/Navbar";
-import Chart from "../../components/chart/Chart";
-import List from "../../components/table/Table";
-
 import { useState, useEffect } from "react";
 import {
   doc,
@@ -17,21 +14,19 @@ import {
 import { useParams } from "react-router-dom";
 import { db } from "../../firebase";
 import moment from "moment";
-
 // Toast
 import { showSuccessToast, showErrorToast } from "../../components/toast/Toast";
 
 const SingleOrder = () => {
   const { orderId } = useParams();
 
-  //------------------ Retrieve User Order Data ------------------//
+  // Retrieve User Order Data
   const [userOrderData, setUserOrderData] = useState([]);
   const getUserOrderData = async () => {
     const docRef = doc(db, "UserOrders", orderId);
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
-      console.log("Document data: ", docSnap.data());
       setUserOrderData(docSnap.data());
     } else {
       // doc.data() will be undefined in this case
@@ -41,8 +36,9 @@ const SingleOrder = () => {
   useEffect(() => {
     getUserOrderData();
   }, []);
+  const data = userOrderData.orderData;
 
-  //------------------- Change Order Status -------------------//
+  // Change Order Status function
   const changeOrderStatus = async (id, orderData, status) => {
     const docRef = doc(db, "UserOrders", id);
     const data = {
@@ -50,7 +46,7 @@ const SingleOrder = () => {
       orderStatus: status,
     };
 
-    // When order status is confirmed, reduce the stock of each product
+    // When order status is prepared, reduce the stock of each product
     if (status === "Prepared") {
       const orderItems = orderData.orderData;
 
@@ -103,26 +99,20 @@ const SingleOrder = () => {
     getUserOrderData();
   };
 
-  //------------------- Change Delivery Rider Name -------------------//
-  const changeDeliveryRiderInfo = (id, orderdata, riderInfo) => {
-    console.log(id, orderdata, riderInfo);
-    const docRef = doc(db, "UserOrders", id);
-    const data = {
-      ...orderdata,
-      deliveryRiderInfo: riderInfo,
-    };
-    setDoc(docRef, data)
-      .then(() => {
-        showSuccessToast("Delivery Rider is assigned!");
-      })
-      .catch((error) => {
-        showErrorToast("Error writing document: ", error);
-      });
-    getUserOrderData();
+  // Proof of Payment Issue drop down function
+  const handleProofOfPaymentIssue = async (selectedValue) => {
+    const docRef = doc(db, "UserOrders", orderId);
+    try {
+      await updateDoc(docRef, { proofOfPaymentIssue: selectedValue });
+      setUserOrderData((prevState) => ({
+        ...prevState,
+        proofOfPaymentIssue: selectedValue,
+      }));
+      showSuccessToast("Proof of Payment Issue is updated!");
+    } catch (error) {
+      showErrorToast("Error updating document: ", error);
+    }
   };
-
-  const data = userOrderData.orderData;
-  // console.log(typeof data);
 
   return (
     <div className="single">
@@ -207,7 +197,8 @@ const SingleOrder = () => {
                 {/*------------------ Order Status ------------------*/}
                 <div className="detailItem">
                   <span className="itemKey">Order Status:</span>
-                  {userOrderData.orderStatus !== "Cancelled" ? (
+                  {userOrderData.orderStatus !== "Cancelled" &&
+                  userOrderData.orderStatus !== "Delivered" ? (
                     <select
                       onChange={(e) =>
                         changeOrderStatus(
@@ -246,16 +237,98 @@ const SingleOrder = () => {
                   )}
                 </div>
 
-                {/*------------------ Proof of Payment ------------------*/}
-                {userOrderData.proofOfPaymentURL != null && (
+                {/*------------------ Reason for Cancellation (Rider) ------------------*/}
+                {userOrderData.cancellationReason && (
                   <div className="detailItem">
-                    <span className="itemKey">Proof of Payment:</span>
-                    <img
-                      src={userOrderData.proofOfPaymentURL}
-                      alt="Proof of Payment"
-                    />
+                    <span className="itemKey">
+                      Reason for Cancellation (Rider):
+                    </span>
+                    <span className="itemValue">
+                      {userOrderData.cancellationReason}
+                    </span>
                   </div>
                 )}
+
+                {/*------------------ Proof of Payment Issue ------------------*/}
+                {/* {userOrderData.proofOfPaymentURL != null &&
+                  userOrderData.orderPayment === "GCash" && (
+                    <>
+                      {userOrderData?.orderStatus !== "Cancelled" &&
+                        userOrderData?.orderStatus !== "Delivered" && (
+                          <div className="detailItem">
+                            <span className="itemKey">
+                              Proof of Payment Issue:&nbsp;
+                            </span>
+                            <select
+                              onChange={(e) =>
+                                handleProofOfPaymentIssue(e.target.value)
+                              }
+                              value={userOrderData.proofOfPaymentIssue || ""}
+                            >
+                              <option value="" disabled>
+                                ---Select---
+                              </option>
+                              <option value="Insufficient Payment Amount">
+                                Insufficient Payment Amount
+                              </option>
+                              <option value="Invalid Proof of Payment">
+                                Invalid Proof of Payment
+                              </option>
+                            </select>
+                          </div>
+                        )}
+                    </>
+                  )} */}
+                {userOrderData.proofOfPaymentURL != null &&
+                userOrderData.orderPayment === "GCash" &&
+                userOrderData.orderStatus !== "Cancelled" &&
+                userOrderData.orderStatus !== "Delivered" ? (
+                  <div className="detailItem">
+                    <span className="itemKey">
+                      Proof of Payment Issue:&nbsp;
+                    </span>
+                    <select
+                      onChange={(e) =>
+                        handleProofOfPaymentIssue(e.target.value)
+                      }
+                      value={userOrderData.proofOfPaymentIssue || ""}
+                    >
+                      <option value="" disabled>
+                        ---Select---
+                      </option>
+                      <option value="Insufficient Payment Amount">
+                        Insufficient Payment Amount
+                      </option>
+                      <option value="Invalid Proof of Payment">
+                        Invalid Proof of Payment
+                      </option>
+                    </select>
+                  </div>
+                ) : (
+                  userOrderData.proofOfPaymentIssue && (
+                    <div className="detailItem">
+                      <span className="itemKey">
+                        Proof of Payment Issue:&nbsp;
+                      </span>
+                      {userOrderData.proofOfPaymentIssue}
+                    </div>
+                  )
+                )}
+
+                {/*------------------ Proof of Payment ------------------*/}
+                {userOrderData.proofOfPaymentURL != null &&
+                  userOrderData.orderPayment === "GCash" && (
+                    <div className="detailItem">
+                      <span className="itemKey">Proof of Payment:</span>
+                      {userOrderData.proofOfPaymentURL.map((url, index) => (
+                        <img
+                          key={index}
+                          src={url}
+                          alt={`Proof of Payment ${index + 1}`}
+                        />
+                      ))}
+                    </div>
+                  )}
               </div>
             </div>
           </div>
@@ -290,10 +363,6 @@ const SingleOrder = () => {
             </div>
           </div>
         </div>
-        {/* <div className="bottom">
-          <h1 className="title">Last Transactions</h1>
-          <List />
-        </div> */}
       </div>
     </div>
   );

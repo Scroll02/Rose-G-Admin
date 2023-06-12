@@ -157,10 +157,13 @@ const ProductTable = () => {
       const imageRef = ref(storage, imageUrl);
       await deleteObject(imageRef);
 
-      const deletedFields = {};
+      const deletedFields = [];
 
       Object.entries(docSnap.data()).forEach(([field, value]) => {
-        deletedFields[field] = value;
+        deletedFields.push({
+          field: field,
+          value: value,
+        });
       });
 
       await deleteDoc(docRef);
@@ -176,6 +179,7 @@ const ProductTable = () => {
         const firstName = userData.firstName;
         const lastName = userData.lastName;
         const profileImageUrl = userData.profileImageUrl;
+        const role = userData.role;
 
         const monthDocumentId = moment().format("YYYY-MM");
 
@@ -192,6 +196,7 @@ const ProductTable = () => {
           firstName: firstName,
           lastName: lastName,
           profileImageUrl: profileImageUrl,
+          role: role,
           actionType: "Delete",
           actionDescription: "Deleted product data",
         });

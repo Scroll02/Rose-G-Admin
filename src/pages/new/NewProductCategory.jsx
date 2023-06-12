@@ -146,6 +146,7 @@ const NewProductCategory = ({ inputs, title }) => {
         const firstName = userData.firstName;
         const lastName = userData.lastName;
         const profileImageUrl = userData.profileImageUrl;
+        const role = userData.role;
 
         const monthDocumentId = moment().format("YYYY-MM");
 
@@ -171,6 +172,7 @@ const NewProductCategory = ({ inputs, title }) => {
           firstName: firstName,
           lastName: lastName,
           profileImageUrl: profileImageUrl,
+          role: role,
           actionType: "Create",
           actionDescription: "Created product category data",
         });

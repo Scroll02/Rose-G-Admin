@@ -258,6 +258,7 @@ const SingleProduct = () => {
         const firstName = userData.firstName;
         const lastName = userData.lastName;
         const profileImageUrl = userData.profileImageUrl;
+        const role = userData.role;
 
         if (isUpdated) {
           await updateDoc(docRef, updates);
@@ -277,6 +278,7 @@ const SingleProduct = () => {
             firstName: firstName,
             lastName: lastName,
             profileImageUrl: profileImageUrl,
+            role: role,
             actionType: "Update",
             actionDescription: "Updated product data",
           });

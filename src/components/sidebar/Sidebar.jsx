@@ -39,12 +39,19 @@ const Sidebar = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const userDocRef = doc(db, "UserData", auth.currentUser.uid);
-        const userDocSnap = await getDoc(userDocRef);
+        if (auth.currentUser) {
+          const userDocRef = doc(db, "UserData", auth.currentUser.uid);
 
-        if (userDocSnap.exists()) {
-          const userData = userDocSnap.data();
-          setUserData(userData);
+          // Listen for real-time changes using onSnapshot
+          const unsubscribe = onSnapshot(userDocRef, (userDocSnap) => {
+            if (userDocSnap.exists()) {
+              const userData = userDocSnap.data();
+              setUserData(userData);
+            } else {
+              // Document does not exist, handle the case if needed
+            }
+          });
+          return () => unsubscribe();
         }
       } catch (error) {
         console.error("Error fetching user data:", error);
@@ -121,7 +128,8 @@ const Sidebar = () => {
     const filteredData = filterOrdersByDate(orderData);
     const count = filteredData.length;
     setOrderCount(count);
-    // If order status is changed to anything other than Pending, minus 1 the order count
+
+    // If order status is changed to anything other than Pending, subtract 1 from the order count
     const unsub = onSnapshot(collection(db, "UserOrders"), (snapShot) => {
       snapShot.docs.forEach((doc) => {
         const order = doc.data();
@@ -135,30 +143,24 @@ const Sidebar = () => {
       });
     });
 
-    // Set the showNewOrderAlert state based on order count
-    if (count > 0) {
-      setShowNewOrderAlert(true);
-    } else {
-      setShowNewOrderAlert(false);
-    }
     return () => {
       unsub();
     };
   }, [orderData]);
-
-  // Close New Order Alert
-  const closeNewOrderAlert = () => {
-    setShowNewOrderAlert(false);
-  };
 
   // Show New Order Alert
   useEffect(() => {
     // Check if the current location is "/orders"
     const isOrdersPage = location.pathname.startsWith("/orders");
 
-    // Update the showNewOrderAlert state based on the current location
+    // Update the showNewOrderAlert state based on the current location and order count
     setShowNewOrderAlert(!isOrdersPage && orderCount > 0);
   }, [location, orderCount]);
+
+  // Close New Order Alert
+  const closeNewOrderAlert = () => {
+    setShowNewOrderAlert(false);
+  };
 
   // Logout function
   const handleLogout = async () => {
@@ -305,7 +307,7 @@ const Sidebar = () => {
           )}
 
           {/* Sales Report */}
-          {userData && userData.role === "Super Admin" && (
+          {userData?.role === "Super Admin" && (
             <li>
               <NavLink
                 to="/salesReport"
@@ -347,7 +349,7 @@ const Sidebar = () => {
           </li>
 
           {/* Audit Trail */}
-          {userData && userData.role === "Super Admin" && (
+          {userData?.role === "Super Admin" && (
             <li>
               <NavLink
                 to="/auditTrail"

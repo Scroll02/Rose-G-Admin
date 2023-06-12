@@ -103,16 +103,18 @@ const OrderTable = ({ datatableTitle }) => {
       const orderDocRef = doc(db, "UserOrders", selectedOrderId);
       const orderDocSnapshot = await getDoc(orderDocRef);
       const orderData = orderDocSnapshot.data();
-      const proofOfPaymentUrl = orderData.proofOfPaymentURL;
+      const proofOfPaymentUrls = orderData.proofOfPaymentURL;
       const userId = orderData.orderUserId;
 
-      if (proofOfPaymentUrl) {
-        const fileName = proofOfPaymentUrl.split("%2F").pop().split("?")[0];
-        const storageRef = ref(
-          storage,
-          `proofOfPayment_images/${userId}/${fileName}`
-        );
-        await deleteObject(storageRef);
+      if (proofOfPaymentUrls && proofOfPaymentUrls.length > 0) {
+        for (const proofOfPaymentUrl of proofOfPaymentUrls) {
+          const fileName = proofOfPaymentUrl.split("%2F").pop().split("?")[0];
+          const storageRef = ref(
+            storage,
+            `proofOfPayment_images/${userId}/${fileName}`
+          );
+          await deleteObject(storageRef);
+        }
       }
 
       await deleteDoc(orderDocRef);

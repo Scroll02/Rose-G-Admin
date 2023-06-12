@@ -180,10 +180,48 @@
     }
 
     .bottom {
-      -webkit-box-shadow: 2px 4px 10px 1px rgba(0, 0, 0, 0.47);
-      box-shadow: 2px 4px 10px 1px rgba(201, 201, 201, 0.47);
+      // -webkit-box-shadow: 2px 4px 10px 1px rgba(0, 0, 0, 0.47);
+      // box-shadow: 2px 4px 10px 1px rgba(201, 201, 201, 0.47);
       padding: 20px;
-      margin: 10px 20px;
+      // margin: 10px 20px;
+
+      .fieldsContainer {
+        background-color: var(--background-color1);
+        border-radius: 8px;
+        padding: 20px;
+        width: 100%;
+
+        .fieldsSummary {
+          .fieldsTitle {
+            font-size: 25px;
+            font-weight: bold;
+            color: var(--background-color2);
+          }
+
+          .fieldsTable {
+            width: 100%;
+            border-collapse: collapse;
+
+            th,
+            td {
+              border: 1px solid #ccc;
+              padding: 8px;
+              text-align: left;
+            }
+            th {
+              color: var(--text-color2);
+            }
+            td {
+              color: var(--text-color1);
+            }
+
+            th {
+              background-color: var(--background-color3);
+              font-weight: bold;
+            }
+          }
+        }
+      }
     }
 
     .title {

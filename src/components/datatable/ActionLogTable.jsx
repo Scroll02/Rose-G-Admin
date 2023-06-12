@@ -1,8 +1,11 @@
 import { useState, useEffect } from "react";
 import { actionLogColumns } from "../../datatablesource";
+import { Link } from "react-router-dom";
 // MUI
 import { DataGrid } from "@mui/x-data-grid";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import moment from "moment";
 // Firebase
 import { collection, onSnapshot } from "firebase/firestore";
@@ -21,10 +24,8 @@ const ActionLogTable = () => {
       collection(db, "ActivityLog"),
       (snapshot) => {
         const newData = [];
-
         snapshot.docs.forEach((doc) => {
           const actionLogData = doc.data().actionLogData || [];
-
           actionLogData.forEach((logData, index) => {
             const entry = {
               id: `${doc.id}-${index}`,
@@ -32,6 +33,7 @@ const ActionLogTable = () => {
               firstName: logData.firstName,
               profileImageUrl: logData.profileImageUrl,
               lastName: logData.lastName,
+              role: logData.role,
               timestamp: new Date(logData.timestamp),
               actionType: logData.actionType,
               actionDescription: logData.actionDescription,
@@ -40,14 +42,11 @@ const ActionLogTable = () => {
             newData.push(entry);
           });
         });
-
-        // Sort newData array in descending order based on lastLoginAt timestamp
+        // Sort newData array in descending order based on timestamp
         newData.sort((a, b) => b.timestamp - a.timestamp);
-
         setData(newData);
       }
     );
-
     return unsubscribe;
   }, []);
 
@@ -85,7 +84,7 @@ const ActionLogTable = () => {
     return true; // Return all data if no search is performed
   });
 
-  // Generate options for months and years based on available data
+  // Generate options for months based on available data
   const availableMonths = [
     "January",
     "February",
@@ -100,6 +99,8 @@ const ActionLogTable = () => {
     "November",
     "December",
   ];
+
+  // Generate options for years based on available data
   const availableYears = [
     ...new Set(data.map((entry) => entry.timestamp.getFullYear())),
   ];
@@ -109,6 +110,7 @@ const ActionLogTable = () => {
     { key: "userId", label: "User ID" },
     { key: "firstName", label: "First Name" },
     { key: "lastName", label: "Last Name" },
+    { key: "role", label: "Role" },
     { key: "timestamp", label: "Time Stamp" },
     { key: "actionType", label: "Action Type" },
     { key: "actionDescription", label: "Action Description" },
@@ -166,7 +168,29 @@ const ActionLogTable = () => {
       <DataGrid
         className="datagrid"
         rows={searchedData}
-        columns={actionLogColumns}
+        // columns={actionLogColumns}
+        columns={actionLogColumns.concat([
+          {
+            field: "action",
+            headerName: "Action",
+            width: 220,
+            renderCell: (params) => {
+              return (
+                <div className="cellAction">
+                  <Link
+                    to={`/auditTrail/${params.row.id}`}
+                    style={{ textDecoration: "none" }}
+                  >
+                    <div className="viewButton">
+                      <VisibilityIcon />
+                      <span>View</span>
+                    </div>
+                  </Link>
+                </div>
+              );
+            },
+          },
+        ])}
         pageSize={10}
         rowsPerPageOptions={[10]}
       />

@@ -34,16 +34,13 @@ const SingleUser = () => {
   const getUserData = async () => {
     const docRef = doc(db, "UserData", userId);
     const docSnap = await getDoc(docRef);
-
     if (docSnap.exists()) {
-      console.log("Document data: ", docSnap.data());
       setUserData(docSnap.data());
     } else {
       // doc.data() will be undefined in this case
       console.log("No such document!");
     }
   };
-
   useEffect(() => {
     getUserData();
   }, []);
@@ -189,6 +186,25 @@ const SingleUser = () => {
                   {userData?.lastName}
                 </h1>
 
+                {/*-------------------- Role -------------------- */}
+                {userData?.role !== "Customer" ? (
+                  <>
+                    <div className="detailItem">
+                      <span className="itemKey">Role:</span>
+                      <span className="itemValue">{userData?.role}</span>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="detailItemCustomer">
+                      <span className="itemKeyCustomer">Role:</span>
+                      <span className="itemValueCustomer">
+                        {userData?.role}
+                      </span>
+                    </div>
+                  </>
+                )}
+
                 {/*------------------ New Profile Image ------------------*/}
                 {userData?.role !== "Customer" ? (
                   <>
@@ -331,27 +347,8 @@ const SingleUser = () => {
                   </>
                 )}
 
-                {/*-------------------- Role -------------------- */}
-                {userData?.role !== "Customer" ? (
-                  <>
-                    <div className="detailItem">
-                      <span className="itemKey">Role:</span>
-                      <span className="itemValue">{userData?.role}</span>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div className="detailItemCustomer">
-                      <span className="itemKeyCustomer">Role:</span>
-                      <span className="itemValueCustomer">
-                        {userData?.role}
-                      </span>
-                    </div>
-                  </>
-                )}
-
                 {/*-------------------- Email Verified -------------------- */}
-                {userData?.role !== "Customer" ? (
+                {/* {userData?.role !== "Customer" ? (
                   <>
                     <div className="detailItem">
                       <span className="itemKey">Email Verified:</span>
@@ -369,7 +366,7 @@ const SingleUser = () => {
                       </span>
                     </div>
                   </>
-                )}
+                )} */}
               </div>
             </div>
           </div>
