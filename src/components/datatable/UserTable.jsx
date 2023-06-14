@@ -2,20 +2,25 @@ import "./datatable.scss";
 import { DataGrid } from "@mui/x-data-grid";
 import { userColumns } from "../../datatablesource";
 import { Link } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
+import { AuthContext } from "../../context/AuthContext";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import AddIcon from "@mui/icons-material/Add";
-
 // Firebase
-import { collection, deleteDoc, doc, onSnapshot } from "firebase/firestore";
-import { db, storage } from "../../firebase";
+import {
+  collection,
+  deleteDoc,
+  doc,
+  onSnapshot,
+  getDocs,
+} from "firebase/firestore";
+import { onAuthStateChanged, deleteUser } from "firebase/auth";
+import { db, storage, auth } from "../../firebase";
 import { deleteObject, ref } from "firebase/storage";
-
 // Toast
 import { showErrorToast, showSuccessToast } from "../toast/Toast";
-
 // Modal
 import ConfirmationModal from "../modal/ConfirmationModal";
 
@@ -23,6 +28,26 @@ const UserTable = () => {
   const [data, setData] = useState([]);
   const [searchValue, setSearchValue] = useState("");
   const [selectedColumn, setSelectedColumn] = useState("firstName");
+
+  // Retrieve the current user role
+  const { currentUser } = useContext(AuthContext);
+  const [userRole, setUserRole] = useState(null);
+  useEffect(() => {
+    // Fetch the current user's data from Firestore
+    const fetchCurrentUserRole = async () => {
+      if (currentUser) {
+        const userDataRef = collection(db, "UserData");
+        const userSnapshot = await getDocs(userDataRef);
+        userSnapshot.forEach((doc) => {
+          const userData = doc.data();
+          if (userData.uid === currentUser.uid) {
+            setUserRole(userData.role);
+          }
+        });
+      }
+    };
+    fetchCurrentUserRole();
+  }, [currentUser]);
 
   //------------------ Retrieve Users Data ------------------//
   useEffect(() => {
@@ -32,26 +57,24 @@ const UserTable = () => {
     return () => unsub();
   }, []);
 
-  // console.log(data);
-
   //------------------ Delete User Data  ------------------//
   const [selectedUserId, setSelectedUserId] = useState(null);
-  const handleDelete = async () => {
-    try {
-      const user = data.find((item) => item.id === selectedUserId);
-      if (user.profileImageUrl) {
-        const storageRef = ref(storage, user.profileImageUrl);
-        await deleteObject(storageRef);
-      }
+  // const handleDelete = async () => {
+  //   try {
+  //     const user = data.find((item) => item.id === selectedUserId);
+  //     if (user.profileImageUrl) {
+  //       const storageRef = ref(storage, user.profileImageUrl);
+  //       await deleteObject(storageRef);
+  //     }
 
-      await deleteDoc(doc(db, "UserData", selectedUserId));
-      setData(data.filter((item) => item.id !== selectedUserId));
-      showSuccessToast("User data is successfully deleted", 2000);
-    } catch (err) {
-      console.log(err);
-      showErrorToast("Error deleting user", 2000);
-    }
-  };
+  //     await deleteDoc(doc(db, "UserData", selectedUserId));
+  //     setData(data.filter((item) => item.id !== selectedUserId));
+  //     showSuccessToast("User data is successfully deleted", 2000);
+  //   } catch (err) {
+  //     console.log(err);
+  //     showErrorToast("Error deleting user", 2000);
+  //   }
+  // };
 
   // This delete function, deletes data from firestore database and authentication
   // const handleDelete = async (id, email) => {
@@ -78,6 +101,38 @@ const UserTable = () => {
   // Modal
 
   // Modal
+
+  const handleDelete = async () => {
+    try {
+      const user = data.find((item) => item.id === selectedUserId);
+
+      // Delete the user's profile image from storage
+      if (user.profileImageUrl) {
+        const storageRef = ref(storage, user.profileImageUrl);
+        await deleteObject(storageRef);
+      }
+
+      // Get the current user
+      const currentUser = auth.currentUser;
+
+      if (currentUser && currentUser.uid === user.uid) {
+        // Delete the user's authentication identifier
+        await currentUser.delete();
+
+        // Delete the user's data in Firestore
+        await deleteDoc(doc(db, "UserData", selectedUserId));
+
+        setData(data.filter((item) => item.id !== selectedUserId));
+        showSuccessToast("User data is successfully deleted", 2000);
+      } else {
+        showErrorToast("You are not authorized to delete this user", 2000);
+      }
+    } catch (err) {
+      console.log(err);
+      showErrorToast("Error deleting user", 2000);
+    }
+  };
+
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const closeConfirmationModal = () => {
     setShowConfirmationModal(false);
@@ -94,6 +149,12 @@ const UserTable = () => {
   // Filter the data based on the search value
   const filteredData = data.filter((user) => {
     const lowerCaseSearchValue = searchValue.toLowerCase();
+    const isSuperAdmin = user.role === "Super Admin";
+
+    if (userRole !== "Super Admin" && isSuperAdmin) {
+      return false;
+    }
+
     switch (selectedColumn) {
       case "uid":
         return user.uid?.toLowerCase()?.includes(lowerCaseSearchValue);
@@ -141,10 +202,12 @@ const UserTable = () => {
           </div>
         </div>
         <div className="datatableButtons">
-          <Link to="/users/new" className="link">
-            <AddIcon />
-            New User
-          </Link>
+          {userRole && userRole === "Super Admin" && (
+            <Link to="/users/new" className="link">
+              <AddIcon />
+              New User
+            </Link>
+          )}
         </div>
       </div>
       <DataGrid
@@ -154,7 +217,7 @@ const UserTable = () => {
           {
             field: "action",
             headerName: "Action",
-            width: 150,
+            width: 180,
             headerClassName: "headerName",
             renderCell: (params) => {
               return (
@@ -168,15 +231,17 @@ const UserTable = () => {
                       <span>View</span>
                     </div>
                   </Link>
-                  <div
-                    className="deleteButton"
-                    onClick={() => {
-                      setSelectedUserId(params.row.id);
-                      setShowConfirmationModal(true);
-                    }}
-                  >
-                    <DeleteForeverIcon />
-                  </div>
+                  {userRole && userRole === "Super Admin" && (
+                    <div
+                      className="deleteButton"
+                      onClick={() => {
+                        setSelectedUserId(params.row.id);
+                        setShowConfirmationModal(true);
+                      }}
+                    >
+                      <DeleteForeverIcon />
+                    </div>
+                  )}
                 </div>
               );
             },

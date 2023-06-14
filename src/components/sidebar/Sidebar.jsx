@@ -23,6 +23,7 @@ import {
   getDoc,
   updateDoc,
   setDoc,
+  getDocs,
 } from "firebase/firestore";
 import { signOut } from "firebase/auth";
 import { auth, db } from "../../firebase";
@@ -34,32 +35,25 @@ const Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  //------------------ User Data (For Restricting Access on Sidebar Menu) ------------------//
-  const [userData, setUserData] = useState(null);
+  // Retrieve the current user role
+  const { currentUser } = useContext(AuthContext);
+  const [userRole, setUserRole] = useState(null);
   useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        if (auth.currentUser) {
-          const userDocRef = doc(db, "UserData", auth.currentUser.uid);
-
-          // Listen for real-time changes using onSnapshot
-          const unsubscribe = onSnapshot(userDocRef, (userDocSnap) => {
-            if (userDocSnap.exists()) {
-              const userData = userDocSnap.data();
-              setUserData(userData);
-            } else {
-              // Document does not exist, handle the case if needed
-            }
-          });
-          return () => unsubscribe();
-        }
-      } catch (error) {
-        console.error("Error fetching user data:", error);
+    // Fetch the current user's data from Firestore
+    const fetchCurrentUserRole = async () => {
+      if (currentUser) {
+        const userDataRef = collection(db, "UserData");
+        const userSnapshot = await getDocs(userDataRef);
+        userSnapshot.forEach((doc) => {
+          const userData = doc.data();
+          if (userData.uid === currentUser.uid) {
+            setUserRole(userData.role);
+          }
+        });
       }
     };
-
-    fetchUserData();
-  }, []);
+    fetchCurrentUserRole();
+  }, [currentUser]);
 
   //------------------ User Orders Data ------------------//
   const [orderCount, setOrderCount] = useState(0);
@@ -307,7 +301,7 @@ const Sidebar = () => {
           )}
 
           {/* Sales Report */}
-          {userData?.role === "Super Admin" && (
+          {userRole && userRole === "Super Admin" && (
             <li>
               <NavLink
                 to="/salesReport"
@@ -349,7 +343,7 @@ const Sidebar = () => {
           </li>
 
           {/* Audit Trail */}
-          {userData?.role === "Super Admin" && (
+          {userRole && userRole === "Super Admin" && (
             <li>
               <NavLink
                 to="/auditTrail"

@@ -173,7 +173,7 @@ const ActionLogTable = () => {
           {
             field: "action",
             headerName: "Action",
-            width: 220,
+            width: 150,
             renderCell: (params) => {
               return (
                 <div className="cellAction">

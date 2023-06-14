@@ -70,11 +70,28 @@
 
               .itemValue {
                 font-weight: 600;
+
+                &.Delivered,
+                &.Order-Picked-up,
+                &.Create {
+                  background-color: rgba(0, 128, 0, 0.05);
+                  color: green;
+                }
+                &.Cancelled,
+                &.Delete {
+                  background-color: rgba(236, 6, 6, 0.05);
+                  color: red;
+                }
+                &.Update {
+                  background-color: rgba(255, 123, 0, 0.05);
+                  color: darkorange;
+                }
               }
 
               img {
-                height: auto;
-                width: 30%;
+                height: 400px;
+                width: 50%;
+                margin: 0 10px;
               }
             }
 
@@ -180,10 +197,7 @@
     }
 
     .bottom {
-      // -webkit-box-shadow: 2px 4px 10px 1px rgba(0, 0, 0, 0.47);
-      // box-shadow: 2px 4px 10px 1px rgba(201, 201, 201, 0.47);
       padding: 20px;
-      // margin: 10px 20px;
 
       .fieldsContainer {
         background-color: var(--background-color1);

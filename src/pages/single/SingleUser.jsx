@@ -7,9 +7,9 @@ import defaultUserIcon from "../../images/defaultUserIcon.png";
 import DriveFolderUploadOutlinedIcon from "@mui/icons-material/DriveFolderUploadOutlined";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-
+import moment from "moment";
 // Firebase
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc, setDoc } from "firebase/firestore";
 import { db, auth, storage } from "../../firebase";
 import {
   ref,
@@ -60,63 +60,80 @@ const SingleUser = () => {
   // console.log(newAddress);
 
   //------------------ Update User Data Function  ------------------//
-  // const handleUpdate = async () => {
-  //   const docRef = doc(db, "UserData", userId);
-
-  //   if (docRef !== null) {
-  //     const updates = {};
-
-  //     if (newFirstName !== "") {
-  //       updates.firstName = newFirstName;
-  //     }
-
-  //     if (newLastName !== "") {
-  //       updates.lastName = newLastName;
-  //     }
-
-  //     if (newEmail !== "") {
-  //       updates.email = newEmail;
-  //     }
-
-  //     if (newContactNumber !== "") {
-  //       updates.contactNumber = newContactNumber;
-  //     }
-
-  //     if (newAddress !== "") {
-  //       updates.address = newAddress;
-  //     }
-
-  //     if (Object.keys(updates).length > 0) {
-  //       await updateDoc(docRef, updates);
-  //       showSuccessToast("User data is updated", 1000);
-  //       navigate(-1);
-  //     } else {
-  //       showInfoToast("No changes made");
-  //     }
-  //   } else {
-  //     showInfoToast("No user data");
-  //   }
-  // };
   const handleUpdate = async () => {
     const docRef = doc(db, "UserData", userId);
 
     if (docRef !== null) {
       const updates = {};
+      const updatedFields = [];
+      let isUpdated = false;
 
       if (newFirstName !== "") {
-        updates.firstName = newFirstName;
+        const docSnapshot = await getDoc(docRef);
+        const oldFirstName = docSnapshot.data().firstName;
+        const newFirstNameValue = newFirstName;
+
+        if (oldFirstName !== newFirstNameValue) {
+          updatedFields.push({
+            field: "firstName",
+            oldValue: oldFirstName,
+            newValue: newFirstNameValue,
+          });
+        }
+
+        updates.firstName = newFirstNameValue;
+        isUpdated = true;
       }
 
       if (newLastName !== "") {
-        updates.lastName = newLastName;
+        const docSnapshot = await getDoc(docRef);
+        const oldLastName = docSnapshot.data().lastName;
+        const newLastNameValue = newLastName;
+
+        if (oldLastName !== newLastNameValue) {
+          updatedFields.push({
+            field: "lastName",
+            oldValue: oldLastName,
+            newValue: newLastNameValue,
+          });
+        }
+
+        updates.lastName = newLastNameValue;
+        isUpdated = true;
       }
 
       if (newContactNumber !== "") {
-        updates.contactNumber = newContactNumber;
+        const docSnapshot = await getDoc(docRef);
+        const oldContactNumber = docSnapshot.data().contactNumber;
+        const newContactNumberValue = newContactNumber;
+
+        if (oldContactNumber !== newContactNumberValue) {
+          updatedFields.push({
+            field: "contactNumber",
+            oldValue: oldContactNumber,
+            newValue: newContactNumberValue,
+          });
+        }
+
+        updates.contactNumber = newContactNumberValue;
+        isUpdated = true;
       }
 
       if (newAddress !== "") {
-        updates.address = newAddress;
+        const docSnapshot = await getDoc(docRef);
+        const oldAddress = docSnapshot.data().address;
+        const newAddressValue = newAddress;
+
+        if (oldAddress !== newAddressValue) {
+          updatedFields.push({
+            field: "address",
+            oldValue: oldAddress,
+            newValue: newAddressValue,
+          });
+        }
+
+        updates.address = newAddressValue;
+        isUpdated = true;
       }
 
       if (newImageFile !== "") {
@@ -136,18 +153,73 @@ const SingleUser = () => {
         );
         await uploadBytes(storageRef, newImageFile);
         const downloadURL = await getDownloadURL(storageRef);
-        updates.profileImageUrl = downloadURL;
+
+        const oldProfileImageUrl = docSnapshot.data().profileImageUrl;
+        const newProfileImageUrlValue = downloadURL;
+
+        if (oldProfileImageUrl !== newProfileImageUrlValue) {
+          updatedFields.push({
+            field: "profileImageUrl",
+            oldValue: oldProfileImageUrl,
+            newValue: newProfileImageUrlValue,
+          });
+        }
+
+        updates.profileImageUrl = newProfileImageUrlValue;
+        isUpdated = true;
       }
 
-      if (Object.keys(updates).length > 0) {
-        await updateDoc(docRef, updates);
-        showSuccessToast("User data is updated", 1000);
-        navigate(-1);
+      const currentUser = auth.currentUser;
+      const userId = currentUser.uid;
+      const userDocRef = doc(db, "UserData", userId);
+      const userDocSnapshot = await getDoc(userDocRef);
+
+      if (userDocSnapshot.exists()) {
+        const userData = userDocSnapshot.data();
+        const firstName = userData.firstName;
+        const lastName = userData.lastName;
+        const profileImageUrl = userData.profileImageUrl;
+        const role = userData.role;
+
+        if (isUpdated) {
+          await updateDoc(docRef, updates);
+
+          const monthDocumentId = moment().format("YYYY-MM");
+          const activityLogDocRef = doc(db, "ActivityLog", monthDocumentId);
+          const activityLogDocSnapshot = await getDoc(activityLogDocRef);
+          const activityLogData = activityLogDocSnapshot.exists()
+            ? activityLogDocSnapshot.data().actionLogData || []
+            : [];
+
+          activityLogData.push({
+            timestamp: new Date().toISOString(),
+            updatedFields: updatedFields,
+            userId: userId,
+            firstName: firstName,
+            lastName: lastName,
+            profileImageUrl: profileImageUrl,
+            role: role,
+            actionType: "Update",
+            actionDescription: "Updated user data",
+          });
+
+          await setDoc(
+            activityLogDocRef,
+            {
+              actionLogData: activityLogData,
+            },
+            { merge: true }
+          );
+
+          showSuccessToast("User data is updated", 2000);
+          navigate(-1);
+        } else {
+          showInfoToast("No changes made", 2000);
+          navigate(-1);
+        }
       } else {
-        showInfoToast("No changes made");
+        showInfoToast("No user data", 2000);
       }
-    } else {
-      showInfoToast("No user data");
     }
   };
 

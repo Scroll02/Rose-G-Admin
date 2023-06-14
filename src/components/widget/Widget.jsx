@@ -84,7 +84,7 @@ const Widget = ({ type }) => {
         ),
         icon: (
           <a href="/orders" style={{ textDecoration: "none" }}>
-            <BorderColorRoundedIcon
+            <LocalDiningRoundedIcon
               className="icon"
               style={{ backgroundColor: "#E8B0AF", color: "#742a40" }}
             />
@@ -104,7 +104,7 @@ const Widget = ({ type }) => {
         ),
         icon: (
           <a href="/orders" style={{ textDecoration: "none" }}>
-            <BorderColorRoundedIcon
+            <LocalDiningRoundedIcon
               className="icon"
               style={{ backgroundColor: "#E8B0AF", color: "#742a40" }}
             />
@@ -124,7 +124,7 @@ const Widget = ({ type }) => {
         ),
         icon: (
           <a href="/orders" style={{ textDecoration: "none" }}>
-            <BorderColorRoundedIcon
+            <LocalDiningRoundedIcon
               className="icon"
               style={{ backgroundColor: "#E8B0AF", color: "#742a40" }}
             />
@@ -144,7 +144,7 @@ const Widget = ({ type }) => {
         ),
         icon: (
           <a href="/orders" style={{ textDecoration: "none" }}>
-            <BorderColorRoundedIcon
+            <LocalDiningRoundedIcon
               className="icon"
               style={{ backgroundColor: "#E8B0AF", color: "#742a40" }}
             />
@@ -164,7 +164,7 @@ const Widget = ({ type }) => {
         ),
         icon: (
           <a href="/orders" style={{ textDecoration: "none" }}>
-            <BorderColorRoundedIcon
+            <LocalDiningRoundedIcon
               className="icon"
               style={{ backgroundColor: "#E8B0AF", color: "#742a40" }}
             />
@@ -184,7 +184,7 @@ const Widget = ({ type }) => {
         ),
         icon: (
           <a href="/orders" style={{ textDecoration: "none" }}>
-            <BorderColorRoundedIcon
+            <LocalDiningRoundedIcon
               className="icon"
               style={{ backgroundColor: "#E8B0AF", color: "#742a40" }}
             />

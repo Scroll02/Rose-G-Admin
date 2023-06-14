@@ -43,6 +43,10 @@ const SingleActionLog = () => {
     getActionLogData();
   }, [actionLogId]);
 
+  const actionTypeClassName = `itemValue ${
+    data?.actionType ? data?.actionType.replace(/\s/g, "-") : ""
+  }`;
+
   return (
     <div className="single">
       <Sidebar />
@@ -69,7 +73,9 @@ const SingleActionLog = () => {
                 {/*------------------ Action Type ------------------*/}
                 <div className="detailItem">
                   <span className="itemKey">Action Type:</span>
-                  <span className="itemValue">{data?.actionType}</span>
+                  <span className={actionTypeClassName}>
+                    {data?.actionType}
+                  </span>
                 </div>
 
                 {/*------------------ Action Description ------------------*/}

@@ -476,8 +476,13 @@ export const actionLogColumns = [
   {
     field: "actionType",
     headerName: "Action Type",
-    width: 150,
-    headerClassName: "headerName",
+    width: 120,
+    renderCell: (params) => {
+      const cellClassName = `cellActionType ${
+        params.row.actionType ? params.row.actionType.replace(/\s/g, "-") : ""
+      }`;
+      return <div className={cellClassName}>{params.row.actionType}</div>;
+    },
   },
   {
     field: "actionDescription",

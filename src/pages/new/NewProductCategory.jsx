@@ -115,7 +115,7 @@ const NewProductCategory = ({ inputs, title }) => {
     const storageRef = ref(
       storage,
       `productCategory_images/${new Date().getTime()}_${categoryImg.name}`
-    ); // replace 'images' with your storage path
+    );
 
     try {
       const uploadTask = uploadBytesResumable(storageRef, categoryImg);

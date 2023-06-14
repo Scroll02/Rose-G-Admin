@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from "react";
 import "./deliveryFee.scss";
 import DeliveryImg from "../../images/delivery-fee.svg";
-
+import moment from "moment";
 // Firebase
-import { doc, getDoc, setDoc } from "firebase/firestore";
-import { db } from "../../firebase";
-
+import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { db, auth } from "../../firebase";
 // Toast
-import { showSuccessToast, showErrorToast } from "../toast/Toast";
+import {
+  showSuccessToast,
+  showErrorToast,
+  showInfoToast,
+} from "../toast/Toast";
 
 const DeliveryFee = () => {
   const [deliveryFee, setDeliveryFee] = useState("");
@@ -54,19 +57,93 @@ const DeliveryFee = () => {
     }
   };
 
+  // const handleSaveClick = async () => {
+  //   try {
+  //     // Save the delivery fee to the DeliveryFee collection
+  //     const deliveryData = {
+  //       value: Number(deliveryFee),
+  //     };
+
+  //     // Add the delivery data to the DeliveryFee collection in Firebase Firestore
+  //     const docRef = doc(db, "DeliveryFee", "deliveryFee");
+  //     await setDoc(docRef, deliveryData);
+
+  //     setIsEditable(false);
+  //     showSuccessToast("Delivery fee saved successfully", 2000);
+  //   } catch (error) {
+  //     showErrorToast("Error saving delivery fee", 2000);
+  //   }
+  // };
+
   const handleSaveClick = async () => {
     try {
-      // Save the delivery fee to the DeliveryFee collection
-      const deliveryData = {
-        value: Number(deliveryFee),
-      };
-
-      // Add the delivery data to the DeliveryFee collection in Firebase Firestore
       const docRef = doc(db, "DeliveryFee", "deliveryFee");
-      await setDoc(docRef, deliveryData);
+      const docSnapshot = await getDoc(docRef);
+      const oldDeliveryFee = docSnapshot.data().value;
+      const newDeliveryFeeValue = Number(deliveryFee);
 
-      setIsEditable(false);
-      showSuccessToast("Delivery fee saved successfully", 2000);
+      if (oldDeliveryFee !== newDeliveryFeeValue) {
+        const updates = {
+          value: newDeliveryFeeValue,
+        };
+        await updateDoc(docRef, updates);
+
+        const currentUser = auth.currentUser;
+        const userId = currentUser.uid;
+
+        // Retrieve the user document from the UserData collection
+        const userDocRef = doc(db, "UserData", userId);
+        const userDocSnapshot = await getDoc(userDocRef);
+        if (userDocSnapshot.exists()) {
+          const userData = userDocSnapshot.data();
+          const firstName = userData.firstName;
+          const lastName = userData.lastName;
+          const profileImageUrl = userData.profileImageUrl;
+          const role = userData.role;
+
+          const updatedFields = [
+            {
+              field: "value",
+              oldValue: oldDeliveryFee,
+              newValue: newDeliveryFeeValue,
+            },
+          ];
+
+          const monthDocumentId = moment().format("YYYY-MM");
+          const activityLogDocRef = doc(db, "ActivityLog", monthDocumentId);
+          const activityLogDocSnapshot = await getDoc(activityLogDocRef);
+          const activityLogData = activityLogDocSnapshot.exists()
+            ? activityLogDocSnapshot.data().actionLogData || []
+            : [];
+
+          activityLogData.push({
+            timestamp: new Date().toISOString(),
+            updatedFields: updatedFields,
+            userId: userId,
+            firstName: firstName,
+            lastName: lastName,
+            profileImageUrl: profileImageUrl,
+            role: role,
+            actionType: "Update",
+            actionDescription: "Updated delivery fee data",
+          });
+
+          await setDoc(
+            activityLogDocRef,
+            {
+              actionLogData: activityLogData,
+            },
+            { merge: true }
+          );
+
+          setIsEditable(false);
+          showSuccessToast("Delivery fee saved successfully", 2000);
+        } else {
+          showInfoToast("No user data");
+        }
+      } else {
+        showInfoToast("No changes were made.");
+      }
     } catch (error) {
       showErrorToast("Error saving delivery fee", 2000);
     }

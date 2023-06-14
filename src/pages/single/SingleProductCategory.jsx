@@ -51,59 +51,7 @@ const SingleProductCategory = () => {
   const [newCategoryName, setNewCategoryName] = useState("");
   const [newSlug, setNewSlug] = useState("");
 
-  //------------------ Update Food Data Function  ------------------//
-  // const handleUpdate = async () => {
-  //   const docRef = doc(db, "ProductCategories", categoryId);
-  //   if (docRef !== null) {
-  //     const updates = {};
-  //     let isUpdated = false; // add a flag variable
-
-  //     if (newCategoryName !== "") {
-  //       updates.categoryName = newCategoryName;
-  //       isUpdated = true;
-  //     }
-
-  //     if (newSlug !== "") {
-  //       updates.slug = newSlug;
-  //       isUpdated = true;
-  //     }
-
-  //     if (newCategoryImg !== "") {
-  //       // Get the URL of the old image from Firestore
-  //       const docSnapshot = await getDoc(docRef);
-  //       const oldImageUrl = docSnapshot.data().categoryImg;
-
-  //       const storageRef = ref(
-  //         storage,
-  //         `productCategory_images/${new Date().getTime()}_${
-  //           newCategoryImg.name
-  //         }`
-  //       );
-  //       await uploadBytes(storageRef, newCategoryImg);
-  //       const downloadURL = await getDownloadURL(storageRef);
-  //       updates.categoryImg = downloadURL;
-
-  //       // Delete the old image from storage
-  //       if (oldImageUrl) {
-  //         const oldImageRef = ref(storage, oldImageUrl);
-  //         await deleteObject(oldImageRef);
-  //       }
-  //       isUpdated = true;
-  //     }
-
-  //     if (isUpdated) {
-  //       // check the flag variable to display the success message
-  //       await updateDoc(docRef, updates);
-  //       showSuccessToast("Category data is updated", 1000);
-  //       navigate(-1);
-  //     } else {
-  //       showInfoToast("No changes were made.");
-  //       navigate(-1);
-  //     }
-  //   } else {
-  //     alert("No product category data");
-  //   }
-  // };
+  //------------------ Update Product Category Function  ------------------//
   const handleUpdate = async () => {
     const docRef = doc(db, "ProductCategories", categoryId);
 

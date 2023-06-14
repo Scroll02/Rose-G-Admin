@@ -20,7 +20,7 @@ import {
   writeBatch,
   setDoc,
 } from "firebase/firestore";
-import { getStorage, ref, deleteObject } from "firebase/storage";
+import { ref, deleteObject } from "firebase/storage";
 import { db, storage, auth } from "../../firebase";
 // Toast
 import {
@@ -145,10 +145,7 @@ const ProductTable = () => {
   // };
 
   // Modal
-
   const handleDelete = async () => {
-    const storage = getStorage();
-
     try {
       const docRef = doc(db, "ProductData", selectedProductId);
       const docSnap = await getDoc(docRef);
@@ -299,7 +296,7 @@ const ProductTable = () => {
           {
             field: "action",
             headerName: "Action",
-            width: 200,
+            width: 180,
             renderCell: (params) => {
               return (
                 <div className="cellAction">

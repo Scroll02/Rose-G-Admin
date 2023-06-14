@@ -85,8 +85,9 @@ const SingleOrder = () => {
         }
       }
 
-      // Update paymentStatus to "Paid"
+      // Update paymentStatus to "Paid" and add thankYouModalDisplayed field with value false
       data.paymentStatus = "Paid";
+      data.thankYouModalDisplayed = false;
     }
 
     try {
@@ -113,6 +114,13 @@ const SingleOrder = () => {
       showErrorToast("Error updating document: ", error);
     }
   };
+
+  // Order status class name
+  const orderStatusClassName = `itemValue ${
+    userOrderData.orderStatus
+      ? userOrderData.orderStatus.replace(/\s/g, "-")
+      : ""
+  }`;
 
   return (
     <div className="single">
@@ -198,7 +206,8 @@ const SingleOrder = () => {
                 <div className="detailItem">
                   <span className="itemKey">Order Status:</span>
                   {userOrderData.orderStatus !== "Cancelled" &&
-                  userOrderData.orderStatus !== "Delivered" ? (
+                  userOrderData.orderStatus !== "Delivered" &&
+                  userOrderData.orderStatus !== "Order Picked up" ? (
                     <select
                       onChange={(e) =>
                         changeOrderStatus(
@@ -231,7 +240,7 @@ const SingleOrder = () => {
                       <option value="Cancelled">Cancelled</option>
                     </select>
                   ) : (
-                    <span className="itemValue">
+                    <span className={orderStatusClassName}>
                       {userOrderData.orderStatus}
                     </span>
                   )}
@@ -249,40 +258,23 @@ const SingleOrder = () => {
                   </div>
                 )}
 
+                {/*------------------ settlement Options ------------------*/}
+                {userOrderData.settlementOptions && (
+                  <div className="detailItem">
+                    <span className="itemKey">Settlement Options:</span>
+                    <span className="itemValue">
+                      {userOrderData.settlementOptions}
+                    </span>
+                  </div>
+                )}
+
                 {/*------------------ Proof of Payment Issue ------------------*/}
-                {/* {userOrderData.proofOfPaymentURL != null &&
-                  userOrderData.orderPayment === "GCash" && (
-                    <>
-                      {userOrderData?.orderStatus !== "Cancelled" &&
-                        userOrderData?.orderStatus !== "Delivered" && (
-                          <div className="detailItem">
-                            <span className="itemKey">
-                              Proof of Payment Issue:&nbsp;
-                            </span>
-                            <select
-                              onChange={(e) =>
-                                handleProofOfPaymentIssue(e.target.value)
-                              }
-                              value={userOrderData.proofOfPaymentIssue || ""}
-                            >
-                              <option value="" disabled>
-                                ---Select---
-                              </option>
-                              <option value="Insufficient Payment Amount">
-                                Insufficient Payment Amount
-                              </option>
-                              <option value="Invalid Proof of Payment">
-                                Invalid Proof of Payment
-                              </option>
-                            </select>
-                          </div>
-                        )}
-                    </>
-                  )} */}
                 {userOrderData.proofOfPaymentURL != null &&
                 userOrderData.orderPayment === "GCash" &&
                 userOrderData.orderStatus !== "Cancelled" &&
-                userOrderData.orderStatus !== "Delivered" ? (
+                userOrderData.orderStatus !== "Delivered" &&
+                userOrderData.orderStatus !== "Confirmed" &&
+                userOrderData.orderStatus !== "Prepared" ? (
                   <div className="detailItem">
                     <span className="itemKey">
                       Proof of Payment Issue:&nbsp;
@@ -310,7 +302,9 @@ const SingleOrder = () => {
                       <span className="itemKey">
                         Proof of Payment Issue:&nbsp;
                       </span>
-                      {userOrderData.proofOfPaymentIssue}
+                      <span className="itemValue">
+                        {userOrderData.proofOfPaymentIssue}
+                      </span>
                     </div>
                   )
                 )}
