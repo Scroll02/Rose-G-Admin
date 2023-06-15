@@ -17,7 +17,8 @@ export const userColumns = [
       return (
         <div className="cellWithImg">
           {params.row.profileImageUrl == "" ||
-          params.row.profileImageUrl == null ? (
+          params.row.profileImageUrl == null ||
+          params.row.profileImageUrl == undefined ? (
             <img
               className="cellImg"
               src={defaultUserIcon}
@@ -60,36 +61,6 @@ export const userColumns = [
     width: 160,
     headerClassName: "headerName",
   },
-  // {
-  //   field: "status",
-  //   headerName: "Status",
-  //   width: 160,
-  //   headerClassName: "headerName",
-  //   renderCell: (params) => {
-  //     return (
-  //       <div className={`cellWithStatus ${params.row.status}`}>
-  //         {params.row.status}
-  //       </div>
-  //     );
-  //   },
-  // },
-
-  // {
-  //   field: "isVerified",
-  //   headerName: "Email Verified",
-  //   width: 150,
-  //   renderCell: (params) => {
-  //     return params.row.isVerified ? (
-  //       <div className={`cellWithIsVerified ${params.row.status}`}>
-  //         Verified
-  //       </div>
-  //     ) : (
-  //       <div className={`cellWithIsVerified ${params.row.status}`}>
-  //         Not Verified
-  //       </div>
-  //     );
-  //   },
-  // },
 
   {
     field: "emailVerified",

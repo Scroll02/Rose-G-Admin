@@ -137,6 +137,134 @@ const NewUser = ({ inputs, title }) => {
   //------------------ Add New User Function ------------------//
   const [selectedUserRole, setSelectedUserRole] = useState("");
   var bcrypt = require("bcryptjs");
+  // const handleAdd = async (e) => {
+  //   e.preventDefault();
+  //   // Check if any input field is empty
+  //   if (
+  //     !data.firstName ||
+  //     !data.lastName ||
+  //     !data.email ||
+  //     !data.contactNumber ||
+  //     !selectedUserRole
+  //   ) {
+  //     showErrorToast("Please fill out all input fields.", 2000);
+  //     return;
+  //   }
+
+  //   // Check if all input fields meet the regex
+  //   if (
+  //     checkFirstName ||
+  //     checkLastName ||
+  //     checkValidEmail ||
+  //     checkContactNumber
+  //   ) {
+  //     setInputError((prevError) => ({
+  //       ...prevError,
+  //       cPassword: "Confirm Password must match Password.",
+  //     }));
+  //     return;
+  //   }
+
+  //   try {
+  //     const currentUser = auth.currentUser;
+  //     const userId = currentUser.uid;
+
+  //     const userDocRef = doc(db, "UserData", userId);
+  //     const userDocSnapshot = await getDoc(userDocRef);
+
+  //     if (userDocSnapshot.exists()) {
+  //       const userData = userDocSnapshot.data();
+  //       const firstName = userData.firstName;
+  //       const lastName = userData.lastName;
+  //       const profileImageUrl = userData.profileImageUrl;
+  //       const role = userData.role;
+
+  //       const monthDocumentId = moment().format("YYYY-MM");
+
+  //       const activityLogDocRef = doc(db, "ActivityLog", monthDocumentId);
+  //       const activityLogDocSnapshot = await getDoc(activityLogDocRef);
+  //       const activityLogData = activityLogDocSnapshot.exists()
+  //         ? activityLogDocSnapshot.data().actionLogData || []
+  //         : [];
+
+  //       const createdFields = [];
+
+  //       Object.entries(data).forEach(([field, value]) => {
+  //         if (field !== "password" && field !== "cPassword") {
+  //           createdFields.push({
+  //             field: field,
+  //             value: value,
+  //           });
+  //         }
+  //       });
+
+  //       activityLogData.push({
+  //         timestamp: new Date().toISOString(),
+  //         createdFields: createdFields,
+  //         userId: userId,
+  //         firstName: firstName,
+  //         lastName: lastName,
+  //         profileImageUrl: profileImageUrl,
+  //         role: role,
+  //         actionType: "Create",
+  //         actionDescription: "Created user data",
+  //       });
+
+  //       const res = await createUserWithEmailAndPassword(
+  //         auth,
+  //         data.email,
+  //         data.password
+  //       );
+
+  //       let downloadURL = null;
+
+  //       if (file) {
+  //         const storageRef = ref(
+  //           storage,
+  //           `userProfile_images/${res.user.uid}/${new Date().getTime()}_${
+  //             file.name
+  //           }`
+  //         );
+  //         const uploadTask = uploadBytesResumable(storageRef, file);
+  //         const snapshot = await uploadTask;
+  //         downloadURL = await getDownloadURL(snapshot.ref);
+  //       }
+
+  //       const newDocRef = doc(collection(db, "UserData"), res.user.uid);
+  //       await setDoc(newDocRef, {
+  //         ...data,
+  //         profileImageUrl: downloadURL || "",
+  //         createdAt: serverTimestamp(),
+  //         emailVerified: "Not Verified",
+  //         role: selectedUserRole,
+  //         uid: res.user.uid,
+  //       });
+
+  //       await setDoc(
+  //         activityLogDocRef,
+  //         {
+  //           actionLogData: activityLogData,
+  //         },
+  //         { merge: true }
+  //       );
+
+  //       navigate("/users");
+  //       showSuccessToast("New user is created", 2000);
+  //     } else {
+  //       showInfoToast("No user data");
+  //     }
+  //   } catch (err) {
+  //     let errorMessage = "Failed to create user";
+
+  //     if (err.code === "auth/email-already-in-use") {
+  //       errorMessage = "Email address is already in use";
+  //     } else if (err.code === "auth/weak-password") {
+  //       errorMessage = "Password is too weak";
+  //     }
+  //     showErrorToast(errorMessage, 2000);
+  //   }
+  // };
+
   const handleAdd = async (e) => {
     e.preventDefault();
     // Check if any input field is empty
@@ -248,7 +376,7 @@ const NewUser = ({ inputs, title }) => {
           { merge: true }
         );
 
-        navigate(-1);
+        navigate("/users");
         showSuccessToast("New user is created", 2000);
       } else {
         showInfoToast("No user data");

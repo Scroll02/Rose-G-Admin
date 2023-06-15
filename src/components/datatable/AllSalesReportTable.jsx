@@ -100,6 +100,7 @@ const AllSalesReportTable = () => {
       return;
     }
 
+    const formattedDate = moment(selectedDate).format("MMMM DD, YYYY");
     const currentDate = moment().format("MMMM DD, YYYY");
     const table = document.querySelector("table");
     const csvString = [
@@ -112,7 +113,7 @@ const AllSalesReportTable = () => {
       )
       .join("\n");
 
-    const filename = `sales_report_${currentDate}.csv`;
+    const filename = `sales_report_${formattedDate}.csv`;
     const blob = new Blob(["\ufeff", csvString], {
       type: "text/csv;charset=utf-8;",
     });

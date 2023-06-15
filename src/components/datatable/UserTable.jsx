@@ -8,6 +8,7 @@ import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import AddIcon from "@mui/icons-material/Add";
+import moment from "moment";
 // Firebase
 import {
   collection,
@@ -15,6 +16,8 @@ import {
   doc,
   onSnapshot,
   getDocs,
+  getDoc,
+  setDoc,
 } from "firebase/firestore";
 import { onAuthStateChanged, deleteUser } from "firebase/auth";
 import { db, storage, auth } from "../../firebase";
@@ -59,49 +62,6 @@ const UserTable = () => {
 
   //------------------ Delete User Data  ------------------//
   const [selectedUserId, setSelectedUserId] = useState(null);
-  // const handleDelete = async () => {
-  //   try {
-  //     const user = data.find((item) => item.id === selectedUserId);
-  //     if (user.profileImageUrl) {
-  //       const storageRef = ref(storage, user.profileImageUrl);
-  //       await deleteObject(storageRef);
-  //     }
-
-  //     await deleteDoc(doc(db, "UserData", selectedUserId));
-  //     setData(data.filter((item) => item.id !== selectedUserId));
-  //     showSuccessToast("User data is successfully deleted", 2000);
-  //   } catch (err) {
-  //     console.log(err);
-  //     showErrorToast("Error deleting user", 2000);
-  //   }
-  // };
-
-  // This delete function, deletes data from firestore database and authentication
-  // const handleDelete = async (id, email) => {
-  //   try {
-  //     const user = auth.currentUser;
-
-  //     if (user && user.email === email) {
-  //       // Delete the user's authentication identifier
-  //       await auth.deleteUser(user);
-
-  //       // Delete the user's data in Firestore
-  //       await deleteDoc(doc(db, "UserData", id));
-
-  //       setData(data.filter((item) => item.id !== id));
-  //       showErrorToast("User data is deleted", 1000);
-  //     } else {
-  //       showErrorToast("You are not authorized to delete this user", 1000);
-  //     }
-  //   } catch (err) {
-  //     console.log(err);
-  //   }
-  // };
-
-  // Modal
-
-  // Modal
-
   const handleDelete = async () => {
     try {
       const user = data.find((item) => item.id === selectedUserId);
@@ -132,6 +92,76 @@ const UserTable = () => {
       showErrorToast("Error deleting user", 2000);
     }
   };
+  // const handleDelete = async () => {
+  //   try {
+  //     const user = data.find((item) => item.id === selectedUserId);
+
+  //     // Delete the user's profile image from storage
+  //     if (user.profileImageUrl) {
+  //       const storageRef = ref(storage, user.profileImageUrl);
+  //       await deleteObject(storageRef);
+  //     }
+
+  //     // Get the current user
+  //     const currentUser = auth.currentUser;
+
+  //     if (currentUser && currentUser.uid === user.uid) {
+  //       const deletedFields = [];
+
+  //       // Add user fields to the deletedFields array
+  //       Object.entries(user).forEach(([field, value]) => {
+  //         if (value !== undefined) {
+  //           deletedFields.push({
+  //             field: field,
+  //             value: value,
+  //           });
+  //         }
+  //       });
+
+  //       // Delete the user's authentication identifier
+  //       await currentUser.delete();
+
+  //       // Delete the user's data in Firestore
+  //       await deleteDoc(doc(db, "UserData", selectedUserId));
+
+  //       const monthDocumentId = moment().format("YYYY-MM");
+
+  //       const activityLogDocRef = doc(db, "ActivityLog", monthDocumentId);
+  //       const activityLogDocSnapshot = await getDoc(activityLogDocRef);
+  //       const activityLogData = activityLogDocSnapshot.exists()
+  //         ? activityLogDocSnapshot.data().actionLogData || []
+  //         : [];
+
+  //       activityLogData.push({
+  //         timestamp: new Date().toISOString(),
+  //         deletedFields: deletedFields,
+  //         userId: currentUser.uid,
+  //         firstName: currentUser.firstName || "",
+  //         lastName: currentUser.lastName || "",
+  //         profileImageUrl: currentUser.profileImageUrl || "",
+  //         role: currentUser.role || "",
+  //         actionType: "Delete",
+  //         actionDescription: "Deleted user data",
+  //       });
+
+  //       await setDoc(
+  //         activityLogDocRef,
+  //         {
+  //           actionLogData: activityLogData,
+  //         },
+  //         { merge: true }
+  //       );
+
+  //       setData(data.filter((item) => item.id !== selectedUserId));
+  //       showSuccessToast("User data is successfully deleted", 2000);
+  //     } else {
+  //       showErrorToast("You are not authorized to delete this user", 2000);
+  //     }
+  //   } catch (err) {
+  //     console.log(err);
+  //     showErrorToast("Error deleting user", 2000);
+  //   }
+  // };
 
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const closeConfirmationModal = () => {

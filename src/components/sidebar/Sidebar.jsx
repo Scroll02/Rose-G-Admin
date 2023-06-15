@@ -53,7 +53,7 @@ const Sidebar = () => {
       }
     };
     fetchCurrentUserRole();
-  }, [currentUser]);
+  }, []);
 
   //------------------ User Orders Data ------------------//
   const [orderCount, setOrderCount] = useState(0);

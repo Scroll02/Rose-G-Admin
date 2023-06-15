@@ -81,7 +81,9 @@ const SingleActionLog = () => {
                 {/*------------------ Action Description ------------------*/}
                 <div className="detailItem">
                   <span className="itemKey">Action Description:</span>
-                  <span className="itemValue">{data?.actionDescription}</span>
+                  <span className="itemValue">
+                    {data?.actionDescription || ""}
+                  </span>
                 </div>
 
                 {/*------------------ Time Stamp ------------------*/}
