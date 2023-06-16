@@ -35,6 +35,7 @@ const ProductTable = () => {
   const [data, setData] = useState([]);
   const [searchValue, setSearchValue] = useState("");
   const [selectedColumn, setSelectedColumn] = useState("productName");
+  const [resetTime, setResetTime] = useState(null);
 
   //------------------ Retrieve Product Data ------------------//
   // Once stock is below or less than criticalStock that product will displayed first on the table
